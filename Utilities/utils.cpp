@@ -1,9 +1,10 @@
-#include "usefullshit.h"
+#include "utils.h"
 #include <Windows.h>
 #include <string>
 #include <iostream>
 #include <iomanip>
 #include <conio.h>
+#include <vector>
 
 void consoleBundle()
 {
@@ -58,8 +59,14 @@ void pressKey(INPUT& input)
 	input.ki.dwFlags = 0;
 }
 
-void humanType(std::vector<UINT16> keys)
+void humanType(const std::string &toWrite)
 {
+	HKL currentKBL = GetKeyboardLayout(0);
+	std::vector<short> keys{};
+	for (short i = 0; i < toWrite.length(); ++i)
+		keys.push_back(VkKeyScanExA(toWrite.at(i), currentKBL));
+	
+
 	INPUT input{};
 	input.type = INPUT_KEYBOARD;
 	for (UINT16 i = 0; i < keys.size(); ++i)
@@ -79,10 +86,7 @@ void copyToClipBoard(const std::string& dataToCopy)
 		HGLOBAL hGlobalAlloc = GlobalAlloc(GMEM_MOVEABLE, dataToCopy.size() + 1);
 
 		if (!hGlobalAlloc)
-		{
 			std::cout << "Failed to get a handle to the globalAlloc" << '\n';
-			Sleep(5000);
-		}
 		else
 		{
 			memcpy(GlobalLock(hGlobalAlloc), dataToCopy.c_str(), dataToCopy.size() + 1);
@@ -98,4 +102,31 @@ void copyToClipBoard(const std::string& dataToCopy)
 	}
 	else
 		std::cout << "Failed to open clipboard" << '\n';
+}
+
+
+/***********************/
+/*     MOUSE UTILS     */
+/***********************/
+void leftClickDown()
+{
+	INPUT mouseDown{};
+	mouseDown.type = INPUT_MOUSE;
+	mouseDown.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+	SendInput(1, &mouseDown, sizeof(INPUT));
+}
+
+void leftClickUp()
+{
+	INPUT mouseUp{};
+	mouseUp.type = INPUT_MOUSE;
+	mouseUp.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+	SendInput(1, &mouseUp, sizeof(INPUT));
+}
+
+void e_click(const int& holdTime)
+{
+	leftClickDown();
+	Sleep(holdTime);
+	leftClickUp();
 }
