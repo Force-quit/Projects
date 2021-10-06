@@ -1,26 +1,24 @@
 #include "utils.h"
-#include <Windows.h>
 #include <string>
-#include <iostream>
-#include <iomanip>
-#include <conio.h>
+#include <Windows.h>
 #include <vector>
+#include <iostream>
 
-void consoleBundle()
+void e_consoleBundle()
 {
-	preventConsoleResize();
-	hideCursor();
-	disableQuickEdit();
-	hideScrollingBar();
+	e_preventConsoleResize();
+	e_hideCursor();
+	e_disableQuickEdit();
+	e_hideScrollingBar();
 }
 
-void preventConsoleResize()
+void e_preventConsoleResize()
 {
 	HWND consoleWindow = GetConsoleWindow();
 	SetWindowLong(consoleWindow, GWL_STYLE, GetWindowLong(consoleWindow, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 }
 
-void hideCursor()
+void e_hideCursor()
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO lpCursor{};
@@ -29,7 +27,7 @@ void hideCursor()
 	SetConsoleCursorInfo(console, &lpCursor);
 }
 
-void disableQuickEdit()
+void e_disableQuickEdit()
 {
 	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
 	DWORD prev_mode;
@@ -37,7 +35,7 @@ void disableQuickEdit()
 	SetConsoleMode(hInput, prev_mode & ~ENABLE_QUICK_EDIT_MODE);
 }
 
-void hideScrollingBar()
+void e_hideScrollingBar()
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO info;
@@ -50,7 +48,7 @@ void hideScrollingBar()
 	SetConsoleScreenBufferSize(handle, new_size);
 }
 
-void pressKey(INPUT& input)
+void e_pressKey(INPUT& input)
 {
 	SendInput(1, &input, sizeof(INPUT));
 	Sleep(40);
@@ -59,7 +57,7 @@ void pressKey(INPUT& input)
 	input.ki.dwFlags = 0;
 }
 
-void humanType(const std::string &toWrite)
+void e_humanType(const std::string &toWrite)
 {
 	HKL currentKBL = GetKeyboardLayout(0);
 	std::vector<short> keys{};
@@ -72,12 +70,12 @@ void humanType(const std::string &toWrite)
 	for (UINT16 i = 0; i < keys.size(); ++i)
 	{
 		input.ki.wVk = keys[i];
-		pressKey(input);
+		e_pressKey(input);
 		Sleep(50);
 	}
 }
 
-void copyToClipBoard(const std::string& dataToCopy)
+void e_copyToClipBoard(const std::string& dataToCopy)
 {
 	if (OpenClipboard(GetActiveWindow()))
 	{
@@ -108,7 +106,7 @@ void copyToClipBoard(const std::string& dataToCopy)
 /***********************/
 /*     MOUSE UTILS     */
 /***********************/
-void leftClickDown()
+void e_leftClickDown()
 {
 	INPUT mouseDown{};
 	mouseDown.type = INPUT_MOUSE;
@@ -116,7 +114,7 @@ void leftClickDown()
 	SendInput(1, &mouseDown, sizeof(INPUT));
 }
 
-void leftClickUp()
+void e_leftClickUp()
 {
 	INPUT mouseUp{};
 	mouseUp.type = INPUT_MOUSE;
@@ -126,7 +124,7 @@ void leftClickUp()
 
 void e_click(const int& holdTime)
 {
-	leftClickDown();
+	e_leftClickDown();
 	Sleep(holdTime);
-	leftClickUp();
+	e_leftClickUp();
 }
