@@ -4,6 +4,12 @@
 #include <vector>
 #include <iostream>
 
+void e_flushTampon()
+{
+	std::cin.clear();
+	std::cin.ignore(std::cin.rdbuf()->in_avail());
+}
+
 void e_consoleBundle()
 {
 	e_preventConsoleResize();
@@ -47,6 +53,23 @@ void e_hideScrollingBar()
 	};
 	SetConsoleScreenBufferSize(handle, new_size);
 }
+
+std::string e_passwordGenerator(const std::string& alphabet, const unsigned short& passwordLength)
+{
+	unsigned short randNb;
+	std::string password{};
+	for (UINT16 i = 0; i < passwordLength; ++i)
+	{
+		randNb = rand();
+		randNb %= alphabet.size();
+		password += alphabet[randNb];
+	}
+	return password;
+}
+
+/**************************/
+/*     KEYBOARD UTILS     */
+/**************************/
 
 void e_pressKey(INPUT& input)
 {
@@ -102,10 +125,10 @@ void e_copyToClipBoard(const std::string& dataToCopy)
 		std::cout << "Failed to open clipboard" << '\n';
 }
 
-
 /***********************/
 /*     MOUSE UTILS     */
 /***********************/
+
 void e_leftClickDown()
 {
 	INPUT mouseDown{};
@@ -122,7 +145,7 @@ void e_leftClickUp()
 	SendInput(1, &mouseUp, sizeof(INPUT));
 }
 
-void e_click(const int& holdTime)
+void e_leftClick(const int& holdTime)
 {
 	e_leftClickDown();
 	Sleep(holdTime);
