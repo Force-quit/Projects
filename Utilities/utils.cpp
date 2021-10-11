@@ -129,6 +129,8 @@ void e_copyToClipBoard(const std::string& dataToCopy)
 /*     MOUSE UTILS     */
 /***********************/
 
+// LEFT CLICK
+
 void e_leftClickDown()
 {
 	INPUT mouseDown{};
@@ -150,4 +152,29 @@ void e_leftClick(const int& holdTime)
 	e_leftClickDown();
 	Sleep(holdTime);
 	e_leftClickUp();
+}
+
+// RIGHT CLICK
+
+void e_rightClickDown()
+{
+	INPUT mouseDown{};
+	mouseDown.type = INPUT_MOUSE;
+	mouseDown.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+	SendInput(1, &mouseDown, sizeof(INPUT));
+}
+
+void e_rightClickUp()
+{
+	INPUT mouseDown{};
+	mouseDown.type = INPUT_MOUSE;
+	mouseDown.mi.dwFlags = MOUSEEVENTF_RIGHTUP;
+	SendInput(1, &mouseDown, sizeof(INPUT));
+}
+
+void e_rightClick(const int& holdTime)
+{
+	e_rightClickDown();
+	Sleep(holdTime);
+	e_rightClickUp();
 }

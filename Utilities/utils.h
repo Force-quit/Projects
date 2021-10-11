@@ -29,6 +29,8 @@ void e_humanType(const std::string& toWrite);
 // Copy a string into windows's clipboard
 void e_copyToClipBoard(const std::string &dataToCopy);
 
+
+
 // Simulate a left mouse button down
 void e_leftClickDown();
 
@@ -37,3 +39,13 @@ void e_leftClickUp();
 
 // Simulate a left click
 void e_leftClick(const int& holdTime = 30);
+
+
+// Simulate a right mouse button down
+void e_rightClickDown();
+
+// Simulate a right mouse button up
+void e_rightClickUp();
+
+// Simulate a right click
+void e_rightClick(const int& holdTime = 30);
