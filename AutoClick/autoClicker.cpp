@@ -11,19 +11,23 @@ int main()
 
 	std::cout << "AutoClicker" << std::endl;
 	std::cout << "---------------------------------" << std::endl;
+
+	do
+	{
+		e_flushTampon();
+		std::cout << "Click hold time : ";
+		std::cin >> clickHoldTime;
+	} while (std::cin.fail());
+
 	do
 	{
 		e_flushTampon();
 		std::cout << "Time between clicks : ";
 		std::cin >> timeBetween;
-	} while (std::cin.fail() || timeBetween == 0);
+	} while (std::cin.fail());
 
-	do
-	{
-		e_flushTampon();
-		std::cout << "Click time : ";
-		std::cin >> clickHoldTime;
-	} while (std::cin.fail() || clickHoldTime == 0);
+	if (timeBetween == 0)
+		timeBetween = 1;
 
 	std::cout << "Q : quit program" << std::endl;
 	std::cout << "X : enable/disable" << std::endl;
@@ -34,7 +38,8 @@ int main()
 
 	GetAsyncKeyState('X');
 	GetAsyncKeyState('Q');
-	while (true)
+
+	while (!GetAsyncKeyState('Q'))
 	{
 		if (GetAsyncKeyState('X'))
 		{
@@ -50,12 +55,8 @@ int main()
 
 		if (clicking)
 			e_leftClick(clickHoldTime);
-	
+
 		Sleep(timeBetween);
-
-		if (GetAsyncKeyState('Q'))
-			break;
-
 	}
 	return 0;
 }
