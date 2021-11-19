@@ -5,7 +5,7 @@
 #include <string>
 #include <conio.h>
 #include "../Console(v1.9)/console(v1.9).h"
-#include "../Utilities/usefullshit.h"
+#include "../Utilities/utils.h"
 
 double inputValidation();
 void getProcessId(DWORD& procId, LPCSTR lpWindowName);
@@ -103,7 +103,7 @@ short menuSelection()
 	short returnValue;
 	do
 	{
-		flushTampons();
+		emile::flushTampon();
 		answer = toupper(_getch());
 		switch (answer)
 		{
@@ -240,7 +240,7 @@ double inputValidation()
 	while (true)
 	{
 		std::cout << "Value to write (not negative): ";
-		flushTampons();
+		emile::flushTampon();
 		x = wherex();
 		y = wherey();
 		std::cin >> answer;
