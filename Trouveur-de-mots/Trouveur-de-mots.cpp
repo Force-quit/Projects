@@ -82,7 +82,7 @@ int main()
 			{
 				do
 				{
-					e_flushTampon();
+					emile::flushTampon();
 					std::cout << "Numéro du mot à copier : ";
 					std::cin >> choice;
 				} while (std::cin.fail() || choice > map.size() || choice < 0);
@@ -90,7 +90,7 @@ int main()
 				if (choice == 0)
 					continue;
 
-				e_copyToClipBoard(map.at(choice));
+				emile::copyToClipBoard(map.at(choice));
 				std::cout << "Mot copié dans le clipboard windows\n";
 			}
 			else

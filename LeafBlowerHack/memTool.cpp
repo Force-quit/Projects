@@ -6,7 +6,7 @@
 #include <Psapi.h>
 #include <conio.h>
 #include <tchar.h>
-#include "Utilities/usefullshit.h"
+#include "../Utilities/utils.h"
 
 // Prototypes
 DWORD getProcessId(const wchar_t processName[]);
@@ -121,7 +121,7 @@ int main()
 
 		do
 		{
-			flushTampons();
+			emile::flushTampon();
 			if (!writeToMemory(hProcess, (void*)targetAddress))
 				break;
 		} while (true);
