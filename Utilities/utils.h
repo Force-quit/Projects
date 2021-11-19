@@ -3,49 +3,56 @@
 #include <Windows.h>
 #include <vector>
 
-// Resets std::cin
-void e_flushTampon();
+namespace emile
+{
+	// Resets std::cin
+	void flushTampon();
 
-void e_consoleBundle();
-void e_preventConsoleResize();
-void e_hideCursor();
-void e_disableQuickEdit();
-void e_hideScrollingBar();
+	void consoleBundle();
+	void preventConsoleResize();
+	void hideCursor();
+	void disableQuickEdit();
+	void hideScrollingBar();
 
-std::string e_passwordGenerator(const std::string& alphabet, const unsigned short& passwordLength);
+	std::string passwordGenerator(const std::string& alphabet, const unsigned short& passwordLength);
 
-// Simulate a key press
-void e_pressKey(const unsigned char& key);
+	//////////////////////////////
+	// KEYBOARD AND MOUSE INPUT //
+	//////////////////////////////
 
-// Simulate a key release
-void e_releaseKey(const unsigned char& key);
+	void pressKey(const char& key);
+	void pressKey(const int& keyCode);
+	void pressKey(INPUT& input);
+	void releaseKey(const char& key);
+	void releaseKey(const int& keyCode);
+	void releaseKey(INPUT& input);
+	void fullKeyPress(const char& key);
+	void fullKeyPress(const int& keyCode);
+	void fullKeyPress(INPUT& input);
 
-// Simulate a key press and release
-void e_pressKey(const INPUT& input);
+	// Simulate the typing of a string
+	void humanType(const std::string& toWrite);
 
-// Simulate the typing of a string
-void e_humanType(const std::string& toWrite);
+	// Copy a string into windows's clipboard
+	void copyToClipBoard(const std::string& dataToCopy);
 
-// Copy a string into windows's clipboard
-void e_copyToClipBoard(const std::string &dataToCopy);
+	// Simulate a left mouse button down
+	void leftClickDown();
 
+	// Simulate a left mouse button up
+	void leftClickUp();
 
-
-// Simulate a left mouse button down
-void e_leftClickDown();
-
-// Simulate a left mouse button up
-void e_leftClickUp();
-
-// Simulate a left click
-void e_leftClick(const int& holdTime = 30);
+	// Simulate a left click
+	void leftClick(const int& holdTime = 30);
 
 
-// Simulate a right mouse button down
-void e_rightClickDown();
+	// Simulate a right mouse button down
+	void rightClickDown();
 
-// Simulate a right mouse button up
-void e_rightClickUp();
+	// Simulate a right mouse button up
+	void rightClickUp();
 
-// Simulate a right click
-void e_rightClick(const int& holdTime = 30);
+	// Simulate a right click
+	void rightClick(const int& holdTime = 30);
+
+}

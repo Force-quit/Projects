@@ -4,27 +4,27 @@
 #include <vector>
 #include <iostream>
 
-void e_flushTampon()
+void emile::flushTampon()
 {
 	std::cin.clear();
 	std::cin.ignore(std::cin.rdbuf()->in_avail());
 }
 
-void e_consoleBundle()
+void emile::consoleBundle()
 {
-	e_preventConsoleResize();
-	e_hideCursor();
-	e_disableQuickEdit();
-	e_hideScrollingBar();
+	emile::preventConsoleResize();
+	emile::hideCursor();
+	emile::disableQuickEdit();
+	emile::hideScrollingBar();
 }
 
-void e_preventConsoleResize()
+void emile::preventConsoleResize()
 {
 	HWND consoleWindow = GetConsoleWindow();
 	SetWindowLong(consoleWindow, GWL_STYLE, GetWindowLong(consoleWindow, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 }
 
-void e_hideCursor()
+void emile::hideCursor()
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO lpCursor{};
@@ -33,7 +33,7 @@ void e_hideCursor()
 	SetConsoleCursorInfo(console, &lpCursor);
 }
 
-void e_disableQuickEdit()
+void emile::disableQuickEdit()
 {
 	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
 	DWORD prev_mode;
@@ -41,7 +41,7 @@ void e_disableQuickEdit()
 	SetConsoleMode(hInput, prev_mode & ~ENABLE_QUICK_EDIT_MODE);
 }
 
-void e_hideScrollingBar()
+void emile::hideScrollingBar()
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO info;
@@ -54,7 +54,7 @@ void e_hideScrollingBar()
 	SetConsoleScreenBufferSize(handle, new_size);
 }
 
-std::string e_passwordGenerator(const std::string& alphabet, const unsigned short& passwordLength)
+std::string emile::passwordGenerator(const std::string& alphabet, const unsigned short& passwordLength)
 {
 	unsigned short randNb;
 	std::string password{};
@@ -71,18 +71,74 @@ std::string e_passwordGenerator(const std::string& alphabet, const unsigned shor
 /*     KEYBOARD UTILS     */
 /**************************/
 
-void e_pressKey(INPUT& input)
+void emile::pressKey(const char& key)
 {
+	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
+	emile::pressKey(keyCode);
+}
+
+void emile::pressKey(const int& keyCode)
+{
+	INPUT i{};
+	i.type = INPUT_KEYBOARD;
+	i.ki.wVk = keyCode;
+
+	emile::pressKey(i);
+}
+
+void emile::pressKey(INPUT& input)
+{
+	input.ki.dwFlags = 0;
+	SendInput(1, &input, sizeof(INPUT));
+}
+
+void emile::releaseKey(const char& key)
+{
+	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
+	emile::releaseKey(keyCode);
+}
+
+void emile::releaseKey(const int& keyCode)
+{
+	INPUT i{};
+	i.type = INPUT_KEYBOARD;
+	i.ki.wVk = keyCode;
+	emile::releaseKey(i);
+}
+
+void emile::releaseKey(INPUT& input)
+{
+	input.ki.dwFlags = KEYEVENTF_KEYUP;
+	SendInput(1, &input, sizeof(INPUT));
+}
+
+void emile::fullKeyPress(const char& key)
+{
+	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
+	emile::fullKeyPress(keyCode);
+}
+
+void emile::fullKeyPress(const int& keyCode)
+{
+	INPUT i{};
+	i.type = INPUT_KEYBOARD;
+	i.ki.wVk = keyCode;
+
+	emile::fullKeyPress(i);
+}
+
+void emile::fullKeyPress(INPUT& input)
+{
+	input.ki.dwFlags = 0;
 	SendInput(1, &input, sizeof(INPUT));
 	Sleep(40);
 	input.ki.dwFlags = KEYEVENTF_KEYUP;
 	SendInput(1, &input, sizeof(INPUT));
-	input.ki.dwFlags = 0;
 }
 
-void e_humanType(const std::string &toWrite)
+void emile::humanType(const std::string &toWrite)
 {
-	HKL currentKBL = GetKeyboardLayout(0);
+	const HKL currentKBL = GetKeyboardLayout(0);
 	std::vector<short> keys{};
 	for (short i = 0; i < toWrite.length(); ++i)
 		keys.push_back(VkKeyScanExA(toWrite.at(i), currentKBL));
@@ -93,12 +149,12 @@ void e_humanType(const std::string &toWrite)
 	for (UINT16 i = 0; i < keys.size(); ++i)
 	{
 		input.ki.wVk = keys[i];
-		e_pressKey(input);
+		emile::pressKey(input);
 		Sleep(50);
 	}
 }
 
-void e_copyToClipBoard(const std::string& dataToCopy)
+void emile::copyToClipBoard(const std::string& dataToCopy)
 {
 	if (OpenClipboard(GetActiveWindow()))
 	{
@@ -131,7 +187,7 @@ void e_copyToClipBoard(const std::string& dataToCopy)
 
 // LEFT CLICK
 
-void e_leftClickDown()
+void emile::leftClickDown()
 {
 	INPUT mouseDown{};
 	mouseDown.type = INPUT_MOUSE;
@@ -139,7 +195,7 @@ void e_leftClickDown()
 	SendInput(1, &mouseDown, sizeof(INPUT));
 }
 
-void e_leftClickUp()
+void emile::leftClickUp()
 {
 	INPUT mouseUp{};
 	mouseUp.type = INPUT_MOUSE;
@@ -147,16 +203,16 @@ void e_leftClickUp()
 	SendInput(1, &mouseUp, sizeof(INPUT));
 }
 
-void e_leftClick(const int& holdTime)
+void emile::leftClick(const int& holdTime)
 {
-	e_leftClickDown();
+	emile::leftClickDown();
 	Sleep(holdTime);
-	e_leftClickUp();
+	emile::leftClickUp();
 }
 
 // RIGHT CLICK
 
-void e_rightClickDown()
+void emile::rightClickDown()
 {
 	INPUT mouseDown{};
 	mouseDown.type = INPUT_MOUSE;
@@ -164,7 +220,7 @@ void e_rightClickDown()
 	SendInput(1, &mouseDown, sizeof(INPUT));
 }
 
-void e_rightClickUp()
+void emile::rightClickUp()
 {
 	INPUT mouseDown{};
 	mouseDown.type = INPUT_MOUSE;
@@ -172,9 +228,9 @@ void e_rightClickUp()
 	SendInput(1, &mouseDown, sizeof(INPUT));
 }
 
-void e_rightClick(const int& holdTime)
+void emile::rightClick(const int& holdTime)
 {
-	e_rightClickDown();
+	emile::rightClickDown();
 	Sleep(holdTime);
-	e_rightClickUp();
+	emile::rightClickUp();
 }

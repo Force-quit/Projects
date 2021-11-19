@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <Windows.h>
+#include <iomanip>
 #include <unordered_map>
 #include <memory>
 #include "../Utilities/utils.h"
@@ -18,7 +19,7 @@ std::unordered_map<short, std::string> findWord(const std::unique_ptr<std::strin
 		if (wordList[i].find(subString) != std::string::npos)
 		{
 			++counter;
-			std::cout << counter << ") " << wordList[i] << "\n";
+			std::cout << std::setw(3) << counter << ") " << wordList[i] << "\n";
 			std::pair<short, std::string> mapping(counter, wordList[i]);
 			matches.insert(mapping);
 			if (counter == 25)
@@ -40,28 +41,61 @@ int main()
 	{
 		std::cout << "Ey! Yé où mon fichier texte?";
 		Sleep(5000);
-		return 0;
 	}
-
-	std::unique_ptr<std::string[]> wordList = std::make_unique<std::string[]>(NB_FILE_LINES);
-
-	for (unsigned int i = 0; i < NB_FILE_LINES; i++)
-		std::getline(file, wordList[i]);
-
-	file.close();
-
-	std::string subString{};
-	std::unordered_map<short, std::string> map;
-	short choice{};
-	while (true)
+	else
 	{
-		std::cout << "-------------------------" << '\n';
-		std::cout << "Échantillon de mot à trouver : ";
-		std::cin >> subString;
-		map = findWord(wordList, subString);
-		std::cin >> choice;
-		if (choice <= map.size() && choice >= 1)
-			e_copyToClipBoard(map.at(choice));
+		auto wordList = std::make_unique<std::string[]>(NB_FILE_LINES);
+
+		for (unsigned int i = 0; i < NB_FILE_LINES; i++)
+			std::getline(file, wordList[i]);
+
+		file.close();
+
+		std::string subString{};
+		std::unordered_map<short, std::string> map;
+		short choice{};
+		bool restart{};
+		std::cout << "Trouveur de mots avec échantillon\n";
+		while (true)
+		{
+			std::cout << "-------------------------" << '\n';
+			std::cout << "Échantillon de mot à trouver : ";
+			std::cin >> subString;
+
+			restart = false;
+			for (auto& c : subString)
+			{
+				if (!std::isalpha(c))
+				{
+					restart = true;
+					break;
+				}
+				c = std::tolower(c);
+			}
+				
+
+			if (restart)
+				continue;
+
+			map = findWord(wordList, subString);
+			if (map.size() > 0)
+			{
+				do
+				{
+					e_flushTampon();
+					std::cout << "Numéro du mot à copier : ";
+					std::cin >> choice;
+				} while (std::cin.fail() || choice > map.size() || choice < 0);
+
+				if (choice == 0)
+					continue;
+
+				e_copyToClipBoard(map.at(choice));
+				std::cout << "Mot copié dans le clipboard windows\n";
+			}
+			else
+				std::cout << "Aucun mot avec cet échantillon\n";
+		}
 	}
 
 	return 0;
