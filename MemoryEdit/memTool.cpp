@@ -8,14 +8,12 @@
 #include <tchar.h>
 #include "../Utilities/utils.h"
 
-// Prototypes
 DWORD getProcessId(const wchar_t processName[]);
 USHORT writeToMemory(HANDLE hProcess, void* memoryAdress);
 ULONG64 GetModuleBaseAddress(const wchar_t moduleName[], DWORD pID);
 DWORD getThreadId(DWORD& pid);
 //ULONG64 GetThreadStartAddress(HANDLE hProcess, HANDLE hThread);
 
-// Fonction definitions
 DWORD getProcessId(const wchar_t processName[])
 {
 	HANDLE hProcessSnap{};
@@ -201,5 +199,7 @@ DWORD getThreadId(DWORD &processId)
 
 int main()
 {
+	std::cout << getProcessId(L"System");
+	std::cin.get();
 	return 0;
 }
