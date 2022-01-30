@@ -5,8 +5,8 @@
 
 int main()
 {
-	unsigned short timeBetween{};
-	unsigned short clickHoldTime{};
+	unsigned int timeBetween{};
+	unsigned int clickHoldTime{};
 	SetConsoleTitleA("AutoClicker");
 
 	std::cout << "AutoClicker" << std::endl;
@@ -14,14 +14,14 @@ int main()
 
 	do
 	{
-		e_flushTampon();
+		emile::flushTampon();
 		std::cout << "Click hold time : ";
 		std::cin >> clickHoldTime;
 	} while (std::cin.fail());
 
 	do
 	{
-		e_flushTampon();
+		emile::flushTampon();
 		std::cout << "Time between clicks : ";
 		std::cin >> timeBetween;
 	} while (std::cin.fail());
@@ -54,9 +54,12 @@ int main()
 			keyDown = false;
 
 		if (clicking)
-			e_leftClick(clickHoldTime);
-
-		Sleep(timeBetween);
+		{
+			emile::leftClick(clickHoldTime);
+			Sleep(timeBetween);
+		}
+		else
+			Sleep(1);
 	}
 	return 0;
 }
