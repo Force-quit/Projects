@@ -1,7 +1,7 @@
+#include "../Utilities/utils.h"
+#include "../Console(v1.9)/console(v1.9).h"
 #include <iostream>
 #include <Windows.h>
-#include "../Projects/Utilities/utils.h"
-#include "../Projects/Console(v1.9)/console(v1.9).h"
 
 struct MyPoint
 {
@@ -42,30 +42,27 @@ void drawAndLoadLoop(MyPoint* &firstPoint, MyPoint*& lastPoint, MyPoint*& endPoi
 	}
 }
 
-void playLoop(MyPoint*& firstPoint, MyPoint*& endPoint, short speed = 1, short waitTime = 5)
+void playLoop(MyPoint* const &firstPoint, const MyPoint* &currentPoint, short speed = 1, short waitTime = 5)
 {
 	bool stayInLoop = true;
 	bool moving = true;
 	bool pressedPause = false;
 	bool pressedEscape = false;
 
-	// Reset state??
 	GetAsyncKeyState(VK_ESCAPE);
 	GetAsyncKeyState(VK_SPACE);
-	endPoint = firstPoint;
+	currentPoint = firstPoint;
 	while (stayInLoop)
 	{
 		if (moving)
 		{
-			SetCursorPos(endPoint->p.x, endPoint->p.y);
+			SetCursorPos(currentPoint->p.x, currentPoint->p.y);
 			for (int i = 0; i < speed; ++i)
 			{
-				endPoint = endPoint->nextPoint;
-				if (endPoint == NULL)
-					endPoint = firstPoint;
+				currentPoint = currentPoint->nextPoint;
+				if (currentPoint == NULL)
+					currentPoint = firstPoint;
 			}
-
-
 		}
 
 		if (GetAsyncKeyState(VK_SPACE))
@@ -84,7 +81,6 @@ void playLoop(MyPoint*& firstPoint, MyPoint*& endPoint, short speed = 1, short w
 		else if (pressedEscape)
 			stayInLoop = false;
 
-		
 
 		Sleep(waitTime);
 	}
@@ -98,6 +94,14 @@ int main()
 	char redo;
 	do
 	{
+		std::cout << std::endl << "Press left shift and move your mouse; release shift when done.";
+
+		MyPoint* firstPoint = new MyPoint{};
+		MyPoint* currentPoint = firstPoint;
+		MyPoint* lastPoint = firstPoint;
+
+		drawAndLoadLoop(firstPoint, currentPoint, lastPoint);
+
 		short speed;
 		do
 		{
@@ -114,24 +118,16 @@ int main()
 			std::cin >> waitTime;
 		} while (std::cin.fail() || waitTime < 1);
 
-		std::cout << std::endl << "Press left shift and move your mouse; release shift when done.";
-
-		MyPoint* firstPoint = new MyPoint{};
-		MyPoint* lastPoint = firstPoint;
-		MyPoint* endPoint = firstPoint;
-
-		drawAndLoadLoop(firstPoint, lastPoint, endPoint);
-
 		std::cout << std::endl << "Press space to pause the loop and escape to end it.";
 
-		playLoop(firstPoint, endPoint, speed, waitTime);
+		playLoop(firstPoint, currentPoint, speed, waitTime);
 
-		lastPoint = firstPoint;
-		while (lastPoint != NULL)
+		currentPoint = firstPoint;
+		while (currentPoint != NULL)
 		{
-			firstPoint = lastPoint->nextPoint;
-			delete lastPoint;
-			lastPoint = firstPoint;
+			firstPoint = currentPoint->nextPoint;
+			delete currentPoint;
+			currentPoint = firstPoint;
 		}
 
 		std::cout << "\n\n";

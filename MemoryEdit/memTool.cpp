@@ -6,16 +6,14 @@
 #include <Psapi.h>
 #include <conio.h>
 #include <tchar.h>
-#include "Utilities/usefullshit.h"
+#include "../Utilities/utils.h"
 
-// Prototypes
 DWORD getProcessId(const wchar_t processName[]);
 USHORT writeToMemory(HANDLE hProcess, void* memoryAdress);
 ULONG64 GetModuleBaseAddress(const wchar_t moduleName[], DWORD pID);
-std::vector<ULONG64> threadList(DWORD& pid);
+DWORD getThreadId(DWORD& pid);
 //ULONG64 GetThreadStartAddress(HANDLE hProcess, HANDLE hThread);
 
-// Fonction definitions
 DWORD getProcessId(const wchar_t processName[])
 {
 	HANDLE hProcessSnap{};
@@ -78,7 +76,7 @@ ULONG64 GetModuleBaseAddress(const wchar_t moduleName[], DWORD pID) {
 	return dwModuleBaseAddress;
 }
 
-int main()
+int mainnn()
 {
 	DWORD processId{};
 	do
@@ -121,10 +119,8 @@ int main()
 
 		do
 		{
-			flushTampons();
-			if (!writeToMemory(hProcess, (void*)targetAddress))
-				break;
-		} while (true);
+			emile::flushTampon();
+		} while (writeToMemory(hProcess, (void*)targetAddress));
 	}
 	else
 		std::cout << "OpenProcess failed with code : " << GetLastError();
@@ -135,28 +131,28 @@ int main()
 	return 0;
 }
 
-std::vector<ULONG64> threadList(DWORD &pid) 
+DWORD getThreadId(DWORD &processId) 
 {
-	std::vector<ULONG64> vect = std::vector<ULONG64>();
-	HANDLE h = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-	if (h != INVALID_HANDLE_VALUE)
+	DWORD threadId{};
+	HANDLE allThreadsHandle = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+	if (allThreadsHandle != INVALID_HANDLE_VALUE)
 	{
-		THREADENTRY32 te{};
-		te.dwSize = sizeof(te);
-		if (Thread32First(h, &te))
+		THREADENTRY32 threadEntry{};
+		threadEntry.dwSize = sizeof(threadEntry);
+		if (Thread32First(allThreadsHandle, &threadEntry))
 		{
 			do
 			{
-				if (te.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(te.th32OwnerProcessID))
-					if (te.th32OwnerProcessID == pid)
-						vect.push_back(te.th32ThreadID);
+				if (threadEntry.dwSize >= FIELD_OFFSET(THREADENTRY32, th32OwnerProcessID) + sizeof(threadEntry.th32OwnerProcessID))
+					if (threadEntry.th32OwnerProcessID == processId)
+						return threadEntry.th32ThreadID;
 				
-				te.dwSize = sizeof(te);
-			} while (Thread32Next(h, &te));
+				threadEntry.dwSize = sizeof(threadEntry);
+			} while (Thread32Next(allThreadsHandle, &threadEntry));
 		}
 	}
 
-	return vect;
+	return 0;
 }
 
 //ULONG64 GetThreadStartAddress(HANDLE hProcess, HANDLE hThread)
@@ -200,3 +196,10 @@ std::vector<ULONG64> threadList(DWORD &pid)
 //
 //	return result;
 //}
+
+int main()
+{
+	std::cout << getProcessId(L"System");
+	std::cin.get();
+	return 0;
+}
