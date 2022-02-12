@@ -54,7 +54,6 @@ int main()
 		std::string subString{};
 		std::unordered_map<short, std::string> map;
 		short choice{};
-		bool restart{};
 		std::cout << "Trouveur de mots avec échantillon\n";
 		while (true)
 		{
@@ -62,21 +61,10 @@ int main()
 			std::cout << "Échantillon de mot à trouver : ";
 			std::cin >> subString;
 
-			restart = false;
+			
 			for (auto& c : subString)
-			{
-				if (!std::isalpha(c))
-				{
-					restart = true;
-					break;
-				}
 				c = std::tolower(c);
-			}
-				
-
-			if (restart)
-				continue;
-
+			
 			map = findWord(wordList, subString);
 			if (map.size() > 0)
 			{
