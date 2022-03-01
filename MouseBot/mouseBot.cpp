@@ -42,7 +42,7 @@ void drawAndLoadLoop(MyPoint* &firstPoint, MyPoint*& lastPoint, MyPoint*& endPoi
 	}
 }
 
-void playLoop(MyPoint* const &firstPoint, const MyPoint* &currentPoint, short speed = 1, short waitTime = 5)
+void playLoop(const MyPoint * const firstPoint, const MyPoint* currentPoint, short speed = 1, short waitTime = 5)
 {
 	bool stayInLoop = true;
 	bool moving = true;
@@ -94,7 +94,7 @@ int main()
 	char redo;
 	do
 	{
-		std::cout << std::endl << "Press left shift and move your mouse; release shift when done.";
+		std::cout << std::endl << "Press left shift and move your mouse; release shift when done.\n";
 
 		MyPoint* firstPoint = new MyPoint{};
 		MyPoint* currentPoint = firstPoint;
