@@ -9,7 +9,7 @@ struct MyPoint
 	MyPoint* nextPoint;
 };
 
-void drawAndLoadLoop(MyPoint* &firstPoint, MyPoint*& lastPoint, MyPoint*& endPoint)
+void drawAndLoadLoop(MyPoint* firstPoint, MyPoint* lastPoint, MyPoint* endPoint)
 {
 	POINT p;
 	bool startedLoop = false;
