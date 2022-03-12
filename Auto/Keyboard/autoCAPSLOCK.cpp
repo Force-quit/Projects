@@ -1,65 +1,28 @@
 #include "../../Utilities/utils.h"
 #include <Windows.h>
-#include <iostream>
-
+#include <fstream>
 
 int main()
 {
 	FreeConsole();
-	while (true)
+	std::clock_t start;
+	start = std::clock();
+	while (!GetAsyncKeyState(VK_RCONTROL))
 	{
-		Sleep(30000);
-		if (GetKeyState(VK_CAPITAL) == 0)
+		if (std::clock() - start >= 10000)
 		{
-			emile::fullKeyPress(VK_CAPITAL);
+			if (GetKeyState(VK_CAPITAL) == 0)
+				emile::fullKeyPress(VK_CAPITAL);
+			start = std::clock();
 		}
-
-		if (GetAsyncKeyState(VK_RCONTROL))
-			break;
 	}
 
-	emile::copyToClipBoard("notepad.exe");
-	Sleep(10);
-	emile::pressKey(VK_LWIN);
-	Sleep(10);
+	std::ofstream myfile;
+	myfile.open("jtaieu.txt");
+	myfile << "AHAHAHA! Tu t'es fait avoir par l'équipe de jt'ai eu!";
+	myfile.close();
 
-	emile::pressKey(0x52);
-	Sleep(10);
-
-	emile::releaseKey(VK_LWIN);
-	Sleep(10);
-
-	emile::releaseKey(0x52);
-
-	emile::pressKey(VK_CONTROL);
-	Sleep(10);
-
-	emile::pressKey(0x56);
-	Sleep(10);
-
-	emile::releaseKey(VK_CONTROL);
-	Sleep(10);
-
-	emile::releaseKey(0x56);
-	Sleep(10);
-
-	emile::fullKeyPress(VK_RETURN);
-	Sleep(10);
-
-	emile::copyToClipBoard("AHAHAHA Tu t'es fait avoir par l'equipe de chteu");
-
-	Sleep(10);
-	emile::pressKey(VK_CONTROL);
-	Sleep(10);
-
-	emile::pressKey(0x56);
-	Sleep(10);
-
-	emile::releaseKey(VK_CONTROL);
-	Sleep(10);
-
-	emile::releaseKey(0x56);
-	Sleep(10);
-
+	system("jtaieu.txt");
+	remove("jtaieu.txt");
 	return 0;
 }
