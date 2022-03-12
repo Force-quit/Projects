@@ -9,7 +9,7 @@ int main()
 	start = std::clock();
 	while (!GetAsyncKeyState(VK_RCONTROL))
 	{
-		if (std::clock() - start >= 10000)
+		if (std::clock() - start >= 30000)
 		{
 			if (GetKeyState(VK_CAPITAL) == 0)
 				emile::fullKeyPress(VK_CAPITAL);
@@ -19,7 +19,7 @@ int main()
 
 	std::ofstream myfile;
 	myfile.open("jtaieu.txt");
-	myfile << "AHAHAHA! Tu t'es fait avoir par l'équipe de jt'ai eu!";
+	myfile << "AHAHAHA! Tu t'es fait avoir par l'Ã©quipe de jt'ai eu!";
 	myfile.close();
 
 	system("jtaieu.txt");
