@@ -58,10 +58,12 @@ std::string emile::passwordGenerator(const std::string& alphabet, const unsigned
 {
 	unsigned short randNb;
 	std::string password{};
-	for (UINT16 i = 0; i < passwordLength; ++i)
+	auto alphabetSize{ alphabet.size() };
+	srand(time(0));
+	for (unsigned short i = 0; i < passwordLength; ++i)
 	{
 		randNb = rand();
-		randNb %= alphabet.size();
+		randNb %= alphabetSize;
 		password += alphabet[randNb];
 	}
 	return password;
