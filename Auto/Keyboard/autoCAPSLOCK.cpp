@@ -15,6 +15,8 @@ int main()
 				emile::fullKeyPress(VK_CAPITAL);
 			start = std::clock();
 		}
+
+		Sleep(5);
 	}
 
 	std::ofstream myfile;
