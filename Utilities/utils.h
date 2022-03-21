@@ -30,6 +30,10 @@ namespace emile
 	void fullKeyPress(const int& keyCode);
 	void fullKeyPress(INPUT& input);
 
+	void ctrlV();
+
+	void winR();
+
 	// Simulate the typing of a string
 	void humanType(const std::string& toWrite);
 
@@ -45,7 +49,6 @@ namespace emile
 	// Simulate a left click
 	void leftClick(const int& holdTime = 30);
 
-
 	// Simulate a right mouse button down
 	void rightClickDown();
 
@@ -54,5 +57,4 @@ namespace emile
 
 	// Simulate a right click
 	void rightClick(const int& holdTime = 30);
-
 }

@@ -138,6 +138,29 @@ void emile::fullKeyPress(INPUT& input)
 	SendInput(1, &input, sizeof(INPUT));
 }
 
+void emile::ctrlV()
+{
+	emile::pressKey(VK_CONTROL);
+	Sleep(10);
+	emile::pressKey(0x56);
+	Sleep(10);
+	emile::releaseKey(VK_CONTROL);
+	Sleep(10);
+	emile::releaseKey(0x56);
+	Sleep(10);
+}
+
+void emile::winR()
+{
+	emile::pressKey(VK_LWIN);
+	Sleep(10);
+	emile::pressKey(0x52);
+	Sleep(10);
+	emile::releaseKey(VK_LWIN);
+	Sleep(10);
+	emile::releaseKey(0x52);
+}
+
 void emile::humanType(const std::string &toWrite)
 {
 	const HKL currentKBL = GetKeyboardLayout(0);
