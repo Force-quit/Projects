@@ -1,24 +1,175 @@
-#include "../Utilities/utils.h"
+#include "inputRecorder.h"
+#include <vector>
 #include <Windows.h>
 #include <iostream>
-#include <vector>
-#include <ctime>
+#include <limits>
 
-struct MousePoint
+MousePoint::MousePoint(POINT& currentPoint, long timePos)
+	: p(currentPoint), eventPositionInTime(timePos)
 {
-	POINT p{};
-	long eventPositionInTime{};
-	MousePoint* next{};
-};
 
-struct KeyBoardEvent
+}
+
+MousePoint::MousePoint() {}
+
+KeyBoardEvent::KeyBoardEvent(bool type, short keyCode, short flags, long timePos)
+	: type(type), keyCode(keyCode), flags(flags), eventPositionInTime(timePos)
 {
-	bool type{}; // 1 keyboard 0 mouse
-	short keyCode{};
-	short flags{}; // 2 si up
-	long eventPositionInTime{};
-	KeyBoardEvent* next{};
-};
+
+}
+
+KeyBoardEvent::KeyBoardEvent() {}
+
+long record(std::vector<MousePoint>& mousePoints, std::vector<KeyBoardEvent>& keyboardEvents, std::vector<short>& vKeys)
+{
+	MousePoint* lastMousePoint{};
+	mousePoints.push_back(MousePoint());
+	lastMousePoint = &mousePoints.front();
+	POINT currentMousePoint{};
+
+	std::vector<short> pressedKeys{};
+
+	std::clock_t start{};
+	long currentTime{};
+
+	Sleep(3000);
+	start = std::clock();
+	GetCursorPos(&lastMousePoint->p);
+	while (!GetAsyncKeyState(VK_ESCAPE))
+	{
+		currentTime = std::clock() - start;
+		std::cout << currentTime << std::endl;
+
+		GetCursorPos(&currentMousePoint);
+		if (currentMousePoint.x != lastMousePoint->p.x || currentMousePoint.y != lastMousePoint->p.y)
+		{
+			mousePoints.push_back(MousePoint(currentMousePoint, currentTime));
+			lastMousePoint = &mousePoints.back();
+		}
+
+		for (short i = 0; i < vKeys.size(); i++)
+		{
+			short vKey = vKeys[i];
+
+			if (GetAsyncKeyState(vKey))
+			{
+				short wasAlreadyPressing{};
+				for (short i = 0; i < pressedKeys.size(); ++i)
+				{
+					if (vKey == pressedKeys[i])
+					{
+						wasAlreadyPressing = true;
+						break;
+					}
+				}
+
+				if (wasAlreadyPressing)
+					continue;
+				else
+					pressedKeys.push_back(vKey);
+
+				bool type = true;
+				switch (vKey)
+				{
+				case VK_LBUTTON:
+				case VK_RBUTTON:
+				case VK_MBUTTON:
+				case VK_XBUTTON1:
+				case VK_XBUTTON2:
+					type = false;
+					break;
+				}
+
+				keyboardEvents.push_back(KeyBoardEvent(type, vKey, 0, currentTime));
+			}
+			else
+			{
+				for (short i = 0; i < pressedKeys.size(); ++i)
+				{
+					if (vKey == pressedKeys[i])
+					{
+						bool type = true;
+						switch (vKey)
+						{
+						case VK_LBUTTON:
+						case VK_RBUTTON:
+						case VK_MBUTTON:
+						case VK_XBUTTON1:
+						case VK_XBUTTON2:
+							type = false;
+							break;
+						}
+
+						keyboardEvents.push_back(KeyBoardEvent(type, vKey, KEYEVENTF_KEYUP, currentTime));
+						pressedKeys.erase(pressedKeys.begin() + i);
+						break;
+					}
+				}
+			}
+		}
+
+		Sleep(1);
+	}
+	return std::clock() - start;
+}
+
+void play(std::vector<MousePoint>& mousePoints, std::vector<KeyBoardEvent>& keyboardEvents, long totalTime)
+{
+	POINT mousePos{};
+
+	if (mousePoints.size() == 0)
+		mousePoints.push_back(MousePoint(mousePos, LONG_MAX));
+	
+	MousePoint* nextMousePoint{ &mousePoints.front() };
+
+	if (keyboardEvents.size() == 0)
+		keyboardEvents.push_back(KeyBoardEvent(0, 0, 0, LONG_MAX));
+
+	KeyBoardEvent nextKeyboardEvent{ keyboardEvents.front() };
+
+
+	int mousePointIndex = 0;
+	int keyboardEventIndex = 0;
+
+	INPUT input{};
+	clock_t start{};
+	long currentTime{};
+
+	for (start = std::clock(); currentTime <= totalTime; currentTime = std::clock() - start)
+	{
+		std::cout << currentTime << std::endl;
+		if (currentTime >= nextMousePoint->eventPositionInTime)
+		{
+			SetCursorPos(nextMousePoint->p.x, nextMousePoint->p.y);
+			++mousePointIndex;
+			mousePointIndex %= mousePoints.size();
+			nextMousePoint = &mousePoints[mousePointIndex];
+		}
+
+		if (currentTime >= nextKeyboardEvent.eventPositionInTime)
+		{
+			input.type = nextKeyboardEvent.type;
+			if (nextKeyboardEvent.type)
+			{
+				input.ki.dwFlags = nextKeyboardEvent.flags;
+				input.ki.wVk = nextKeyboardEvent.keyCode;
+			}
+			else
+			{
+				GetCursorPos(&mousePos);
+				input.mi.dwFlags = nextKeyboardEvent.flags;
+				input.mi.dx = mousePos.x;
+				input.mi.dy = mousePos.y;
+			}
+			SendInput(1, &input, sizeof(INPUT));
+			++keyboardEventIndex;
+			keyboardEventIndex %= keyboardEvents.size();
+			nextKeyboardEvent = keyboardEvents[keyboardEventIndex];
+		}
+
+		Sleep(1);
+	}
+}
 
 void fillVirtualKeys(std::vector<short>& vector)
 {
@@ -126,179 +277,4 @@ void fillVirtualKeys(std::vector<short>& vector)
 	vector.push_back(VK_F10); // F10 key
 	vector.push_back(VK_F11); // F11 key
 	vector.push_back(VK_F12); // F12 key
-}
-
-template<typename T>
-void deletePointers(T* first)
-{
-	T* current = first;
-	while (current != NULL)
-	{
-		first = current->next;
-		delete current;
-		current = first;
-	}
-}
-
-int main()
-{
-	emile::disableQuickEdit();
-	std::vector<short> vKeys{};
-	fillVirtualKeys(vKeys);
-
-	MousePoint* firstMousePos = new MousePoint();
-	MousePoint* currentMousePos = firstMousePos;
-	POINT p{};
-
-	KeyBoardEvent* firstEvent{};
-	KeyBoardEvent* currentEvent{};
-	std::vector<short> pressedKeys{};
-
-	std::clock_t start{};
-	long totalTime{};
-	long currentTime{};
-
-	Sleep(3000);
-	start = std::clock();
-	GetCursorPos(&(firstMousePos->p));
-	while (!GetAsyncKeyState(VK_ESCAPE))
-	{
-		currentTime = std::clock() - start;
-		std::cout << currentTime << std::endl;
-
-		GetCursorPos(&p);
-		if (p.x != currentMousePos->p.x || p.y != currentMousePos->p.y)
-		{
-			currentMousePos->next = new MousePoint();
-			currentMousePos = currentMousePos->next;
-			currentMousePos->p = p;
-			currentMousePos->eventPositionInTime = currentTime;
-		}
-
-		for (short i = 0; i < vKeys.size(); i++)
-		{
-			short vKey = vKeys[i];
-
-			if (GetAsyncKeyState(vKey))
-			{
-				short wasAlreadyPressing{};
-				for (short i = 0; i < pressedKeys.size(); ++i)
-				{
-					if (vKey == pressedKeys[i])
-					{
-						wasAlreadyPressing = true;
-						break;
-					}
-				}
-
-				if (wasAlreadyPressing)
-					continue;
-				else
-					pressedKeys.push_back(vKey);
-
-
-				if (firstEvent == nullptr)
-				{
-					firstEvent = new KeyBoardEvent();
-					currentEvent = firstEvent;
-				}
-				else
-				{
-					currentEvent->next = new KeyBoardEvent();
-					currentEvent = currentEvent->next;
-				}
-				currentEvent->eventPositionInTime = currentTime;
-				currentEvent->keyCode = vKey;
-
-				bool type = true;
-				switch (vKey)
-				{
-					case VK_LBUTTON:
-					case VK_RBUTTON:
-					case VK_MBUTTON:
-					case VK_XBUTTON1:
-					case VK_XBUTTON2:
-						type = false;
-						break;
-				}
-				currentEvent->type = type;
-			}
-			else
-			{
-				for (short i = 0; i < pressedKeys.size(); ++i)
-				{
-					if (vKey == pressedKeys[i])
-					{
-						currentEvent->next = new KeyBoardEvent();
-						currentEvent = currentEvent->next;
-
-						currentEvent->eventPositionInTime = currentTime;
-						currentEvent->flags = KEYEVENTF_KEYUP;
-						currentEvent->keyCode = vKey;
-
-						bool type = true;
-						switch (vKey)
-						{
-						case VK_LBUTTON:
-						case VK_RBUTTON:
-						case VK_MBUTTON:
-						case VK_XBUTTON1:
-						case VK_XBUTTON2:
-							type = false;
-							break;
-						}
-
-						currentEvent->type = type;
-						pressedKeys.erase(pressedKeys.begin() + i);
-						break;
-					}
-				}
-			}
-		}
-
-		Sleep(1);
-	}
-	totalTime = std::clock() - start;
-
-	Sleep(3000);
-
-	currentMousePos = firstMousePos;
-	currentEvent = firstEvent;
-	INPUT input{};
-	for (start = std::clock(); currentTime <= totalTime; currentTime = std::clock() - start)
-	{
-		std::cout << currentTime << std::endl;
-		if (currentMousePos != nullptr && currentTime >= currentMousePos->eventPositionInTime)
-		{
-			SetCursorPos(currentMousePos->p.x, currentMousePos->p.y);
-			currentMousePos = currentMousePos->next;
-		}
-
-		if (currentEvent != nullptr && currentTime >= currentEvent->eventPositionInTime)
-		{
-			input.type = currentEvent->type;
-			if (currentEvent->type)
-			{
-				input.ki.dwFlags = currentEvent->flags;
-				input.ki.wVk = currentEvent->keyCode;
-			}
-			else
-			{
-				GetCursorPos(&p);
-				input.mi.dwFlags = currentEvent->flags;
-				input.mi.dx = p.x;
-				input.mi.dy = p.y;
-			}
-			SendInput(1, &input, sizeof(INPUT));
-			currentEvent = currentEvent->next;
-		}
-		
-		Sleep(1);
-	}
-
-
-	deletePointers<KeyBoardEvent>(firstEvent);
-	deletePointers<MousePoint>(firstMousePos);
-
-	return 0;
 }
