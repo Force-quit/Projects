@@ -32,7 +32,8 @@ struct KeyBoardEvent
 };
 
 void recordMouseMovement(std::vector<MousePoint>& mousePoints, const clock_t& recordingTime, const bool& keepRecording);
-long record(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyBoardEvent>& keyboardEvents);
+void recordMouseEvents(std::vector<MouseEvent>& mouseEvents, const clock_t& recordingTime, const bool& keepRecording);
+void recordKeyBoardEvents(std::vector<KeyBoardEvent>& keyboardEvents, const clock_t& recordingTime, const bool& keepRecording);
 void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyBoardEvent>& keyboardEvents, long totalTime);
 void fillKeyBoardVirtualKeys(std::vector<short>& vector);
 void fillMouseVirtualKeys(std::vector<short>& vector);

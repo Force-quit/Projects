@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <ctime>
 #include <iostream>
+#include <thread>
 
 int main()
 {
@@ -12,27 +13,39 @@ int main()
 	std::vector<MouseEvent> mouseEvents{};
 	std::vector<KeyBoardEvent> keyboardEvents{};
 
-	
+	//std::vector<short> stuff = std::vector<short>(keyBoardVKeys.begin(), keyBoardVKeys.begin() + 3);
+	//std::vector<short> stuff2 = std::vector<short>(keyBoardVKeys.begin() + 3, keyBoardVKeys.begin() + 6);
+
 	Sleep(3000);
 	clock_t start = std::clock();
 	clock_t recordingTime = start - std::clock();
 	bool keepRecording = true;
 
-	std::thread mouseRecording(recordMouseMovement, mousePoints, recordingTime, keepRecording);
+	std::cout << "Starting recording" << std::endl;
+	std::thread mouseMovementRecording(recordMouseMovement, std::ref(mousePoints), std::ref(recordingTime), std::ref(keepRecording));
+	std::thread mouseInputRecording(recordMouseEvents, std::ref(mouseEvents), std::ref(recordingTime), std::ref(keepRecording));
+	std::thread keyboardInputRecording(recordKeyBoardEvents, std::ref(keyboardEvents), std::ref(recordingTime), std::ref(keepRecording));
 
+	GetAsyncKeyState(VK_ESCAPE);
 	while (!GetAsyncKeyState(VK_ESCAPE))
 	{
-		recordingTime = start - std::clock();
+		recordingTime = std::clock() - start;
 		Sleep(1);
 	}
 
 	keepRecording = false;
 
-	mouseRecording.join();
+	mouseMovementRecording.join();
+	mouseInputRecording.join();
+	keyboardInputRecording.join();
 
-	long totalRecordingTime = record(mousePoints, mouseEvents, keyboardEvents);
+	long totalRecordingTime = std::clock() - start;
+	std::cout << "Ended recording" << std::endl;
 
 	Sleep(3000);
+
+	if (keyboardEvents.back().keyCode == VK_ESCAPE)
+		keyboardEvents.pop_back();
 
 	play(mousePoints, mouseEvents, keyboardEvents, totalRecordingTime);
 
