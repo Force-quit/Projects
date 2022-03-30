@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <Windows.h>
+#include <mutex>
 
 struct MousePoint
 {
@@ -30,6 +31,7 @@ struct KeyBoardEvent
 	KeyBoardEvent();
 };
 
+void recordMouseMovement(std::vector<MousePoint>& mousePoints, const clock_t& recordingTime, const bool& keepRecording);
 long record(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyBoardEvent>& keyboardEvents);
 void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyBoardEvent>& keyboardEvents, long totalTime);
 void fillKeyBoardVirtualKeys(std::vector<short>& vector);

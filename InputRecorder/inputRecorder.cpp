@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <iostream>
 #include <limits>
+#include <thread>
 
 MousePoint::MousePoint(POINT& currentPoint, long timePos)
 	: p(currentPoint), eventPositionInTime(timePos)
@@ -27,6 +28,26 @@ MouseEvent::MouseEvent(long x, long y, long timePos, DWORD mouseData, DWORD flag
 }
 
 MouseEvent::MouseEvent() {}
+
+void recordMouseMovement(std::vector<MousePoint>& mousePoints, const clock_t& recordingTime, const bool& keepRecording)
+{
+	MousePoint* lastMousePoint{};
+	mousePoints.push_back(MousePoint());
+	lastMousePoint = &mousePoints.front();
+	POINT currentMousePoint{};
+	std::cout << "Starting mouse movement capture" << std::endl;
+	GetCursorPos(&lastMousePoint->p);
+	while (keepRecording)
+	{
+		GetCursorPos(&currentMousePoint);
+		if (currentMousePoint.x != lastMousePoint->p.x || currentMousePoint.y != lastMousePoint->p.y)
+		{
+			mousePoints.push_back(MousePoint(currentMousePoint, recordingTime));
+			lastMousePoint = &mousePoints.back();
+		}
+		Sleep(1);
+	}
+}
 
 long record(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyBoardEvent>& keyboardEvents)
 {
@@ -66,7 +87,7 @@ long record(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouse
 	while (!GetAsyncKeyState(VK_ESCAPE))
 	{
 		currentTime = std::clock() - start;
-		//std::cout << currentTime << std::endl;
+		std::cout << currentTime << std::endl;
 
 		GetCursorPos(&currentMousePoint);
 		if (currentMousePoint.x != lastMousePoint->p.x || currentMousePoint.y != lastMousePoint->p.y)
@@ -182,7 +203,7 @@ long record(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouse
 				else
 					pressedKeyboardKeys.push_back(vKey);
 
-				std::cout << std::hex << vKey << " key down" << std::endl;
+				//std::cout << std::hex << vKey << " key down" << std::endl;
 				keyboardEvents.push_back(KeyBoardEvent(vKey, 0, currentTime));
 			}
 			else
@@ -191,7 +212,7 @@ long record(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouse
 				{
 					if (vKey == pressedKeyboardKeys[i])
 					{
-						std::cout << vKey << " key up" << std::endl;
+						//std::cout << vKey << " key up" << std::endl;
 						keyboardEvents.push_back(KeyBoardEvent(vKey, KEYEVENTF_KEYUP, currentTime));
 						pressedKeyboardKeys.erase(pressedKeyboardKeys.begin() + i);
 						break;
@@ -225,6 +246,8 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 	int mouseEventIndex = 0;
 	int keyboardEventIndex = 0;
 
+	std::vector<INPUT> inputsToSend{};
+
 	INPUT keyboardInput{};
 	keyboardInput.type = INPUT_KEYBOARD;
 
@@ -237,7 +260,7 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 	std::cout << "Starting" << std::endl;
 	for (start = std::clock(); currentTime <= totalTime; currentTime = std::clock() - start)
 	{
-		//std::cout << currentTime << std::endl;
+		std::cout << currentTime << std::endl;
 		if (nextMousePoint != nullptr && currentTime >= nextMousePoint->eventPositionInTime)
 		{
 			//std::cout << "Mouse move" << std::endl;
@@ -252,14 +275,15 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 
 		if (nextMouseEvent != nullptr && currentTime >= nextMouseEvent->eventPositionInTime)
 		{
-			std::cout << "Mouse event" << std::endl;
+			//std::cout << "Mouse event" << std::endl;
 
 			mouseInput.mi.dwFlags = nextMouseEvent->dwFlags;
 			mouseInput.mi.dx = nextMouseEvent->x;
 			mouseInput.mi.dy = nextMouseEvent->y;
 			mouseInput.mi.mouseData = nextMouseEvent->mouseData;
 
-			SendInput(1, &mouseInput, sizeof(INPUT));
+			inputsToSend.push_back(mouseInput);
+			//SendInput(1, &mouseInput, sizeof(INPUT));
 
 			++mouseEventIndex;
 			if (mouseEventIndex < mouseEvents.size())
@@ -270,7 +294,7 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 
 		if (nextKeyboardEvent != nullptr && currentTime >= nextKeyboardEvent->eventPositionInTime)
 		{
-			std::cout << "Keyboard event" << std::endl;
+			//std::cout << "Keyboard event" << std::endl;
 			keyboardInput.ki.wVk = nextKeyboardEvent->keyCode;
 			keyboardInput.ki.dwFlags = nextKeyboardEvent->flags;
 			/*if (nextKeyboardEvent->flags == 0)
@@ -280,7 +304,9 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 					if (keysBeingPressed[i] == nextKeyboardEvent->keyCode)
 						keysBeingPressed.erase(keysBeingPressed.begin() + i);*/
 
-			SendInput(1, &keyboardInput, sizeof(INPUT));
+
+			inputsToSend.push_back(keyboardInput);
+			//SendInput(1, &keyboardInput, sizeof(INPUT));
 
 			++keyboardEventIndex;
 			if (keyboardEventIndex < keyboardEvents.size())
@@ -295,6 +321,13 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 			keyboardInput.ki.dwFlags = 0;
 			SendInput(1, &keyboardInput, sizeof(INPUT));
 		}*/
+
+		if (inputsToSend.size() > 0)
+		{
+			INPUT* inputs = &inputsToSend[0]; // Vector stores contiguously?
+			SendInput(inputsToSend.size(), inputs, sizeof(INPUT));
+			inputsToSend.clear();
+		}
 
 		Sleep(1);
 	}
