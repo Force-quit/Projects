@@ -57,4 +57,7 @@ namespace emile
 
 	// Simulate a right click
 	void rightClick(const int& holdTime = 30);
+
+	// Wait until user presses and release the specified virutal key
+	void waitForKeyPress(short vKey);
 }

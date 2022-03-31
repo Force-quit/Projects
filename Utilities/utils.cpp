@@ -259,3 +259,16 @@ void emile::rightClick(const int& holdTime)
 	Sleep(holdTime);
 	emile::rightClickUp();
 }
+
+void emile::waitForKeyPress(short vKey)
+{
+	bool keyDown{};
+	while (true)
+	{
+		if (GetAsyncKeyState(vKey))
+			keyDown = true;
+		else if (keyDown)
+			break;
+		Sleep(1);
+	}
+}
