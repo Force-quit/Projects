@@ -6,13 +6,11 @@
 #include <iostream>
 #include <thread>
 #include <vector>
-#include <algorithm>
-
 
 int main()
 {
 	emile::consoleBundle();
-
+	
 	std::vector<std::thread> keyboardThreads{};
 	std::vector<std::vector<short>> keyboardThreadsVKeys{};
 	fillKeyBoardVirtualKeys(keyboardThreadsVKeys);
@@ -62,6 +60,5 @@ int main()
 
 	std::cout << "Starting playback...";
 	play(mousePoints, mouseEvents, keyboardEvents, totalRecordingTime);
-
 	return 0;
 }

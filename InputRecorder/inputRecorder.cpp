@@ -47,6 +47,9 @@ void recordMouseMovement(std::vector<MousePoint>& mousePoints, const clock_t& re
 		}
 		Sleep(1);
 	}
+
+	if (mousePoints.size() == 1)
+		mousePoints.clear();
 }
 
 void recordMouseEvents(std::vector<MouseEvent>& mouseEvents, const clock_t& recordingTime, const bool& keepRecording)
