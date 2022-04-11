@@ -140,14 +140,23 @@ void emile::fullKeyPress(INPUT& input)
 
 void emile::ctrlV()
 {
-	emile::pressKey(VK_CONTROL);
-	Sleep(10);
-	emile::pressKey(0x56);
-	Sleep(10);
-	emile::releaseKey(VK_CONTROL);
-	Sleep(10);
-	emile::releaseKey(0x56);
-	Sleep(10);
+	const short NB_INPUTS = 4;
+
+	INPUT inputs[NB_INPUTS]{};
+	
+	for (INPUT& i : inputs)
+		i.type = INPUT_KEYBOARD;
+
+	inputs[0].ki.wVk = VK_CONTROL;
+	inputs[1].ki.wVk = 0x56;
+
+	inputs[2].ki.wVk = 0x56;
+	inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
+
+	inputs[3].ki.wVk = VK_CONTROL;
+	inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
+
+	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
 void emile::winR()
