@@ -161,13 +161,23 @@ void emile::ctrlV()
 
 void emile::winR()
 {
-	emile::pressKey(VK_LWIN);
-	Sleep(10);
-	emile::pressKey(0x52);
-	Sleep(10);
-	emile::releaseKey(VK_LWIN);
-	Sleep(10);
-	emile::releaseKey(0x52);
+	const short NB_INPUTS = 4;
+
+	INPUT inputs[NB_INPUTS]{};
+
+	for (INPUT& i : inputs)
+		i.type = INPUT_KEYBOARD;
+
+	inputs[0].ki.wVk = VK_LWIN;
+	inputs[1].ki.wVk = 0x52;
+
+	inputs[2].ki.wVk = 0x52;
+	inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
+
+	inputs[3].ki.wVk = VK_LWIN;
+	inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
+
+	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
 void emile::humanType(const std::string &toWrite)

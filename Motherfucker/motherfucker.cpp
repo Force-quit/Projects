@@ -1,6 +1,6 @@
+#include "motherfucker.h"
 #include "../Utilities/utils.h"
 #include <Windows.h>
-#include <ctime>
 #include <TlHelp32.h>
 
 bool multipleInstances(const wchar_t processName[])
@@ -67,37 +67,48 @@ void createPrankMessage()
 	Sleep(50);
 	emile::fullKeyPress(VK_RETURN);
 	Sleep(50);
-	emile::copyToClipBoard("Get pranked punk");
+	emile::copyToClipBoard("LOLOLOLOLOLOLOL XD XD ahahahh HIHII");
 	Sleep(50);
 	emile::ctrlV();
 }
 
-int main()
+int rangedRandom(int min, int max)
 {
-	FreeConsole();
+	return min + rand() % ((max + 1) - min);
+}
 
-	if (checkMultipleInstances())
-		return 0;
+void prank_CAPSLOCK()
+{
+	if (GetKeyState(VK_CAPITAL) == 0)
+		emile::fullKeyPress(VK_CAPITAL);
+}
 
-	std::clock_t start;
-	start = std::clock();
-	GetAsyncKeyState(VK_RCONTROL);
-	while (!GetAsyncKeyState(VK_RCONTROL))
-	{
-		if (std::clock() - start >= 30000)
-		{
-			if (GetKeyState(VK_CAPITAL) == 0)
-				emile::fullKeyPress(VK_CAPITAL);
-			start = std::clock();
-		}
+void prank_WINDOWS()
+{
+	emile::fullKeyPress(VK_LWIN);
+}
 
-		Sleep(5);
-	}
+void prank_SPACE()
+{
+	emile::fullKeyPress(VK_SPACE);
+}
 
-	while (GetAsyncKeyState(VK_RCONTROL))
-		Sleep(5);
+void prank_RETURN()
+{
+	emile::fullKeyPress(VK_RETURN);
+}
 
-	createPrankMessage();
+void prank_BACKSPACE()
+{
+	emile::fullKeyPress(VK_BACK);
+}
 
-	return 0;
+void prank_CTRLV()
+{
+	emile::ctrlV();
+}
+
+void prank_ESCAPE()
+{
+	emile::fullKeyPress(VK_ESCAPE);
 }
