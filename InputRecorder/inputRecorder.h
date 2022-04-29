@@ -14,7 +14,6 @@ struct MousePoint
 struct MouseEvent
 {
 	long x{}, y{}, eventPositionInTime{};
-	bool type{ false };
 	DWORD mouseData{}, dwFlags{};
 
 	MouseEvent(long x, long y, long timePos, DWORD mouseData, DWORD flags);
@@ -37,3 +36,12 @@ void recordKeyBoardEvents(std::vector<KeyBoardEvent>& keyboardEvents, std::mutex
 void fillKeyBoardVirtualKeys(std::vector<std::vector<short>>& vector);
 void fillMouseVirtualKeys(std::vector<short>& vector);
 void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyBoardEvent>& keyboardEvents, long totalTime);
+
+void record();
+void loadAndPlay();
+
+void saveMouseMovements(std::vector<MousePoint>& mousePoints);
+void loadMouseMovements(std::vector<MousePoint>& mousePoints);
+
+void saveMouseEvents(std::vector<MouseEvent>& mouseEvents);
+void loadMouseEvents(std::vector<MouseEvent>& mouseEvents);

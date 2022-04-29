@@ -5,6 +5,7 @@
 #include <thread>
 #include <algorithm>
 #include <random>
+#include <fstream>
 
 MousePoint::MousePoint(POINT& currentPoint, long timePos)
 	: p(currentPoint), eventPositionInTime(timePos)
@@ -177,12 +178,12 @@ void recordKeyBoardEvents(std::vector<KeyBoardEvent>& keyboardEvents, std::mutex
 						break;
 					}
 				}
-				
+
 				if (wasAlreadyPressing)
 					continue;
 				else
 					pressedKeyboardKeys.push_back(vKey);
-				
+
 				vectorMutex.lock();
 				keyboardEvents.push_back(KeyBoardEvent(vKey, 0, recordingTime));
 				vectorMutex.unlock();
@@ -415,7 +416,7 @@ void fillKeyBoardVirtualKeys(std::vector<std::vector<short>>& vector)
 		VK_F11,
 		VK_F12
 	};
-	
+
 	auto rng = std::default_random_engine{};
 	std::shuffle(std::begin(KEYBOARD_VKEYS), std::end(KEYBOARD_VKEYS), rng);
 
@@ -436,4 +437,129 @@ void fillMouseVirtualKeys(std::vector<short>& vector)
 	vector.push_back(VK_MBUTTON);
 	vector.push_back(VK_XBUTTON1); // Back
 	vector.push_back(VK_XBUTTON2); // Next
+}
+
+void saveMouseMovements(std::vector<MousePoint>& mousePoints)
+{
+	std::ofstream saveFile("mousePoints.txt");
+	for (MousePoint& p : mousePoints)
+		saveFile << p.p.x << ',' << p.p.y << ',' << p.eventPositionInTime << '\n';
+	saveFile.close();
+}
+
+void loadMouseMovements(std::vector<MousePoint>& mousePoints)
+{
+	std::ifstream saveFile("mousePoints.txt");
+	std::string line;
+	while (std::getline(saveFile, line))
+	{
+		std::string number;
+		char currentChar;
+		bool firstNumber = true;
+
+		long x{}, y{}, pos{};
+		POINT p;
+		for (auto& i : line)
+		{
+			if (i == ',')
+			{
+				if (firstNumber)
+					x = std::stol(number);
+				else
+					y = std::stol(number);
+
+				firstNumber = false;
+				number.clear();
+			}
+			else
+				number += i;
+		}
+		pos = std::stol(number);
+		p.x = x;
+		p.y = y;
+		mousePoints.push_back(MousePoint(p, pos));
+	}
+	saveFile.close();
+}
+
+void loadAndPlay()
+{
+	std::vector<MousePoint> mousePoints{};
+	std::vector<MouseEvent> mouseEvents{};
+	std::vector<KeyBoardEvent> keyboardEvents{};
+	long totalRecordingTime{};
+	
+	loadMouseMovements(mousePoints);
+
+	std::cout << "Starting playback in 3 seconds";
+	Sleep(3000);
+	play(mousePoints, mouseEvents, keyboardEvents, totalRecordingTime);
+}
+
+void saveMouseEvents(std::vector<MouseEvent>& mouseEvents)
+{
+	std::ofstream saveFile("mouseEvents.txt");
+	for (MouseEvent& e : mouseEvents)
+		saveFile << e.x << ',' << e.y << ',' << e.eventPositionInTime 
+		<< ',' << e.mouseData << ',' << e.dwFlags << '\n';
+	saveFile.close();
+}
+
+void record()
+{
+	std::vector<std::thread> keyboardThreads{};
+	std::vector<std::vector<short>> keyboardThreadsVKeys{};
+	fillKeyBoardVirtualKeys(keyboardThreadsVKeys);
+
+	std::vector<MousePoint> mousePoints{};
+	std::vector<MouseEvent> mouseEvents{};
+	std::vector<KeyBoardEvent> keyboardEvents{};
+	std::mutex keyboardEventsMutex{};
+
+	bool keepRecording = true;
+
+	std::cout << "Starting in 3..." << std::endl;
+	Sleep(1000);
+	std::cout << "Starting in 2..." << std::endl;
+	Sleep(1000);
+	std::cout << "Starting in 1..." << std::endl;
+	Sleep(1000);
+	std::cout << "Started" << std::endl;
+
+
+
+
+	clock_t start = std::clock();
+	clock_t recordingTime = start - std::clock();
+	std::thread mouseMovementRecording(recordMouseMovement, std::ref(mousePoints), std::ref(recordingTime), std::ref(keepRecording));
+	std::thread mouseInputRecording(recordMouseEvents, std::ref(mouseEvents), std::ref(recordingTime), std::ref(keepRecording));
+	for (auto& vKeysSection : keyboardThreadsVKeys)
+		keyboardThreads.push_back(std::thread(recordKeyBoardEvents, std::ref(keyboardEvents), std::ref(keyboardEventsMutex),
+			std::ref(vKeysSection), std::ref(recordingTime), std::ref(keepRecording)));
+
+
+	GetAsyncKeyState(VK_ESCAPE);
+	while (!GetAsyncKeyState(VK_ESCAPE))
+	{
+		recordingTime = std::clock() - start;
+		Sleep(1);
+	}
+
+	keepRecording = false;
+
+	mouseMovementRecording.join();
+	mouseInputRecording.join();
+	for (auto& thread : keyboardThreads)
+		thread.join();
+
+
+	long totalRecordingTime = std::clock() - start;
+	std::cout << "Ended recording" << "\n\n";
+
+	if (keyboardEvents.size() > 0)
+		if (keyboardEvents.back().keyCode == VK_ESCAPE)
+			keyboardEvents.pop_back();
+
+	saveMouseMovements(mousePoints);
+	saveMouseEvents(mouseEvents);
 }
