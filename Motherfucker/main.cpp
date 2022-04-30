@@ -4,10 +4,11 @@
 #include <ctime> 
 #include <random>
 
-using prank_function_type = void (*)();
 
 int main()
 {	
+	using prank_function_type = void (*)();
+	
 	FreeConsole();
 	srand(time(0));
 

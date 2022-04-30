@@ -271,13 +271,6 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 		{
 			keyboardInput.ki.wVk = nextKeyboardEvent->keyCode;
 			keyboardInput.ki.dwFlags = nextKeyboardEvent->flags;
-			/*if (nextKeyboardEvent->flags == 0)
-				keysBeingPressed.push_back(nextKeyboardEvent->keyCode);
-			else
-				for (short i = 0; i < keysBeingPressed.size(); i++)
-					if (keysBeingPressed[i] == nextKeyboardEvent->keyCode)
-						keysBeingPressed.erase(keysBeingPressed.begin() + i);*/
-
 
 			inputsToSend.push_back(keyboardInput);
 
@@ -287,13 +280,6 @@ void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEv
 			else
 				nextKeyboardEvent = nullptr;
 		}
-
-		/*for (short i = 0; i < keysBeingPressed.size(); i++)
-		{
-			keyboardInput.ki.wVk = keysBeingPressed[i];
-			keyboardInput.ki.dwFlags = 0;
-			SendInput(1, &keyboardInput, sizeof(INPUT));
-		}*/
 
 		if (inputsToSend.size() > 0)
 		{
