@@ -193,7 +193,7 @@ void emile::humanType(const std::string &toWrite)
 	for (UINT16 i = 0; i < keys.size(); ++i)
 	{
 		input.ki.wVk = keys[i];
-		emile::pressKey(input);
+		emile::fullKeyPress(input);
 		Sleep(50);
 	}
 }

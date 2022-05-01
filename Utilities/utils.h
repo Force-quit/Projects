@@ -5,15 +5,22 @@
 
 namespace emile
 {
-	// Resets std::cin
+	// Resets std::cin buffer
 	void flushTampon();
 
+	
 	void consoleBundle();
 	void preventConsoleResize();
 	void hideCursor();
 	void disableQuickEdit();
 	void hideScrollingBar();
 
+	/** 
+	* Generate a password string 
+	* @param alphabet : string containing possible password characters
+	* @param passwordLength : Length of the password
+	* @return The password string
+	*/
 	std::string passwordGenerator(const std::string& alphabet, const unsigned short& passwordLength);
 
 	//////////////////////////////
