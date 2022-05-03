@@ -1,18 +1,25 @@
-#define NOMINMAX
 #include "../Utilities/utils.h"
 #include "inputRecorder.h"
-#include <Windows.h>
-#include <ctime>
 #include <iostream>
-#include <thread>
-#include <vector>
 
 int main()
 {
+	auto title = R"( (                                                                        
+ )\ )                        )                            (               
+(()/(                 (   ( /(   (      (           (     )\ )   (   (    
+ /(_)) (     `  )    ))\  )\())  )(    ))\  (   (   )(   (()/(  ))\  )(   
+(_))   )\ )  /(/(   /((_)(_))/  (()\  /((_) )\  )\ (()\   ((_))/((_)(()\  
+|_ _| _(_/( ((_)_\ (_))( | |_    ((_)(_))  ((_)((_) ((_)  _| |(_))   ((_) 
+ | | | ' \))| '_ \)| || ||  _|  | '_|/ -_)/ _|/ _ \| '_|/ _` |/ -_) | '_| 
+|___||_||_| | .__/  \_,_| \__|  |_|  \___|\__|\___/|_|  \__,_|\___| |_|   
+            |_|                                                           
+)";
+
+	std::cout << title << std::endl;
 	std::cout << "Record a session : 1" << std::endl;
 	std::cout << "Playback last session : 2" << std::endl;
 
-	char choice;
+	char choice{};
 	do
 	{
 		emile::flushTampon();
