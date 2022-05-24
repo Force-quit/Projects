@@ -183,10 +183,9 @@ void emile::winR()
 void emile::humanType(const std::string &toWrite)
 {
 	const HKL currentKBL = GetKeyboardLayout(0);
-	std::vector<short> keys{};
+	std::vector<short> keys;
 	for (short i = 0; i < toWrite.length(); ++i)
-		keys.push_back(VkKeyScanExA(toWrite.at(i), currentKBL));
-	
+		keys.push_back(VkKeyScanExA(toWrite[i], currentKBL));
 
 	INPUT input{};
 	input.type = INPUT_KEYBOARD;

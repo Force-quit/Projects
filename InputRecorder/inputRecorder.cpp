@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <random>
 #include <fstream>
+#include <string>
 
 MousePoint::MousePoint(POINT& currentPoint, long timePos)
 	: p(currentPoint), eventPositionInTime(timePos)
