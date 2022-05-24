@@ -512,9 +512,6 @@ void record()
 	Sleep(1000);
 	std::cout << "Started" << std::endl;
 
-
-
-
 	clock_t start = std::clock();
 	clock_t recordingTime = start - std::clock();
 	std::thread mouseMovementRecording(recordMouseMovement, std::ref(mousePoints), std::ref(recordingTime), std::ref(keepRecording));
