@@ -1,0 +1,3 @@
+https://www.cplusplus.com/forum/beginner/267364/
+https://stackoverflow.com/questions/32987103/image-to-ascii-art-conversion
+https://blat-blatnik.github.io/computerBear/making-accurate-sleep-function/

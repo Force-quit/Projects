@@ -1,0 +1,83 @@
+
+
+BOOL CALLBACK CheckValidWindow(HWND hWnd, LPARAM)
+{
+	//HWND hWnd = FindWindowA("Notepad", NULL);
+	TCHAR className[1000];
+	GetClassName(hWnd, className, 100);
+	if (className == L"Notepad")
+	{
+		cout << "Found open notepad process...\n";
+		if (IsWindowVisible(hWnd))
+		{
+			cout << "Checking if the window is valid...\n";
+			char* title = new char[11];
+			string playing = "Playing - ";
+			GetWindowTextA(hWnd, title, 11);
+			if (string(title) == playing)
+			{
+				cout << "Window was created by this program, reusing it...\n";
+				delete[] title;
+				//return FindWindowEx(hWnd, NULL, L"Edit", NULL);
+				return FALSE;
+			}
+			else
+			{
+
+
+
+			}
+		}
+		else
+		{
+			cout << "Hidden window found, terminating it...\n";
+			SendMessage(hWnd, WM_CLOSE, NULL, NULL);
+		}
+	}
+	else;
+}
+
+HWND GetNotePad(const string title)
+{
+	HWND hWnd;
+	ShellExecuteA(0, "open", "notepad.exe", NULL, NULL, 0);	//creates hidden window for testing
+	if (EnumWindows(CheckValidWindow, reinterpret_cast<LPARAM>(&hWnd)))
+	{
+		cout << hWnd;
+		return hWnd;
+	}
+	cout << "qweqweqw";
+	STARTUPINFOW startupInfo;
+	PROCESS_INFORMATION procInfo;
+
+	ZeroMemory(&startupInfo, sizeof(startupInfo));
+	ZeroMemory(&procInfo, sizeof(procInfo));
+
+	wchar_t NOTEPATH[] = L"C:/Windows/System32/Notepad.exe";
+
+	CreateProcess(NOTEPATH,
+		NULL,
+		NULL,
+		NULL,
+		FALSE,
+		NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE | CREATE_UNICODE_ENVIRONMENT,
+		NULL,
+		NULL,
+		&startupInfo,
+		&procInfo
+	);
+
+	WaitForInputIdle(procInfo.hProcess, 20000);
+	HWND hWndProc = FindWindowW(L"Notepad", NULL);
+	HWND hwnd = FindWindowEx(hWndProc, NULL, L"Edit", NULL);
+
+	CloseHandle(procInfo.hProcess);
+	CloseHandle(procInfo.hThread);
+
+	SetWindowTextA(hWndProc, "Playing - Bad Apple");
+	return hwnd;
+
+}
+
+
+

@@ -1,0 +1,1 @@
+If you want to delete any of the files here, make sure you already have them elsewhere on your system.

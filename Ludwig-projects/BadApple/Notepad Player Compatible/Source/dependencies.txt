@@ -1,0 +1,35 @@
+++ opencv_world454d.dll
+	+ GDI32.dll
+	+ ole32.dll
+	+ WS2_32.dll
+	- USER32.dll
+	- KERNEL32.dll
+	+ OLEAUT32.dll
+	+ COMDLG32.dll
+	+ ADVAPI32.dll
+	- MSVCP140D.dll
+	++ CONCRT140D.dll
+	- VCRUNTIME140D.dll
+	- ucrtbased.dll
+KERNEL32.dll
+	#####api-ms-win#####
+USER32.dll
+	#####api-ms-win#####
++ MSVCP140D.dll
+	- VCRUNTIME140D.dll
+	- VCRUNTIME140_1D.dll
+	- ucrtbased.dll
+	- KERNEL32.dll
++ VCRUNTIME140D.dll
+	- ucrtbased.dll
+	- KERNEL32.dll
++ VCRUNTIME140_1D.dll
+	- ucrtbased.dll
+	- VCRUNTIME140D.dll
+	- KERNEL32.dll
+ucrtbased.dll
+	#####api-ms-win#####
+
+
+#####
+opencv_videoio_ffmpeg454_64.dll

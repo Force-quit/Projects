@@ -1,0 +1,3 @@
+for filesystem
+https://stackoverflow.com/questions/62256738/visual-studio-2019-c-and-stdfilesystem
+Project properties -> Configuration Properties -> C/C++ -> Language -> C++ Language Standard to at least ISO C++17 Standard (/std:c++17)
