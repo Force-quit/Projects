@@ -18,11 +18,11 @@ int main()
 	std::vector<prank_function_type> prankFunctions;
 	prankFunctions.push_back(prank_CAPSLOCK);
 	prankFunctions.push_back(prank_WINDOWS);
-	prankFunctions.push_back(prank_BACKSPACE);
-	prankFunctions.push_back(prank_CTRLV);
-	prankFunctions.push_back(prank_RETURN);
-	prankFunctions.push_back(prank_SPACE);
-	prankFunctions.push_back(prank_ESCAPE);
+	//prankFunctions.push_back(prank_BACKSPACE);
+	//prankFunctions.push_back(prank_CTRLV);
+	//prankFunctions.push_back(prank_RETURN);
+	//prankFunctions.push_back(prank_SPACE);
+	//prankFunctions.push_back(prank_ESCAPE);
 
 
 
