@@ -1,1 +1,0 @@
-(git clone ->) https://github.com/AlexWooz/The-frie-music-bot.git
