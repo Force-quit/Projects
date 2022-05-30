@@ -16,13 +16,13 @@ MousePoint::MousePoint(POINT& currentPoint, long timePos)
 
 MousePoint::MousePoint() {}
 
-KeyBoardEvent::KeyBoardEvent(short keyCode, short flags, long timePos)
+KeyboardEvent::KeyboardEvent(short keyCode, short flags, long timePos)
 	: keyCode(keyCode), flags(flags), eventPositionInTime(timePos)
 {
 
 }
 
-KeyBoardEvent::KeyBoardEvent() {}
+KeyboardEvent::KeyboardEvent() {}
 
 MouseEvent::MouseEvent(long x, long y, long timePos, DWORD mouseData, DWORD flags)
 	: x(x), y(y), eventPositionInTime(timePos), mouseData(mouseData), dwFlags(flags)
@@ -158,7 +158,7 @@ void recordMouseEvents(std::vector<MouseEvent>& mouseEvents, const clock_t& reco
 	}
 }
 
-void recordKeyBoardEvents(std::vector<KeyBoardEvent>& keyboardEvents, std::mutex& vectorMutex, const std::vector<short>& vKeys, const clock_t& recordingTime, const bool& keepRecording)
+void recordKeyBoardEvents(std::vector<KeyboardEvent>& keyboardEvents, std::mutex& vectorMutex, const std::vector<short>& vKeys, const clock_t& recordingTime, const bool& keepRecording)
 {
 	std::vector<short> pressedKeyboardKeys{};
 	for (auto vKey : vKeys)
@@ -186,7 +186,7 @@ void recordKeyBoardEvents(std::vector<KeyBoardEvent>& keyboardEvents, std::mutex
 					pressedKeyboardKeys.push_back(vKey);
 
 				vectorMutex.lock();
-				keyboardEvents.push_back(KeyBoardEvent(vKey, 0, recordingTime));
+				keyboardEvents.push_back(KeyboardEvent(vKey, 0, recordingTime));
 				vectorMutex.unlock();
 			}
 			else
@@ -196,7 +196,7 @@ void recordKeyBoardEvents(std::vector<KeyBoardEvent>& keyboardEvents, std::mutex
 					if (vKey == pressedKeyboardKeys[i])
 					{
 						vectorMutex.lock();
-						keyboardEvents.push_back(KeyBoardEvent(vKey, KEYEVENTF_KEYUP, recordingTime));
+						keyboardEvents.push_back(KeyboardEvent(vKey, KEYEVENTF_KEYUP, recordingTime));
 						vectorMutex.unlock();
 
 						pressedKeyboardKeys.erase(pressedKeyboardKeys.begin() + i);
@@ -210,11 +210,11 @@ void recordKeyBoardEvents(std::vector<KeyBoardEvent>& keyboardEvents, std::mutex
 	}
 }
 
-void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyBoardEvent>& keyboardEvents, long totalTime)
+void play(std::vector<MousePoint>& mousePoints, std::vector<MouseEvent>& mouseEvents, std::vector<KeyboardEvent>& keyboardEvents, long totalTime)
 {
 	MousePoint* nextMousePoint{};
 	MouseEvent* nextMouseEvent{};
-	KeyBoardEvent* nextKeyboardEvent{};
+	KeyboardEvent* nextKeyboardEvent{};
 	std::vector<short> keysBeingPressed{};
 
 	if (mousePoints.size() != 0)
@@ -416,82 +416,6 @@ void fillKeyBoardVirtualKeys(std::vector<std::vector<short>>& vector)
 	}
 }
 
-void fillMouseVirtualKeys(std::vector<short>& vector)
-{
-	// Mouse
-	vector.push_back(VK_LBUTTON);
-	vector.push_back(VK_RBUTTON);
-	vector.push_back(VK_MBUTTON);
-	vector.push_back(VK_XBUTTON1); // Back
-	vector.push_back(VK_XBUTTON2); // Next
-}
-
-void saveMouseMovements(std::vector<MousePoint>& mousePoints)
-{
-	std::ofstream saveFile("mousePoints.txt");
-	for (MousePoint& p : mousePoints)
-		saveFile << p.p.x << ',' << p.p.y << ',' << p.eventPositionInTime << '\n';
-	saveFile.close();
-}
-
-void loadMouseMovements(std::vector<MousePoint>& mousePoints)
-{
-	std::ifstream saveFile("mousePoints.txt");
-	std::string line;
-	while (std::getline(saveFile, line))
-	{
-		std::string number;
-		char currentChar;
-		bool firstNumber = true;
-
-		long x{}, y{}, pos{};
-		POINT p;
-		for (auto& i : line)
-		{
-			if (i == ',')
-			{
-				if (firstNumber)
-					x = std::stol(number);
-				else
-					y = std::stol(number);
-
-				firstNumber = false;
-				number.clear();
-			}
-			else
-				number += i;
-		}
-		pos = std::stol(number);
-		p.x = x;
-		p.y = y;
-		mousePoints.push_back(MousePoint(p, pos));
-	}
-	saveFile.close();
-}
-
-void loadAndPlay()
-{
-	std::vector<MousePoint> mousePoints{};
-	std::vector<MouseEvent> mouseEvents{};
-	std::vector<KeyBoardEvent> keyboardEvents{};
-	long totalRecordingTime{};
-	
-	loadMouseMovements(mousePoints);
-
-	std::cout << "Starting playback in 3 seconds";
-	Sleep(3000);
-	play(mousePoints, mouseEvents, keyboardEvents, totalRecordingTime);
-}
-
-void saveMouseEvents(std::vector<MouseEvent>& mouseEvents)
-{
-	std::ofstream saveFile("mouseEvents.txt");
-	for (MouseEvent& e : mouseEvents)
-		saveFile << e.x << ',' << e.y << ',' << e.eventPositionInTime 
-		<< ',' << e.mouseData << ',' << e.dwFlags << '\n';
-	saveFile.close();
-}
-
 void record()
 {
 	std::vector<std::thread> keyboardThreads{};
@@ -500,7 +424,7 @@ void record()
 
 	std::vector<MousePoint> mousePoints{};
 	std::vector<MouseEvent> mouseEvents{};
-	std::vector<KeyBoardEvent> keyboardEvents{};
+	std::vector<KeyboardEvent> keyboardEvents{};
 	std::mutex keyboardEventsMutex{};
 
 	bool keepRecording = true;
@@ -544,6 +468,144 @@ void record()
 		if (keyboardEvents.back().keyCode == VK_ESCAPE)
 			keyboardEvents.pop_back();
 
+	CreateDirectoryA("SavedSessions", NULL);
+	saveTotalRecordingTime(totalRecordingTime);
 	saveMouseMovements(mousePoints);
 	saveMouseEvents(mouseEvents);
+	saveKeyBoardEvents(keyboardEvents);
+}
+
+void loadAndPlay()
+{
+	std::vector<MousePoint> mousePoints;
+	std::vector<MouseEvent> mouseEvents;
+	std::vector<KeyboardEvent> keyboardEvents;
+	long totalRecordingTime{};
+
+	loadTotalRecordingTime(totalRecordingTime);
+	loadMouseMovements(mousePoints);
+	loadMouseEvents(mouseEvents);
+	loadKeyboardEvents(keyboardEvents);
+
+	std::cout << "Starting in 3..." << std::endl;
+	Sleep(1000);
+	std::cout << "Starting in 2..." << std::endl;
+	Sleep(1000);
+	std::cout << "Starting in 1..." << std::endl;
+	Sleep(1000);
+	std::cout << "Started playing back" << std::endl;
+	play(mousePoints, mouseEvents, keyboardEvents, totalRecordingTime);
+}
+
+void fillMouseVirtualKeys(std::vector<short>& vector)
+{
+	// Mouse
+	vector.push_back(VK_LBUTTON);
+	vector.push_back(VK_RBUTTON);
+	vector.push_back(VK_MBUTTON);
+	vector.push_back(VK_XBUTTON1); // Back
+	vector.push_back(VK_XBUTTON2); // Next
+}
+
+void saveTotalRecordingTime(const long& totalRecordingtime)
+{
+	std::ofstream saveFile("SavedSessions\\totalRecordingTime.txt");
+	saveFile << totalRecordingtime;
+	saveFile.close();
+}
+
+void loadTotalRecordingTime(long& totalRecordingTime)
+{
+	std::ifstream saveFile("SavedSessions\\totalRecordingTime.txt");
+	saveFile >> totalRecordingTime;
+	saveFile.close();
+}
+
+void saveMouseEvents(std::vector<MouseEvent>& mouseEvents)
+{
+	std::ofstream saveFile("SavedSessions\\mouseEvents.txt");
+	for (MouseEvent& e : mouseEvents)
+		saveFile << e.x << ',' << e.y << ',' << e.eventPositionInTime << ',' << e.mouseData << ',' << e.dwFlags << ',';
+	saveFile.close();
+}
+
+void loadMouseEvents(std::vector<MouseEvent>& mouseEvents)
+{
+	std::ifstream saveFile("SavedSessions\\mouseEvents.txt");
+	long x{};
+	long y{};
+	long timePos{};
+	DWORD mouseData{};
+	DWORD flags{};
+	char separator{};
+	while (!saveFile.eof())
+	{
+		saveFile >> x;
+		saveFile >> separator;
+		saveFile >> y;
+		saveFile >> separator;
+		saveFile >> timePos;
+		saveFile >> separator;
+		saveFile >> mouseData;
+		saveFile >> separator;
+		saveFile >> flags;
+		saveFile >> separator;
+		mouseEvents.push_back(MouseEvent(x, y, timePos, mouseData, flags));
+	}
+	saveFile.close();
+}
+
+void saveMouseMovements(std::vector<MousePoint>& mousePoints)
+{
+	std::ofstream saveFile("SavedSessions\\mousePoints.txt");
+	for (MousePoint& p : mousePoints)
+		saveFile << p.p.x << ',' << p.p.y << ',' << p.eventPositionInTime << ',';
+	saveFile.close();
+}
+
+void loadMouseMovements(std::vector<MousePoint>& mousePoints)
+{
+	std::ifstream saveFile("SavedSessions\\mousePoints.txt");
+	POINT p;
+	long timePos{};
+	char separator{};
+	while (!saveFile.eof())
+	{
+		saveFile >> p.x;
+		saveFile >> separator;
+		saveFile >> p.y;
+		saveFile >> separator;
+		saveFile >> timePos;
+		saveFile >> separator;
+		mousePoints.push_back(MousePoint(p, timePos));
+	}
+	saveFile.close();
+}
+
+void saveKeyBoardEvents(const std::vector<KeyboardEvent>& keyboardEvents)
+{
+	std::ofstream saveFile("SavedSessions\\keyboardEvents.txt");
+	for (auto& k : keyboardEvents)
+		saveFile << k.keyCode << ',' << k.flags << ',' << k.eventPositionInTime << ',';
+	saveFile.close();
+}
+
+void loadKeyboardEvents(std::vector<KeyboardEvent>& keyBoardEvents)
+{
+	std::ifstream saveFile("SavedSessions\\keyboardEvents.txt");
+	short keyCode{};
+	short flags{};
+	long timePos{};
+	char separator{};
+	while (!saveFile.eof())
+	{
+		saveFile >> keyCode;
+		saveFile >> separator;
+		saveFile >> flags;
+		saveFile >> separator;
+		saveFile >> timePos;
+		saveFile >> separator;
+		keyBoardEvents.push_back(KeyboardEvent(keyCode, flags, timePos));
+	}
+	saveFile.close();
 }

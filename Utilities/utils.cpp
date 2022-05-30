@@ -10,21 +10,21 @@ void emile::flushTampon()
 	std::cin.ignore(std::cin.rdbuf()->in_avail());
 }
 
-void emile::consoleBundle()
+void emile::Console::consoleBundle()
 {
-	emile::preventConsoleResize();
-	emile::hideCursor();
-	emile::disableQuickEdit();
-	emile::hideScrollingBar();
+	emile::Console::preventConsoleResize();
+	emile::Console::hideCursor();
+	emile::Console::disableQuickEdit();
+	emile::Console::hideScrollingBar();
 }
 
-void emile::preventConsoleResize()
+void emile::Console::preventConsoleResize()
 {
 	HWND consoleWindow = GetConsoleWindow();
 	SetWindowLong(consoleWindow, GWL_STYLE, GetWindowLong(consoleWindow, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 }
 
-void emile::hideCursor()
+void emile::Console::hideCursor()
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO lpCursor{};
@@ -33,7 +33,7 @@ void emile::hideCursor()
 	SetConsoleCursorInfo(console, &lpCursor);
 }
 
-void emile::disableQuickEdit()
+void emile::Console::disableQuickEdit()
 {
 	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
 	DWORD prev_mode;
@@ -41,7 +41,7 @@ void emile::disableQuickEdit()
 	SetConsoleMode(hInput, prev_mode & ~ENABLE_QUICK_EDIT_MODE);
 }
 
-void emile::hideScrollingBar()
+void emile::Console::hideScrollingBar()
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO info;

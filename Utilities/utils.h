@@ -8,12 +8,14 @@ namespace emile
 	// Resets std::cin buffer
 	void flushTampon();
 
-	
-	void consoleBundle();
-	void preventConsoleResize();
-	void hideCursor();
-	void disableQuickEdit();
-	void hideScrollingBar();
+	struct Console
+	{
+		static void consoleBundle();
+		static void preventConsoleResize();
+		static void hideCursor();
+		static void disableQuickEdit();
+		static void hideScrollingBar();
+	};
 
 	/** 
 	* Generate a password string 

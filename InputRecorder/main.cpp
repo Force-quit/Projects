@@ -16,23 +16,38 @@ int main()
 )";
 
 	std::cout << title << std::endl;
-	std::cout << "Record a session : 1" << std::endl;
-	std::cout << "Playback last session : 2" << std::endl;
-
+	
 	char choice{};
+	emile::Console::disableQuickEdit();
 	do
 	{
-		emile::flushTampon();
-		std::cout << "Select : ";
-		std::cin >> choice;
-	} while (std::cin.fail() || choice != '1' and choice != '2');
+		std::cout << "Record a session : 1" << std::endl;
+		std::cout << "Playback last session : 2" << std::endl;
 
+		do
+		{
+			emile::flushTampon();
+			std::cout << "Select : ";
+			std::cin >> choice;
+		} while (std::cin.fail() || choice != '1' and choice != '2');
 
-	emile::consoleBundle();
-	if (choice == '1')
-		record();
-	else
-		loadAndPlay();
+		std::cout << std::endl;
+		
+		if (choice == '1')
+			record();
+		else
+			loadAndPlay();
 
+		std::cout << std::endl;
+
+		do
+		{
+			emile::flushTampon();
+			std::cout << "Do you want to perform another action? (Y/N) : ";
+			std::cin >> choice;
+			choice = toupper(choice);
+		} while (std::cin.fail() || choice != 'Y' and choice != 'N');
+		std::cout << std::endl;
+	} while (choice == 'Y');
 	return 0;
 }
