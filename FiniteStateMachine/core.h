@@ -1,73 +1,73 @@
 #pragma once
-#include <vector>
-class Transition;
-class State;
-class FiniteStateMachine;
+#include <list>
+#include <memory>
 
-using TransitionList = std::vector<Transition>;
-using StateList = std::vector<State>;
+class State;
 
 class Transition
 {
 private:
-	State* __nextState;
+	std::shared_ptr<State> mNextState;
 protected:
-	void _execTransitingAction();
-	void _doTransitingAction();
+	virtual void execTransitingAction();
+	virtual void doTransitingAction() = 0;
 public:
-	Transition(const State* const nextState = nullptr);
+	using TransitionList = std::list<std::shared_ptr<Transition>>;
+	Transition(std::shared_ptr<State> nextState = nullptr);
 	bool isValid() const;
-	bool virtual isTransiting() const;
-	void setNextState(const State& nextState);
-	State getNextState() const;
+	virtual bool isTransiting() = 0;
+	void setNextState(std::shared_ptr<State> nextState);
+	std::shared_ptr<State> getNextState() const;
 };
 
-class State 
+class State
 {
 public:
+	using StateList = std::list<std::shared_ptr<State>>;
 	struct Parameters
 	{
 		bool terminal = false;
 		bool doInStateActionWhenEntering = false;
 		bool doInStateActionWhenExiting = false;
 	};
+
 	State(Parameters parameters = Parameters());
 	bool isValid() const;
 	bool isTerminal() const;
-	Transition isTransiting() const;
-	void addTransition(Transition transition);
-private:
-	Parameters __parameters;
-	TransitionList __transition;
+	std::shared_ptr<Transition> isTransiting(); // Aller voir std::optionnal
+	void addTransition(Transition& transition);
 protected:
-	void _execEnteringAction();
-	void _execInStateAction();
-	void _execExitingAction();
-	void _doEnteringAction();
-	void _doInStateAction();
-	void _doExitingAction();
+	void execEnteringAction();
+	void execInStateAction();
+	void execExitingAction();
+	virtual void doEnteringAction() = 0;
+	virtual void doInStateAction() = 0;
+	virtual void doExitingAction() = 0;
+private:
+	Parameters mParameters;
+	Transition::TransitionList mTransitions;
 };
 
-class FiniteStateMachine 
+
+class FiniteStateMachine
 {
 public:
 	class Layout
 	{
 	public:
-		Layout();
 		bool isValid() const;
-		State* getInitialState() const;
-		void setInitialState();
-		void addState(State state);
-		void addStates(StateList states);
+		std::shared_ptr<State> getInitialState() const;
+		void setInitialState(std::shared_ptr<State> initialState);
+		void addState(std::shared_ptr<State> state);
+		void addStates(State::StateList states);
 	private:
-		StateList __states;
-		State* __initialState;
+		State::StateList mStates;
+		std::shared_ptr<State> mInitialState;
 	};
 
-	FiniteStateMachine();
+	FiniteStateMachine(Layout layout);
 private:
-	Layout __layout;
-	State* __currentState;
-	bool __continue;
+	Layout mLayout;
+	std::shared_ptr<State> mCurrentState;
+	bool mContinue;
 };
