@@ -14,7 +14,7 @@ protected:
 public:
 	using TransitionList = std::list<std::shared_ptr<Transition>>;
 	Transition(std::shared_ptr<State> nextState = nullptr);
-	bool isValid() const;
+	bool isValid() const; // Aller voir assert
 	virtual bool isTransiting() = 0;
 	void setNextState(std::shared_ptr<State> nextState);
 	std::shared_ptr<State> getNextState() const;

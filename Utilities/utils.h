@@ -17,13 +17,19 @@ namespace emile
 		static void hideScrollingBar();
 	};
 
-	/** 
-	* Generate a password string 
-	* @param alphabet : string containing possible password characters
-	* @param passwordLength : Length of the password
-	* @return The password string
-	*/
-	std::string passwordGenerator(const std::string& alphabet, const unsigned short& passwordLength);
+	struct PasswordGenerator
+	{
+		
+		static const std::string DEFAULT_ALPHABET;
+		/**
+		* Generate a password string
+		* @param alphabet : string containing possible password characters
+		* @param passwordLength : Length of the password
+		* @return The password string
+		*/
+		static std::string generate(const std::string& alphabet = DEFAULT_ALPHABET, const unsigned short& passwordLength = 100);
+	};
+
 
 	//////////////////////////////
 	// KEYBOARD AND MOUSE INPUT //
