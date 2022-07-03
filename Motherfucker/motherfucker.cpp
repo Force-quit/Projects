@@ -56,22 +56,6 @@ bool checkMultipleInstances()
 	return multipleInstances(wideProcessName.c_str());
 }
 
-void createPrankMessage()
-{
-	Sleep(50);
-	emile::copyToClipBoard("notepad.exe");
-	Sleep(50);
-	emile::winR();
-	Sleep(50);
-	emile::ctrlV();
-	Sleep(50);
-	emile::fullKeyPress(VK_RETURN);
-	Sleep(50);
-	emile::copyToClipBoard("LOLOLOLOLOLOLOL XD XD ahahahh HIHII");
-	Sleep(50);
-	emile::ctrlV();
-}
-
 int rangedRandom(int min, int max)
 {
 	return min + rand() % ((max + 1) - min);

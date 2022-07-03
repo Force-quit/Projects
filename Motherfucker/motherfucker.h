@@ -2,7 +2,6 @@
 
 bool multipleInstances(const wchar_t processName[]);
 bool checkMultipleInstances();
-void createPrankMessage();
 int rangedRandom(int min, int max);
 
 void prank_CAPSLOCK();
