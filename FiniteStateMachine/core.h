@@ -9,8 +9,8 @@ class Transition
 private:
 	std::shared_ptr<State> mNextState;
 protected:
-	virtual void execTransitingAction();
-	virtual void doTransitingAction() = 0;
+	virtual void execTransitingAction(); // permet redéfinition
+	virtual void doTransitingAction() = 0; // virtuel pure comme abstact en java
 public:
 	using TransitionList = std::list<std::shared_ptr<Transition>>;
 	Transition(std::shared_ptr<State> nextState = nullptr);

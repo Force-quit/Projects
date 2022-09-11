@@ -36,16 +36,11 @@ bool State::isValid() const
 	if (isTerminal())
 		return true;
 
-	bool isValid{ true };
 	for (auto& t : mTransitions)
-	{
-		if (t.get()->isValid())
-		{
-			isValid = false;
-			break;
-		}
-	}
-	return isValid;
+		if (!t.get()->isValid())
+			return false;
+
+	return true;
 }
 
 bool State::isTerminal() const
@@ -63,7 +58,7 @@ std::shared_ptr<Transition> State::isTransiting()
 
 void State::addTransition(Transition& transition)
 {
-	mTransitions.push_back(std::shared_ptr<Transition>(&transition));
+	mTransitions.push_back(std::make_shared<Transition>(transition));
 }
 
 void State::execEnteringAction()
