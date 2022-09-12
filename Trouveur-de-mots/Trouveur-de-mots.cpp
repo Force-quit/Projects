@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <unordered_map>
 #include "../Utilities/utils.h"
+#include "Trouveur-de-mots.h"
 
 
 std::unordered_map<short, std::string> findWord(const std::vector<std::string>& wordList, const std::string& subString, const unsigned int& NB_WORDS, const unsigned short MAX_FINDS)
@@ -25,41 +26,10 @@ std::unordered_map<short, std::string> findWord(const std::vector<std::string>& 
 	return matches;
 }
 
-unsigned int fillWordsList(std::vector<std::string>& wordList)
+void mainLoop(const std::vector<std::string>& wordList, const unsigned short& MAX_FINDS)
 {
-	std::ifstream file("francais.txt");
-	unsigned int nbLines{ 0 };
-	if (!file.good())
-	{
-		std::cout << "La liste de mots n'est pas à la bonne place...";
-	}
-	else
-	{
-		std::string s;
-		std::cout << "Lecture du fichier de mots...\n";
-		while (std::getline(file, s))
-			++nbLines;
-
-		file.clear();
-		file.seekg(0);
-
-		wordList.resize(nbLines);
-
-		for (unsigned int i = 0; i < nbLines; i++)
-			std::getline(file, wordList[i]);
-
-		file.close();
-		std::cout << "Lecture terminée.\n\n";
-	}
-
-
-	return nbLines;
-}
-
-void mainLoop(std::vector<std::string>& wordList, const unsigned int WORDS_LIST_LENGTH, const unsigned short MAX_FINDS)
-{
-	std::string subString{};
-	std::unordered_map<short, std::string> matchesMap;
+	std::string subString;
+	std::unordered_map<unsigned short, std::string> matchesMap;
 	short choice{};
 
 	bool findOtherWords = true;
@@ -84,7 +54,7 @@ void mainLoop(std::vector<std::string>& wordList, const unsigned int WORDS_LIST_
 			continue;
 		}
 
-		matchesMap = findWord(wordList, subString, WORDS_LIST_LENGTH, MAX_FINDS);
+		matchesMap = findWord(wordList, subString, 1, MAX_FINDS);
 
 		if (matchesMap.size() == 0)
 			std::cout << "Aucun mot avec cet échantillon\n";
@@ -107,28 +77,7 @@ void mainLoop(std::vector<std::string>& wordList, const unsigned int WORDS_LIST_
 
 }
 
-int main()
+void findWords(const std::vector<std::string>& wordList, const std::string& subStr, const unsigned short& MAX_RESULTS, std::unordered_map<unsigned short, std::string>& foundWords)
 {
-	SetConsoleCP(1252);
-	SetConsoleOutputCP(1252);
-	SetConsoleTitleA("Trouveur de mots avec échantillon");
 
-
-	std::vector<std::string> wordList;
-	const unsigned int WORDS_LIST_LENGTH = fillWordsList(wordList);
-
-	if (WORDS_LIST_LENGTH == 0)
-	{
-		emile::flushTampon();
-		std::cin.get();
-	}
-	else
-	{
-		const unsigned short MAX_FINDS = 25;
-
-		std::cout << "Trouveur de mots avec échantillon\n";
-		mainLoop(wordList, WORDS_LIST_LENGTH, MAX_FINDS);
-	}
-
-	return 0;
 }
