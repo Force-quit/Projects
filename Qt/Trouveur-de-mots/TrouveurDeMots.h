@@ -14,7 +14,6 @@ public:
 	TrouveurDeMots(QWidget *parent = nullptr);
 	~TrouveurDeMots();
 private:
-	std::ifstream wordListFile;
 	std::vector<std::string> wordList;
 	Ui::TrouveurDeMotsClass ui;
 };
