@@ -1,4 +1,9 @@
+#if true
+#include "C:\Users\User\Documents\MY-STUFF\Projects\Qt\Trouveur-de-mots\TrouveurDeMots.h"
+#else
 #include "../Users/User/Documents/Projects/Qt/Trouveur-de-mots/TrouveurDeMots.h"
+#endif
+
 #include <qlabel.h>
 #include <qboxlayout.h>
 #include <qgroupbox.h>
@@ -10,10 +15,12 @@
 #include <Windows.h>
 #include <iostream>
 #include <vector>
-#include <thread>
+#include <QLineEdit.h>
+#include <QIntValidator>
+#include <qcombobox.h>
 
 TrouveurDeMots::TrouveurDeMots(QWidget* parent)
-	: QWidget(parent)
+	: QWidget(parent), nbResults(25), wordList()
 {
 	std::string defaultFileName("francais.txt");
 	std::ifstream defaultFile(defaultFileName);
@@ -29,6 +36,23 @@ TrouveurDeMots::TrouveurDeMots(QWidget* parent)
 
 	auto* centralLayout{ new QVBoxLayout };
 
+	auto* parametersGroupBox = initParameters(defaultFileName);
+	
+	auto* resultsLayout{ new QHBoxLayout };
+	auto* resultsComboBox{ new QComboBox };
+	
+	resultsLayout->addWidget(resultsComboBox);
+
+
+	centralLayout->addWidget(parametersGroupBox);
+	centralLayout->addLayout(resultsLayout);
+	setLayout(centralLayout);
+	ui.setupUi(this);
+}
+
+
+QGroupBox* TrouveurDeMots::initParameters(std::string & defaultFileName)
+{
 	auto* parametersGroupBox{ new QGroupBox("Parametres") };
 	auto* parametersLayout{ new QVBoxLayout };
 	auto* wordListLayout{ new QHBoxLayout };
@@ -51,21 +75,28 @@ TrouveurDeMots::TrouveurDeMots(QWidget* parent)
 
 		file.close();
 
-	});
+		});
 	wordListLayout->addWidget(wordListLabel);
 	wordListLayout->addWidget(wordListValue);
 	wordListLayout->addWidget(wordListButton);
+	auto* resultNbLayout{ new QHBoxLayout };
 	auto* resultNbLabel{ new QLabel("Nombre de resultats :") };
-	auto* resultNbValue{ new QLabel("25") };
-	auto* resultNbInput{new };
+	auto* resultNbValue{ new QLabel(QString::number(nbResults)) };
+	auto* resultNbInput{ new QLineEdit };
+	auto* intValidator{ new QIntValidator };
+	intValidator->setRange(1, 50000);
+	resultNbInput->setValidator(intValidator);
+	resultNbLayout->addWidget(resultNbLabel);
+	resultNbLayout->addWidget(resultNbValue);
+	resultNbLayout->addWidget(resultNbInput);
+
 	parametersLayout->addLayout(wordListLayout);
+	parametersLayout->addLayout(resultNbLayout);
 	parametersGroupBox->setLayout(parametersLayout);
-
-
-	centralLayout->addWidget(parametersGroupBox);
-	setLayout(centralLayout);
-	ui.setupUi(this);
+	return parametersGroupBox;
 }
 
 TrouveurDeMots::~TrouveurDeMots()
-{}
+{
+
+}

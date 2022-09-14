@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <QGroupBox.h>
 
 class TrouveurDeMots : public QWidget
 {
@@ -14,6 +15,9 @@ public:
 	TrouveurDeMots(QWidget *parent = nullptr);
 	~TrouveurDeMots();
 private:
+	QGroupBox* initParameters(std::string& defaultFileName);
 	std::vector<std::string> wordList;
+	unsigned int nbResults;
 	Ui::TrouveurDeMotsClass ui;
+
 };
