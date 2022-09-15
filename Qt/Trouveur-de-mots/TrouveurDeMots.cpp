@@ -1,4 +1,4 @@
-#if true
+#if false
 #include "C:\Users\User\Documents\MY-STUFF\Projects\Qt\Trouveur-de-mots\TrouveurDeMots.h"
 #else
 #include "../Users/User/Documents/Projects/Qt/Trouveur-de-mots/TrouveurDeMots.h"
@@ -53,7 +53,7 @@ TrouveurDeMots::TrouveurDeMots(QWidget* parent)
 
 QGroupBox* TrouveurDeMots::initParameters(std::string & defaultFileName)
 {
-	auto* parametersGroupBox{ new QGroupBox("Parametres") };
+	auto* parametersGroupBox{ new QGroupBox("Paramètres") };
 	auto* parametersLayout{ new QVBoxLayout };
 	auto* wordListLayout{ new QHBoxLayout };
 	auto* wordListLabel{ new QLabel("Fichier de reference pour les mots :") };
@@ -81,14 +81,18 @@ QGroupBox* TrouveurDeMots::initParameters(std::string & defaultFileName)
 	wordListLayout->addWidget(wordListButton);
 	auto* resultNbLayout{ new QHBoxLayout };
 	auto* resultNbLabel{ new QLabel("Nombre de resultats :") };
-	auto* resultNbValue{ new QLabel(QString::number(nbResults)) };
 	auto* resultNbInput{ new QLineEdit };
+	resultNbInput->setText(QString::number(nbResults));
 	auto* intValidator{ new QIntValidator };
 	intValidator->setRange(1, 50000);
 	resultNbInput->setValidator(intValidator);
+	auto* resultNbButton{ new QPushButton("Ok") };
+	connect(resultNbButton, &QPushButton::clicked, [this, &resultNbInput]() {
+		nbResults = resultNbInput->text().toShort();
+	});
 	resultNbLayout->addWidget(resultNbLabel);
-	resultNbLayout->addWidget(resultNbValue);
 	resultNbLayout->addWidget(resultNbInput);
+	resultNbLayout->addWidget(resultNbButton);
 
 	parametersLayout->addLayout(wordListLayout);
 	parametersLayout->addLayout(resultNbLayout);
