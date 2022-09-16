@@ -1,5 +1,7 @@
-#if false
+ï»¿
+#if true
 #include "C:\Users\User\Documents\MY-STUFF\Projects\Qt\Trouveur-de-mots\TrouveurDeMots.h"
+#include "C:\Users\User\Documents\MY-STUFF\Projects\Utilities\utils.h"
 #else
 #include "../Users/User/Documents/Projects/Qt/Trouveur-de-mots/TrouveurDeMots.h"
 #endif
@@ -20,84 +22,136 @@
 #include <qcombobox.h>
 
 TrouveurDeMots::TrouveurDeMots(QWidget* parent)
-	: QWidget(parent), nbResults(25), wordList()
+	: QWidget(parent), maxResults(DEFAULT_NB_RESULTS), wordList()
 {
-	std::string defaultFileName("francais.txt");
-	std::ifstream defaultFile(defaultFileName);
+	std::ifstream defaultFile(DEFAULT_WORD_LIST_NAME);
 	if (defaultFile.good())
 	{
 		std::string temp;
 		while (std::getline(defaultFile, temp))
 			wordList.push_back(temp);
 	}
-	else
-		defaultFileName.clear();
 	defaultFile.close();
 
-	auto* centralLayout{ new QVBoxLayout };
+	QVBoxLayout* centralLayout{ new QVBoxLayout };
 
-	auto* parametersGroupBox = initParameters(defaultFileName);
-	
-	auto* resultsLayout{ new QHBoxLayout };
-	auto* resultsComboBox{ new QComboBox };
-	
-	resultsLayout->addWidget(resultsComboBox);
-
+	QGroupBox* parametersGroupBox = initParameters();
+	QHBoxLayout* searchLayout = initSearch();
+	QHBoxLayout* resultsLayout = initResults();
 
 	centralLayout->addWidget(parametersGroupBox);
+	centralLayout->addLayout(searchLayout);
 	centralLayout->addLayout(resultsLayout);
 	setLayout(centralLayout);
 	ui.setupUi(this);
 }
 
 
-QGroupBox* TrouveurDeMots::initParameters(std::string & defaultFileName)
+QGroupBox* TrouveurDeMots::initParameters()
 {
-	auto* parametersGroupBox{ new QGroupBox("Paramètres") };
+	auto* parametersGroupBox{ new QGroupBox("Parameters") };
 	auto* parametersLayout{ new QVBoxLayout };
 	auto* wordListLayout{ new QHBoxLayout };
-	auto* wordListLabel{ new QLabel("Fichier de reference pour les mots :") };
-	auto* wordListValue{ new QLabel(defaultFileName.c_str()) };
-	auto* wordListButton{ new QPushButton("Choisir fichier") };
+	auto* wordListLabel{ new QLabel("Word list :") };
+	auto* wordListValue{ new QLabel(DEFAULT_WORD_LIST_NAME.c_str()) };
+	auto* wordListButton{ new QPushButton("Select file") };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListValue]() {
-		QString filePath = QFileDialog::getOpenFileName(this, "Choose File", QDir::currentPath(), "text files (*.txt)");
-		std::ifstream file(filePath.toStdString());
-		if (!file.good())
-			MessageBox(NULL, L"Error reading file", L"Error", MB_CANCELTRYCONTINUE);
-		else
+
+		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", QDir::currentPath(), "text files (*.txt)");
+
+		if (!filePath.isEmpty())
 		{
-			wordList.clear();
-			std::string temp;
-			while (std::getline(file, temp))
-				wordList.push_back(temp);
-			wordListValue->setText(filePath);
+			std::ifstream file(filePath.toStdString());
+			if (!file.good())
+				MessageBox(NULL, L"Error reading file", L"File error", MB_ICONERROR);
+			else
+			{
+				wordList.clear();
+				std::string temp;
+				while (std::getline(file, temp))
+					wordList.push_back(temp);
+				wordListValue->setText(filePath);
+				resultsComboBox->clear();
+				searchInput->clear();
+			}
+
+			file.close();
 		}
-
-		file.close();
-
-		});
+	});
 	wordListLayout->addWidget(wordListLabel);
 	wordListLayout->addWidget(wordListValue);
 	wordListLayout->addWidget(wordListButton);
 	auto* resultNbLayout{ new QHBoxLayout };
-	auto* resultNbLabel{ new QLabel("Nombre de resultats :") };
-	auto* resultNbInput{ new QLineEdit };
-	resultNbInput->setText(QString::number(nbResults));
+	auto* resultNbLabel{ new QLabel("Result number :") };
+	resultNbInput = new QLineEdit;
+	resultNbInput->setText(QString::number(DEFAULT_NB_RESULTS));
 	auto* intValidator{ new QIntValidator };
-	intValidator->setRange(1, 50000);
+	intValidator->setRange(1, INT_MAX);
 	resultNbInput->setValidator(intValidator);
-	auto* resultNbButton{ new QPushButton("Ok") };
-	connect(resultNbButton, &QPushButton::clicked, [this, &resultNbInput]() {
-		nbResults = resultNbInput->text().toShort();
+	connect(resultNbInput, &QLineEdit::textEdited, [this]() {
+		QString text = resultNbInput->text();
+		if (text.isEmpty())
+			maxResults = 0;
+		else
+		{
+			int result = std::atoi(text.toStdString().c_str());
+			if (result == INT_MAX) // If input too big
+				resultNbInput->setText(QString::number(result));
+			maxResults = result;
+		}
 	});
 	resultNbLayout->addWidget(resultNbLabel);
 	resultNbLayout->addWidget(resultNbInput);
-	resultNbLayout->addWidget(resultNbButton);
 
 	parametersLayout->addLayout(wordListLayout);
 	parametersLayout->addLayout(resultNbLayout);
+	parametersLayout->setAlignment(Qt::AlignTop);
 	parametersGroupBox->setLayout(parametersLayout);
 	return parametersGroupBox;
+}
+
+QHBoxLayout* TrouveurDeMots::initSearch()
+{
+	auto* searchLayout{ new QHBoxLayout };
+	auto* searchLabel{ new QLabel("Substring to find :") };
+	searchInput = new QLineEdit;
+	searchInput->setValidator(new QRegularExpressionValidator(QRegularExpression(QString::fromUtf8("\\p{L}+"))));
+	searchLayout->addWidget(searchLabel);
+	searchLayout->addWidget(searchInput);
+	connect(searchInput, &QLineEdit::textEdited, [this]() {
+		resultsComboBox->clear();
+		if (maxResults != 0)
+		{
+			std::string subString = searchInput->text().toStdString();
+			unsigned int counter = 0;
+			for (unsigned int i = 0; i < wordList.size(); ++i)
+			{
+				if (wordList[i].find(subString) != std::string::npos)
+				{
+					resultsComboBox->addItem(QString::fromUtf8(wordList[i]));
+					++counter;
+					if (counter == maxResults)
+						break;
+				}
+			}
+		}
+		});
+	return searchLayout;
+}
+
+QHBoxLayout* TrouveurDeMots::initResults()
+{
+	auto* resultsLayout{ new QHBoxLayout };
+	resultsComboBox = new QComboBox;
+	auto* resultsButton{ new QPushButton("Copy") };
+	connect(resultsButton, &QPushButton::clicked, [this]() {
+		QString currentText = resultsComboBox->currentText();
+		if (!currentText.isEmpty())
+			emile::copyToClipBoard(currentText.toStdString());
+		});
+	resultsLayout->addWidget(resultsComboBox);
+	resultsLayout->addWidget(resultsButton);
+	return resultsLayout;
 }
 
 TrouveurDeMots::~TrouveurDeMots()
