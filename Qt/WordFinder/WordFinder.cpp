@@ -1,10 +1,5 @@
-#if true
-#include "C:\Users\User\Documents\MY-STUFF\Projects\Qt\WordFinder\WordFinder.h"
-#include "C:\Users\User\Documents\MY-STUFF\Projects\Utilities\utils.h"
-#else
-#include "../Users/User/Documents/Projects/Qt/WordFinder/WordFinder.h"
-#endif
-
+#include "../../Utilities/utils.h"
+#include "WordFinder.h"
 #include <qlabel.h>
 #include <qboxlayout.h>
 #include <qgroupbox.h>

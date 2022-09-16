@@ -12,6 +12,8 @@
 #include <thread>
 #include <mutex>
 
+void searchFunction(int& maxResults, std::vector<std::string>& wordList, bool& stopSearch, QComboBox& resultsComboBox, std::string subString, bool& searching, std::mutex& searchMutex);
+
 class WordFinder : public QWidget
 {
 	Q_OBJECT
@@ -21,7 +23,7 @@ public:
 	~WordFinder();
 private:
 	const unsigned int DEFAULT_NB_RESULTS{ 25 };
-	const std::string DEFAULT_WORD_LIST_NAME = "francais.txt";
+	const std::string DEFAULT_WORD_LIST_NAME = "Word-lists/francais.txt";
 	std::vector<std::string> wordList;
 	int maxResults;
 	Ui::WordFinderClass ui;
