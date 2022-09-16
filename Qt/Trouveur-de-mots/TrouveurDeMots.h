@@ -31,9 +31,11 @@ private:
 
 	std::thread* searchThread;
 
+	bool searching;
+	bool stopSearch;
+
 	QGroupBox* initParameters();
 	QHBoxLayout* initSearch();
 	QHBoxLayout* initResults();
-
 
 };

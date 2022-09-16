@@ -20,9 +20,11 @@
 #include <QLineEdit.h>
 #include <QIntValidator>
 #include <qcombobox.h>
+#include <thread>
+#include <cstdlib>
 
 TrouveurDeMots::TrouveurDeMots(QWidget* parent)
-	: QWidget(parent), maxResults(DEFAULT_NB_RESULTS), wordList()
+	: QWidget(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchThread()
 {
 	std::ifstream defaultFile(DEFAULT_WORD_LIST_NAME);
 	if (defaultFile.good())
@@ -46,6 +48,25 @@ TrouveurDeMots::TrouveurDeMots(QWidget* parent)
 	ui.setupUi(this);
 }
 
+
+void searchFunction(int& maxResults, std::vector<std::string>& wordList, bool& stopSearch, QComboBox& resultsComboBox, std::string subString, bool& searching)
+{
+	unsigned int counter = 0;
+	for (unsigned int i = 0; i < wordList.size() && !stopSearch; ++i)
+	{
+		if (wordList[i].find(subString) != std::string::npos)
+		{
+			resultsComboBox.addItem(QString::fromUtf8(wordList[i]));
+			++counter;
+			if (counter == maxResults)
+				break;
+		}
+	}
+
+	if (resultsComboBox.count() > 0)
+		resultsComboBox.setCurrentIndex(0);
+	searching = false;
+}
 
 QGroupBox* TrouveurDeMots::initParameters()
 {
@@ -77,7 +98,7 @@ QGroupBox* TrouveurDeMots::initParameters()
 
 			file.close();
 		}
-	});
+		});
 	wordListLayout->addWidget(wordListLabel);
 	wordListLayout->addWidget(wordListValue);
 	wordListLayout->addWidget(wordListButton);
@@ -99,7 +120,7 @@ QGroupBox* TrouveurDeMots::initParameters()
 				resultNbInput->setText(QString::number(result));
 			maxResults = result;
 		}
-	});
+		});
 	resultNbLayout->addWidget(resultNbLabel);
 	resultNbLayout->addWidget(resultNbInput);
 
@@ -119,21 +140,23 @@ QHBoxLayout* TrouveurDeMots::initSearch()
 	searchLayout->addWidget(searchLabel);
 	searchLayout->addWidget(searchInput);
 	connect(searchInput, &QLineEdit::textEdited, [this]() {
-		resultsComboBox->clear();
 		if (maxResults != 0)
 		{
-			std::string subString = searchInput->text().toStdString();
-			unsigned int counter = 0;
-			for (unsigned int i = 0; i < wordList.size(); ++i)
+			resultsComboBox->clear();
+			
+			if (searching)
+				stopSearch = true;
+
+			if (searchThread != nullptr)
 			{
-				if (wordList[i].find(subString) != std::string::npos)
-				{
-					resultsComboBox->addItem(QString::fromUtf8(wordList[i]));
-					++counter;
-					if (counter == maxResults)
-						break;
-				}
+				searchThread->join();
+				stopSearch = false;
 			}
+
+			delete searchThread;
+			std::string subString = searchInput->text().toStdString();
+			searchThread = new std::thread(searchFunction, std::ref(maxResults), std::ref(wordList), std::ref(stopSearch), std::ref(*resultsComboBox), subString, std::ref(searching));
+			searching = true;
 		}
 		});
 	return searchLayout;
@@ -147,7 +170,18 @@ QHBoxLayout* TrouveurDeMots::initResults()
 	connect(resultsButton, &QPushButton::clicked, [this]() {
 		QString currentText = resultsComboBox->currentText();
 		if (!currentText.isEmpty())
-			emile::copyToClipBoard(currentText.toStdString());
+		{
+			// What is this dark magic
+			std::wstring wstr = currentText.toStdWString();
+			std::string convertedString;
+			size_t size;
+			convertedString.resize(wstr.length());
+			wcstombs_s(&size, &convertedString[0], convertedString.size() + 1, wstr.c_str(), wstr.size());
+			//
+
+
+			emile::copyToClipBoard(convertedString);
+		}
 		});
 	resultsLayout->addWidget(resultsComboBox);
 	resultsLayout->addWidget(resultsButton);
