@@ -37,14 +37,14 @@ WordFinder::WordFinder(QWidget* parent)
 	QHBoxLayout* resultsLayout = initResults();
 
 	centralLayout->addWidget(parametersGroupBox);
+	centralLayout->addStretch();
 	centralLayout->addLayout(searchLayout);
 	centralLayout->addLayout(resultsLayout);
 	setLayout(centralLayout);
 	ui.setupUi(this);
 }
 
-
-void searchFunction(int& maxResults, std::vector<std::string>& wordList, bool& stopSearch, QComboBox& resultsComboBox, std::string subString, bool& searching, std::mutex& searchMutex)
+void WordFinder::searchFunction(std::string subString)
 {
 	unsigned int counter = 0;
 	QStringList results;
@@ -60,9 +60,9 @@ void searchFunction(int& maxResults, std::vector<std::string>& wordList, bool& s
 	}
 
 	searchMutex.lock();
-	resultsComboBox.addItems(results);
-	if (resultsComboBox.count() > 0)
-		resultsComboBox.setCurrentIndex(0);
+	resultsComboBox->addItems(results);
+	if (resultsComboBox->count() > 0)
+		resultsComboBox->setCurrentIndex(0);
 	searching = false;
 	stopSearch = false;
 	searchMutex.unlock();
@@ -154,7 +154,9 @@ QHBoxLayout* WordFinder::initSearch()
 
 			delete searchThread;
 			std::string subString = searchInput->text().toStdString();
-			searchThread = new std::thread(searchFunction, std::ref(maxResults), std::ref(wordList), std::ref(stopSearch), std::ref(*resultsComboBox), subString, std::ref(searching), std::ref(searchMutex));
+			searchThread = new std::thread([this](std::string s) {
+				searchFunction(s);
+				}, subString);
 			searching = true;
 		}
 		else

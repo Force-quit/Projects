@@ -12,8 +12,6 @@
 #include <thread>
 #include <mutex>
 
-void searchFunction(int& maxResults, std::vector<std::string>& wordList, bool& stopSearch, QComboBox& resultsComboBox, std::string subString, bool& searching, std::mutex& searchMutex);
-
 class WordFinder : public QWidget
 {
 	Q_OBJECT
@@ -36,9 +34,8 @@ private:
 	std::mutex searchMutex;
 	bool searching;
 	bool stopSearch;
-
+	void searchFunction(const std::string subString);
 	QGroupBox* initParameters();
 	QHBoxLayout* initSearch();
 	QHBoxLayout* initResults();
-
 };
