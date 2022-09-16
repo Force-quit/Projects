@@ -1,8 +1,8 @@
 <UI version="4.0" >
- <class>TrouveurDeMotsClass</class>
- <widget class="QWidget" name="TrouveurDeMotsClass" >
+ <class>WordFinderClass</class>
+ <widget class="QWidget" name="WordFinderClass" >
   <property name="objectName" >
-   <string notr="true">TrouveurDeMotsClass</string>
+   <string notr="true">WordFinderClass</string>
   </property>
   <property name="geometry" >
    <rect>
@@ -13,7 +13,7 @@
    </rect>
   </property>
   <property name="windowTitle" >
-   <string>TrouveurDeMots</string>
+   <string>WordFinder</string>
   </property>$centralwidget$
  </widget>
  <layoutDefault spacing="6" margin="11" />

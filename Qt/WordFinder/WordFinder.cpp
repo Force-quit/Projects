@@ -1,9 +1,8 @@
-﻿
 #if true
-#include "C:\Users\User\Documents\MY-STUFF\Projects\Qt\Trouveur-de-mots\TrouveurDeMots.h"
+#include "C:\Users\User\Documents\MY-STUFF\Projects\Qt\WordFinder\WordFinder.h"
 #include "C:\Users\User\Documents\MY-STUFF\Projects\Utilities\utils.h"
 #else
-#include "../Users/User/Documents/Projects/Qt/Trouveur-de-mots/TrouveurDeMots.h"
+#include "../Users/User/Documents/Projects/Qt/WordFinder/WordFinder.h"
 #endif
 
 #include <qlabel.h>
@@ -22,9 +21,10 @@
 #include <qcombobox.h>
 #include <thread>
 #include <cstdlib>
+#include <mutex>
 
-TrouveurDeMots::TrouveurDeMots(QWidget* parent)
-	: QWidget(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchThread()
+WordFinder::WordFinder(QWidget* parent)
+	: QWidget(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchThread(), searchMutex()
 {
 	std::ifstream defaultFile(DEFAULT_WORD_LIST_NAME);
 	if (defaultFile.good())
@@ -49,26 +49,31 @@ TrouveurDeMots::TrouveurDeMots(QWidget* parent)
 }
 
 
-void searchFunction(int& maxResults, std::vector<std::string>& wordList, bool& stopSearch, QComboBox& resultsComboBox, std::string subString, bool& searching)
+void searchFunction(int& maxResults, std::vector<std::string>& wordList, bool& stopSearch, QComboBox& resultsComboBox, std::string subString, bool& searching, std::mutex& searchMutex)
 {
 	unsigned int counter = 0;
+	QStringList results;
 	for (unsigned int i = 0; i < wordList.size() && !stopSearch; ++i)
 	{
 		if (wordList[i].find(subString) != std::string::npos)
 		{
-			resultsComboBox.addItem(QString::fromUtf8(wordList[i]));
+			results.append(QString::fromUtf8(wordList[i]));
 			++counter;
 			if (counter == maxResults)
 				break;
 		}
 	}
 
+	searchMutex.lock();
+	resultsComboBox.addItems(results);
 	if (resultsComboBox.count() > 0)
 		resultsComboBox.setCurrentIndex(0);
 	searching = false;
+	stopSearch = false;
+	searchMutex.unlock();
 }
 
-QGroupBox* TrouveurDeMots::initParameters()
+QGroupBox* WordFinder::initParameters()
 {
 	auto* parametersGroupBox{ new QGroupBox("Parameters") };
 	auto* parametersLayout{ new QVBoxLayout };
@@ -131,7 +136,7 @@ QGroupBox* TrouveurDeMots::initParameters()
 	return parametersGroupBox;
 }
 
-QHBoxLayout* TrouveurDeMots::initSearch()
+QHBoxLayout* WordFinder::initSearch()
 {
 	auto* searchLayout{ new QHBoxLayout };
 	auto* searchLabel{ new QLabel("Substring to find :") };
@@ -142,27 +147,28 @@ QHBoxLayout* TrouveurDeMots::initSearch()
 	connect(searchInput, &QLineEdit::textEdited, [this]() {
 		if (maxResults != 0)
 		{
+			searchMutex.lock();
 			resultsComboBox->clear();
-			
+
 			if (searching)
 				stopSearch = true;
+			searchMutex.unlock();
 
 			if (searchThread != nullptr)
-			{
 				searchThread->join();
-				stopSearch = false;
-			}
 
 			delete searchThread;
 			std::string subString = searchInput->text().toStdString();
-			searchThread = new std::thread(searchFunction, std::ref(maxResults), std::ref(wordList), std::ref(stopSearch), std::ref(*resultsComboBox), subString, std::ref(searching));
+			searchThread = new std::thread(searchFunction, std::ref(maxResults), std::ref(wordList), std::ref(stopSearch), std::ref(*resultsComboBox), subString, std::ref(searching), std::ref(searchMutex));
 			searching = true;
 		}
+		else
+			resultsComboBox->clear();
 		});
 	return searchLayout;
 }
 
-QHBoxLayout* TrouveurDeMots::initResults()
+QHBoxLayout* WordFinder::initResults()
 {
 	auto* resultsLayout{ new QHBoxLayout };
 	resultsComboBox = new QComboBox;
@@ -188,7 +194,7 @@ QHBoxLayout* TrouveurDeMots::initResults()
 	return resultsLayout;
 }
 
-TrouveurDeMots::~TrouveurDeMots()
+WordFinder::~WordFinder()
 {
 
 }
