@@ -172,14 +172,12 @@ QHBoxLayout* WordFinder::initResults()
 		QString currentText = resultsComboBox->currentText();
 		if (!currentText.isEmpty())
 		{
-			// What is this dark magic
+
 			std::wstring wstr = currentText.toStdWString();
 			std::string convertedString;
-			size_t size;
 			convertedString.resize(wstr.length());
+			size_t size;
 			wcstombs_s(&size, &convertedString[0], convertedString.size() + 1, wstr.c_str(), wstr.size());
-			//
-
 
 			emile::copyToClipBoard(convertedString);
 		}
