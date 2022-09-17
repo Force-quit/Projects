@@ -74,7 +74,7 @@ QGroupBox* WordFinder::initParameters()
 	auto* parametersLayout{ new QVBoxLayout };
 	auto* wordListLayout{ new QHBoxLayout };
 	auto* wordListLabel{ new QLabel("Word list :") };
-	auto* wordListValue{ new QLabel(DEFAULT_WORD_LIST_NAME.c_str()) };
+	auto* wordListValue{ new QLabel( wordList.size() > 0 ? DEFAULT_WORD_LIST_NAME.c_str() : "")};
 	auto* wordListButton{ new QPushButton("Select file") };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListValue]() {
 
@@ -154,14 +154,12 @@ QHBoxLayout* WordFinder::initSearch()
 
 			delete searchThread;
 			std::string subString = searchInput->text().toStdString();
-			searchThread = new std::thread([this](std::string s) {
-				searchFunction(s);
-				}, subString);
+			searchThread = new std::thread([this](std::string s) {searchFunction(s);}, subString);
 			searching = true;
 		}
 		else
 			resultsComboBox->clear();
-		});
+	});
 	return searchLayout;
 }
 
