@@ -37,9 +37,9 @@ WordFinder::WordFinder(QWidget* parent)
 	QHBoxLayout* resultsLayout = initResults();
 
 	centralLayout->addWidget(parametersGroupBox);
-	centralLayout->addStretch();
 	centralLayout->addLayout(searchLayout);
 	centralLayout->addLayout(resultsLayout);
+	centralLayout->setAlignment(Qt::AlignTop);
 	setLayout(centralLayout);
 	ui.setupUi(this);
 }
@@ -71,7 +71,6 @@ void WordFinder::searchFunction(std::string subString)
 QGroupBox* WordFinder::initParameters()
 {
 	auto* parametersGroupBox{ new QGroupBox("Parameters") };
-	auto* parametersLayout{ new QVBoxLayout };
 	auto* wordListLayout{ new QHBoxLayout };
 	auto* wordListLabel{ new QLabel("Word list :") };
 	auto* wordListValue{ new QLabel( wordList.size() > 0 ? DEFAULT_WORD_LIST_NAME.c_str() : "")};
@@ -124,9 +123,9 @@ QGroupBox* WordFinder::initParameters()
 	resultNbLayout->addWidget(resultNbLabel);
 	resultNbLayout->addWidget(resultNbInput);
 
+	auto* parametersLayout{ new QVBoxLayout };
 	parametersLayout->addLayout(wordListLayout);
 	parametersLayout->addLayout(resultNbLayout);
-	parametersLayout->setAlignment(Qt::AlignTop);
 	parametersGroupBox->setLayout(parametersLayout);
 	return parametersGroupBox;
 }
