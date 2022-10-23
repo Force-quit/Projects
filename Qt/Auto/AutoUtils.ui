@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AutoClickerClass</class>
- <widget class="QMainWindow" name="AutoClickerClass">
+ <class>AutoUtilsClass</class>
+ <widget class="QMainWindow" name="AutoUtilsClass">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>426</width>
+    <width>600</width>
     <height>400</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AutoClicker</string>
+   <string>AutoUtils</string>
   </property>
   <widget class="QWidget" name="centralWidget"/>
   <widget class="QStatusBar" name="statusBar"/>
