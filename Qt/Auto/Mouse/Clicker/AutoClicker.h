@@ -3,9 +3,11 @@
 #include <QWidget>
 #include "ui_AutoClicker.h"
 #include <QGroupBox>
+#include <QLineEdit>
 #include <QHBoxLayout>
 #include <QIntValidator>
 #include <QButtonGroup>
+#include <string>
 
 class AutoClicker : public QWidget
 {
@@ -15,6 +17,7 @@ public:
 	AutoClicker(QWidget *parent = nullptr);
 	~AutoClicker();
 
+	static const std::string CLICKER_CONFIG_PATH;
 private:
 	Ui::AutoClickerClass ui;
 	

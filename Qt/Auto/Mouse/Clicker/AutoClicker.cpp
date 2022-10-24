@@ -1,4 +1,6 @@
 #include "AutoClicker.h"
+#include <fstream>
+#include <string>
 #include <QBoxLayout>
 #include <QGroupBox>
 #include <QIntValidator>
@@ -8,8 +10,9 @@
 #include <QRadioButton>
 #include <QButtonGroup>
 #include <QFileDialog>
-#include <fstream>
-#include <Windows.h>
+#include <QMessageBox>
+
+const std::string AutoClicker::CLICKER_CONFIG_PATH = "AutoClickerConfigs";
 
 AutoClicker::AutoClicker(QWidget* parent)
 	: QWidget(parent), clickHoldTime(defaultClickHoldTime), invalidClickHoldTime(),
@@ -128,33 +131,48 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 	QPushButton* saveButton{ new QPushButton("Save") };
 	connect(saveButton, &QPushButton::clicked, [this, saveFileName]() {
 
-		QString filePath = QDir::currentPath() + "/MouseConfig";
+		QString filePath = QString::fromStdString("./" + CLICKER_CONFIG_PATH);
 		filePath = QFileDialog::getSaveFileName(this, "Save your AutoClicker configuration", filePath, "text files (*.txt)");
 
 		if (!filePath.isEmpty())
 		{
 			std::ofstream file(filePath.toStdString());
 			if (!file.good())
-				MessageBox(NULL, L"Error saving file", L"File error", MB_ICONERROR);
+			{
+				QMessageBox msgBox;
+				msgBox.setText("File error");
+				msgBox.setInformativeText("Error saving file");
+				msgBox.setStandardButtons(QMessageBox::Ok);
+				msgBox.setDefaultButton(QMessageBox::Ok);
+				msgBox.exec();
+			}
 			else
 				file << clickHoldTime << ',' << timeBetweenClicks << ',' << leftClick;
 			file.close();
 
-			saveFileName->setText("MouseConfig" + filePath.mid(filePath.lastIndexOf("/")));
+			QString fileName = QString::fromStdString(CLICKER_CONFIG_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
+			saveFileName->setText(fileName);
 		}
 	});
 
 	QPushButton* loadButton{ new QPushButton("Load") };
 	connect(loadButton, &QPushButton::clicked, [this, saveFileName]() {
 
-		QString filePath = QDir::currentPath() + "/MouseConfig";
+		QString filePath = QString::fromStdString("./" + CLICKER_CONFIG_PATH);
 		filePath = QFileDialog::getOpenFileName(this, "Load your AutoClicker configuration", filePath, "text files (*.txt)");
 
 		if (!filePath.isEmpty())
 		{
 			std::ifstream file(filePath.toStdString());
 			if (!file.good())
-				MessageBox(NULL, L"Error loading file", L"File error", MB_ICONERROR);
+			{
+				QMessageBox msgBox;
+				msgBox.setText("File error");
+				msgBox.setInformativeText("Error loading file");
+				msgBox.setStandardButtons(QMessageBox::Ok);
+				msgBox.setDefaultButton(QMessageBox::Ok);
+				msgBox.exec();
+			}
 			else
 			{
 				char sep;
@@ -162,7 +180,8 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 			}
 			file.close();
 
-			saveFileName->setText("MouseConfig" + filePath.mid(filePath.lastIndexOf("/")));
+			QString fileName = QString::fromStdString(CLICKER_CONFIG_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
+			saveFileName->setText(fileName);
 			clickHoldTimeEdit->clear();
 			clickHoldTimeEdit->insert(QString::number(clickHoldTime));
 			timeBetweenClicksEdit->clear();
