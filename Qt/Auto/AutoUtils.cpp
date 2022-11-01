@@ -6,6 +6,7 @@ AutoUtils::AutoUtils(QWidget *parent)
 {
 	ui.setupUi(this);
 	setCentralWidget(new AutoClicker);
+	resize(minimumSizeHint());
 }
 
 AutoUtils::~AutoUtils()

@@ -23,7 +23,9 @@ AutoClicker::AutoClicker(QWidget* parent)
 
 	QHBoxLayout* centralLayout{ new QHBoxLayout };
 	QGroupBox* parameters = initParameters();
+	//QHBoxLayout * bottomLayout = initBottomLayout();
 	centralLayout->addWidget(parameters);
+	//centralLayout->addLayout(bottomLayout);
 	setLayout(centralLayout);
 	ui.setupUi(this);
 }
@@ -101,6 +103,7 @@ QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 QHBoxLayout* AutoClicker::initClickButton()
 {
 	QHBoxLayout* clickButtonLayout{ new QHBoxLayout };
+	clickButtonLayout->setAlignment(Qt::AlignLeft);
 	clickButtonLayout->addWidget(new QLabel("Mouse button"));
 
 	clickButtonGroup = new QButtonGroup;

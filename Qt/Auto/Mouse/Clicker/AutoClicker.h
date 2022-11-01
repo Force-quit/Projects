@@ -41,4 +41,11 @@ private:
 	QHBoxLayout* initTimeBetweenClicks();
 	QHBoxLayout* initClickButton();
 	QHBoxLayout* initSaveAndLoad();
+
+
+
+	QHBoxLayout* initBottomLayout();
+
+	bool keepLookingForInputs;
+	void autoClickerThreadFunction();
 };
