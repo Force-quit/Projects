@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QWidget>
+#include <QMainWindow>
 #include "ui_WordFinder.h"
 #include <fstream>
 #include <string>
@@ -12,19 +12,20 @@
 #include <thread>
 #include <mutex>
 
-class WordFinder : public QWidget
+class WordFinder : public QMainWindow
 {
 	Q_OBJECT
 
 public:
-	WordFinder(QWidget* parent = nullptr);
+	WordFinder(QWidget *parent = nullptr);
 	~WordFinder();
+
 private:
+	Ui::WordFinderClass ui;
 	const unsigned int DEFAULT_NB_RESULTS{ 25 };
 	const std::string DEFAULT_WORD_LIST_NAME = "Word-lists/francais.txt";
 	std::vector<std::string> wordList;
 	int maxResults;
-	Ui::WordFinderClass ui;
 
 	QLineEdit* resultNbInput;
 	QLineEdit* searchInput;

@@ -18,9 +18,10 @@
 #include <cstdlib>
 #include <mutex>
 
-WordFinder::WordFinder(QWidget* parent)
-	: QWidget(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchThread(), searchMutex()
+WordFinder::WordFinder(QWidget *parent)
+	: QMainWindow(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchThread(), searchMutex()
 {
+	ui.setupUi(this);
 	std::ifstream defaultFile(DEFAULT_WORD_LIST_NAME);
 	if (defaultFile.good())
 	{
@@ -40,8 +41,14 @@ WordFinder::WordFinder(QWidget* parent)
 	centralLayout->addLayout(searchLayout);
 	centralLayout->addLayout(resultsLayout);
 	centralLayout->setAlignment(Qt::AlignTop);
-	setLayout(centralLayout);
-	ui.setupUi(this);
+
+	QWidget* centralWidget{ new QWidget };
+	centralWidget->setLayout(centralLayout);
+	setCentralWidget(centralWidget);
+
+	int width = size().width() / 2;
+	int height = minimumSizeHint().height();
+	resize(width, height);
 }
 
 void WordFinder::searchFunction(std::string subString)
@@ -73,7 +80,7 @@ QGroupBox* WordFinder::initParameters()
 	auto* parametersGroupBox{ new QGroupBox("Parameters") };
 	auto* wordListLayout{ new QHBoxLayout };
 	auto* wordListLabel{ new QLabel("Word list :") };
-	auto* wordListValue{ new QLabel( wordList.size() > 0 ? DEFAULT_WORD_LIST_NAME.c_str() : "")};
+	auto* wordListValue{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_NAME.c_str() : "") };
 	auto* wordListButton{ new QPushButton("Select file") };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListValue]() {
 
@@ -153,12 +160,12 @@ QHBoxLayout* WordFinder::initSearch()
 
 			delete searchThread;
 			std::string subString = searchInput->text().toStdString();
-			searchThread = new std::thread([this](std::string s) {searchFunction(s);}, subString);
+			searchThread = new std::thread([this](std::string s) {searchFunction(s); }, subString);
 			searching = true;
 		}
 		else
 			resultsComboBox->clear();
-	});
+		});
 	return searchLayout;
 }
 
