@@ -87,8 +87,8 @@ QGroupBox* WordFinder::initParameters()
 	auto* wordListValue{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_PATH.c_str() : "") };
 	auto* wordListButton{ new QPushButton("Select file") };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListValue]() {
-		QString path = QString::fromStdString(DEFAULT_WORD_LIST_PATH);
-		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", path, "text files (*.txt)");
+		QString filePath = QString::fromStdString(DEFAULT_WORD_LIST_PATH);
+		filePath = QFileDialog::getOpenFileName(this, "Select word list", filePath, "text files (*.txt)");
 
 		if (!filePath.isEmpty())
 		{
