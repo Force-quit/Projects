@@ -22,8 +22,11 @@ public:
 
 private:
 	Ui::WordFinderClass ui;
+	
 	const unsigned int DEFAULT_NB_RESULTS{ 25 };
-	const std::string DEFAULT_WORD_LIST_NAME = "Word-lists/francais.txt";
+	const std::string DEFAULT_WORD_LIST_FOLDER = "Word-lists";
+	const std::string DEFAULT_WORD_LIST_PATH = DEFAULT_WORD_LIST_FOLDER + '/' + "francais.txt";
+
 	std::vector<std::string> wordList;
 	int maxResults;
 

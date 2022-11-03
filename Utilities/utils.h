@@ -75,4 +75,9 @@ namespace emile
 
 	// Wait until user presses and release the specified virutal key
 	void waitForKeyPress(short vKey);
+
+	// Create folder is not existant. Returns false if folder did not exist
+	bool verifyFolderExists(const std::string& dirName);
+
+	bool folderExists(const std::string& dirName);
 }

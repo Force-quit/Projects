@@ -2,6 +2,7 @@
 #include <string>
 #include <Windows.h>
 #include <vector>
+#include <filesystem>
 #include <iostream>
 
 void emile::flushTampon()
@@ -291,4 +292,17 @@ std::string emile::PasswordGenerator::generate(const std::string& alphabet, cons
 		password += alphabet[randNb];
 	}
 	return password;
+}
+
+bool emile::verifyFolderExists(const std::string& dirName)
+{
+	bool folderExists = emile::folderExists(dirName);
+	if (!folderExists)
+		std::filesystem::create_directory(dirName);
+	return folderExists;
+}
+
+bool emile::folderExists(const std::string& dirName) 
+{
+	return std::filesystem::is_directory(dirName);
 }

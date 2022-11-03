@@ -19,17 +19,21 @@
 #include <mutex>
 
 WordFinder::WordFinder(QWidget *parent)
-	: QMainWindow(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchThread(), searchMutex()
+	: QMainWindow(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchMutex(), searchThread()
 {
 	ui.setupUi(this);
-	std::ifstream defaultFile(DEFAULT_WORD_LIST_NAME);
-	if (defaultFile.good())
+
+	if (emile::folderExists(DEFAULT_WORD_LIST_FOLDER))
 	{
-		std::string temp;
-		while (std::getline(defaultFile, temp))
-			wordList.push_back(temp);
+		std::ifstream defaultFile(DEFAULT_WORD_LIST_PATH);
+		if (defaultFile.good())
+		{
+			std::string temp;
+			while (std::getline(defaultFile, temp))
+				wordList.push_back(temp);
+		}
+		defaultFile.close();
 	}
-	defaultFile.close();
 
 	QVBoxLayout* centralLayout{ new QVBoxLayout };
 
@@ -80,11 +84,11 @@ QGroupBox* WordFinder::initParameters()
 	auto* parametersGroupBox{ new QGroupBox("Parameters") };
 	auto* wordListLayout{ new QHBoxLayout };
 	auto* wordListLabel{ new QLabel("Word list :") };
-	auto* wordListValue{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_NAME.c_str() : "") };
+	auto* wordListValue{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_PATH.c_str() : "") };
 	auto* wordListButton{ new QPushButton("Select file") };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListValue]() {
-
-		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", QDir::currentPath(), "text files (*.txt)");
+		QString path = QString::fromStdString(DEFAULT_WORD_LIST_PATH);
+		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", path, "text files (*.txt)");
 
 		if (!filePath.isEmpty())
 		{
@@ -171,9 +175,9 @@ QHBoxLayout* WordFinder::initSearch()
 
 QHBoxLayout* WordFinder::initResults()
 {
-	auto* resultsLayout{ new QHBoxLayout };
+	QHBoxLayout* resultsLayout{ new QHBoxLayout };
 	resultsComboBox = new QComboBox;
-	auto* resultsButton{ new QPushButton("Copy") };
+	QPushButton* resultsButton{ new QPushButton("Copy") };
 	connect(resultsButton, &QPushButton::clicked, [this]() {
 		QString currentText = resultsComboBox->currentText();
 		if (!currentText.isEmpty())
@@ -193,7 +197,4 @@ QHBoxLayout* WordFinder::initResults()
 	return resultsLayout;
 }
 
-WordFinder::~WordFinder()
-{
-
-}
+WordFinder::~WordFinder() {}
