@@ -149,27 +149,25 @@ QHBoxLayout* WordFinder::initSearch()
 	searchInput->setValidator(new QRegularExpressionValidator(QRegularExpression(QString::fromUtf8("\\p{L}+"))));
 	searchLayout->addWidget(searchLabel);
 	searchLayout->addWidget(searchInput);
-	connect(searchInput, &QLineEdit::textEdited, [this]() {
-		if (maxResults != 0)
+	connect(searchInput, &QLineEdit::textEdited, [this](const QString& text) {
+		searchMutex.lock();
+		resultsComboBox->clear();
+
+		if (searching)
+			stopSearch = true;
+		searchMutex.unlock();
+
+		if (maxResults > 0 && !text.isEmpty())
 		{
-			searchMutex.lock();
-			resultsComboBox->clear();
-
-			if (searching)
-				stopSearch = true;
-			searchMutex.unlock();
-
 			if (searchThread != nullptr)
 				searchThread->join();
 
 			delete searchThread;
-			std::string subString = searchInput->text().toStdString();
+			std::string subString = text.toStdString();
 			searchThread = new std::thread([this](std::string s) {searchFunction(s); }, subString);
 			searching = true;
 		}
-		else
-			resultsComboBox->clear();
-		});
+	});
 	return searchLayout;
 }
 
