@@ -13,4 +13,5 @@ public:
 
 private:
 	Ui::AutoUtilsClass ui;
+	const std::string CONFIG_PATH{ "Configs" };
 };

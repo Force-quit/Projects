@@ -11,15 +11,16 @@
 #include <QButtonGroup>
 #include <QFileDialog>
 #include <QMessageBox>
+#include "../../../Utilities/utils.h"
 
-const std::string AutoClicker::CLICKER_CONFIG_PATH = "AutoClickerConfigs";
-
-AutoClicker::AutoClicker(QWidget* parent)
+AutoClicker::AutoClicker(const std::string& mainConfigFolder, QWidget* parent)
 	: QWidget(parent), clickHoldTime(defaultClickHoldTime), invalidClickHoldTime(),
 	timeBetweenClicks(defaultTimeBetweenClicks), invalidTimeBetweenClicks(),
-	leftClick()
+	leftClick(), CONFIGS_PATH(mainConfigFolder + '/' + "AutoClicker")
 {
+	emile::ensureFolderExists(CONFIGS_PATH);
 	intValidator = new QIntValidator;
+	intValidator->setBottom(0);
 
 	QHBoxLayout* centralLayout{ new QHBoxLayout };
 	QGroupBox* parameters = initParameters();
@@ -142,7 +143,7 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 	QPushButton* saveButton{ new QPushButton("Save") };
 	connect(saveButton, &QPushButton::clicked, [this, saveFileName]() {
 
-		QString filePath = QString::fromStdString("./" + CLICKER_CONFIG_PATH);
+		QString filePath = QString::fromStdString("./" + CONFIGS_PATH);
 		filePath = QFileDialog::getSaveFileName(this, "Save your AutoClicker configuration", filePath, "text files (*.txt)");
 
 		if (!filePath.isEmpty())
@@ -161,7 +162,7 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 				file << clickHoldTime << ',' << timeBetweenClicks << ',' << leftClick;
 			file.close();
 
-			QString fileName = QString::fromStdString(CLICKER_CONFIG_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
+			QString fileName = QString::fromStdString(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
 			saveFileName->setText(fileName);
 		}
 	});
@@ -169,7 +170,7 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 	QPushButton* loadButton{ new QPushButton("Load") };
 	connect(loadButton, &QPushButton::clicked, [this, saveFileName]() {
 
-		QString filePath = QString::fromStdString("./" + CLICKER_CONFIG_PATH);
+		QString filePath = QString::fromStdString("./" + CONFIGS_PATH);
 		filePath = QFileDialog::getOpenFileName(this, "Load your AutoClicker configuration", filePath, "text files (*.txt)");
 
 		if (!filePath.isEmpty())
@@ -191,7 +192,7 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 			}
 			file.close();
 
-			QString fileName = QString::fromStdString(CLICKER_CONFIG_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
+			QString fileName = QString::fromStdString(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
 			saveFileName->setText(fileName);
 			clickHoldTimeEdit->clear();
 			clickHoldTimeEdit->insert(QString::number(clickHoldTime));
