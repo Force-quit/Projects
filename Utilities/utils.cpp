@@ -59,13 +59,13 @@ void emile::Console::hideScrollingBar()
 /*     KEYBOARD UTILS     */
 /**************************/
 
-void emile::pressKey(const char& key)
+void emile::pressKey(const char key)
 {
 	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
 	emile::pressKey(keyCode);
 }
 
-void emile::pressKey(const int& keyCode)
+void emile::pressKey(const int keyCode)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
@@ -80,13 +80,13 @@ void emile::pressKey(INPUT& input)
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void emile::releaseKey(const char& key)
+void emile::releaseKey(const char key)
 {
 	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
 	emile::releaseKey(keyCode);
 }
 
-void emile::releaseKey(const int& keyCode)
+void emile::releaseKey(const int keyCode)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
@@ -100,28 +100,25 @@ void emile::releaseKey(INPUT& input)
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void emile::fullKeyPress(const char& key)
+void emile::fullKeyPress(const char key)
 {
 	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
 	emile::fullKeyPress(keyCode);
 }
 
-void emile::fullKeyPress(const int& keyCode)
+void emile::fullKeyPress(const int keyCode)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
 	i.ki.wVk = keyCode;
-
 	emile::fullKeyPress(i);
 }
 
 void emile::fullKeyPress(INPUT& input)
 {
-	input.ki.dwFlags = 0;
-	SendInput(1, &input, sizeof(INPUT));
+	emile::pressKey(input);
 	Sleep(40);
-	input.ki.dwFlags = KEYEVENTF_KEYUP;
-	SendInput(1, &input, sizeof(INPUT));
+	emile::releaseKey(input);
 }
 
 void emile::ctrlV()
@@ -166,7 +163,7 @@ void emile::winR()
 	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
-void emile::humanType(const std::string &toWrite)
+void emile::humanType(const std::string& toWrite)
 {
 	const HKL currentKBL = GetKeyboardLayout(0);
 	std::vector<short> keys;

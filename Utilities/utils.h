@@ -35,14 +35,14 @@ namespace emile
 	// KEYBOARD AND MOUSE INPUT //
 	//////////////////////////////
 
-	void pressKey(const char& key);
-	void pressKey(const int& keyCode);
+	void pressKey(const char key);
+	void pressKey(const int keyCode);
 	void pressKey(INPUT& input);
-	void releaseKey(const char& key);
-	void releaseKey(const int& keyCode);
+	void releaseKey(const char key);
+	void releaseKey(const int keyCode);
 	void releaseKey(INPUT& input);
-	void fullKeyPress(const char& key);
-	void fullKeyPress(const int& keyCode);
+	void fullKeyPress(const char key);
+	void fullKeyPress(const int keyCode);
 	void fullKeyPress(INPUT& input);
 
 	void ctrlV();
