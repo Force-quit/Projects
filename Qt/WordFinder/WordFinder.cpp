@@ -50,33 +50,29 @@ WordFinder::WordFinder(QWidget *parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 
-	int width = size().width() / 2;
-	int height = minimumSizeHint().height();
-	resize(width, height);
+	initWindow();
 }
 
 void WordFinder::searchFunction(std::string subString)
 {
 	unsigned int counter = 0;
 	QStringList results;
-	for (unsigned int i = 0; i < wordList.size() && !stopSearch; ++i)
+	for (unsigned int i = 0; i < wordList.size() && !stopSearch && counter != maxResults; ++i)
 	{
 		if (wordList[i].find(subString) != std::string::npos)
 		{
 			results.append(QString::fromUtf8(wordList[i]));
 			++counter;
-			if (counter == maxResults)
-				break;
 		}
 	}
 
-	searchMutex.lock();
-	resultsComboBox->addItems(results);
-	if (resultsComboBox->count() > 0)
-		resultsComboBox->setCurrentIndex(0);
-	searching = false;
-	stopSearch = false;
-	searchMutex.unlock();
+	if (!stopSearch)
+	{
+		searchMutex.lock();
+		resultsComboBox->addItems(results);
+		searching = false;
+		searchMutex.unlock();
+	}
 }
 
 QGroupBox* WordFinder::initParameters()
@@ -113,7 +109,7 @@ QGroupBox* WordFinder::initParameters()
 	wordListLayout->addWidget(wordListValue);
 	wordListLayout->addWidget(wordListButton);
 	auto* resultNbLayout{ new QHBoxLayout };
-	auto* resultNbLabel{ new QLabel("Result number :") };
+	auto* resultNbLabel{ new QLabel("Max results :") };
 	resultNbInput = new QLineEdit;
 	resultNbInput->setText(QString::number(DEFAULT_NB_RESULTS));
 	auto* intValidator{ new QIntValidator };
@@ -144,7 +140,7 @@ QGroupBox* WordFinder::initParameters()
 QHBoxLayout* WordFinder::initSearch()
 {
 	auto* searchLayout{ new QHBoxLayout };
-	auto* searchLabel{ new QLabel("Substring to find :") };
+	auto* searchLabel{ new QLabel("Pattern to find :") };
 	searchInput = new QLineEdit;
 	searchInput->setValidator(new QRegularExpressionValidator(QRegularExpression(QString::fromUtf8("\\p{L}+"))));
 	searchLayout->addWidget(searchLabel);
@@ -152,17 +148,20 @@ QHBoxLayout* WordFinder::initSearch()
 	connect(searchInput, &QLineEdit::textEdited, [this](const QString& text) {
 		searchMutex.lock();
 		resultsComboBox->clear();
-
+		
 		if (searching)
+		{
 			stopSearch = true;
+			searchThread->join();
+			delete searchThread;
+
+			searching = false;
+			stopSearch = false;
+		}
 		searchMutex.unlock();
 
 		if (maxResults > 0 && !text.isEmpty())
 		{
-			if (searchThread != nullptr)
-				searchThread->join();
-
-			delete searchThread;
 			std::string subString = text.toStdString();
 			searchThread = new std::thread([this](std::string s) {searchFunction(s); }, subString);
 			searching = true;
@@ -193,6 +192,13 @@ QHBoxLayout* WordFinder::initResults()
 	resultsLayout->addWidget(resultsComboBox);
 	resultsLayout->addWidget(resultsButton);
 	return resultsLayout;
+}
+
+void WordFinder::initWindow()
+{
+	setWindowTitle("Word finder");
+	resize(minimumSizeHint());
+	setWindowIcon(QIcon("program-icon.png"));
 }
 
 WordFinder::~WordFinder() {}

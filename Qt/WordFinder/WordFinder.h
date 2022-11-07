@@ -42,4 +42,6 @@ private:
 	QGroupBox* initParameters();
 	QHBoxLayout* initSearch();
 	QHBoxLayout* initResults();
+
+	void initWindow();
 };
