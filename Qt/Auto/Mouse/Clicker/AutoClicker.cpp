@@ -55,7 +55,7 @@ QGroupBox* AutoClicker::initParameters()
 QHBoxLayout* AutoClicker::initClickHoldTime()
 {
 	QHBoxLayout* clickHoldTimeLayout{ new QHBoxLayout };
-	clickHoldTimeLayout->addWidget(new QLabel("Click hold time (milliseconds and x > 0):"));
+	clickHoldTimeLayout->addWidget(new QLabel("Click hold time > 0 :"));
 	clickHoldTimeEdit = new QLineEdit;
 	clickHoldTimeEdit->setValidator(intValidator);
 	clickHoldTimeEdit->setText(QString::number(defaultClickHoldTime));
@@ -63,7 +63,13 @@ QHBoxLayout* AutoClicker::initClickHoldTime()
 		clickHoldTime = text.toUInt();
 		if (clickHoldTime == 0)
 		{
-			clickHoldTimeEdit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
+			if (std::atoi(text.toStdString().c_str()) > 0)
+			{
+				clickHoldTimeEdit->setText(QString::number(UINT_MAX));
+				clickHoldTime = UINT_MAX;
+			}
+			else
+				clickHoldTimeEdit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
 			invalidClickHoldTime = true;
 		}
 		else
@@ -73,13 +79,14 @@ QHBoxLayout* AutoClicker::initClickHoldTime()
 		}
 	});
 	clickHoldTimeLayout->addWidget(clickHoldTimeEdit);
+	clickHoldTimeLayout->addWidget(new QLabel("ms"));
 	return clickHoldTimeLayout;
 }
 
 QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 {
 	QHBoxLayout* timeBetweenClickLayout{ new QHBoxLayout };
-	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval (milliseconds):"));
+	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval :"));
 	timeBetweenClicksEdit = new QLineEdit;
 	timeBetweenClicksEdit->setValidator(intValidator);
 	timeBetweenClicksEdit->setText(QString::number(defaultTimeBetweenClicks));
@@ -97,6 +104,7 @@ QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 		}
 	});
 	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
+	timeBetweenClickLayout->addWidget(new QLabel("ms"));
 	return timeBetweenClickLayout;
 }
 
