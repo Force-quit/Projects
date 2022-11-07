@@ -294,7 +294,7 @@ std::string emile::PasswordGenerator::generate(const std::string& alphabet, cons
 	return password;
 }
 
-bool emile::verifyFolderExists(const std::string& dirName)
+bool emile::ensureFolderExists(const std::string& dirName)
 {
 	bool folderExists = emile::folderExists(dirName);
 	if (!folderExists)

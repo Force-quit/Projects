@@ -77,7 +77,7 @@ namespace emile
 	void waitForKeyPress(short vKey);
 
 	// Create folder is not existant. Returns false if folder did not exist
-	bool verifyFolderExists(const std::string& dirName);
+	bool ensureFolderExists(const std::string& dirName);
 
 	bool folderExists(const std::string& dirName);
 }
