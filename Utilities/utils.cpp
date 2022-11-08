@@ -274,23 +274,6 @@ void emile::waitForKeyPress(short vKey)
 	}
 }
 
-
-const std::string emile::PasswordGenerator::DEFAULT_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()?@/";
-std::string emile::PasswordGenerator::generate(const std::string& alphabet, const unsigned short& passwordLength)
-{
-	unsigned short randNb;
-	std::string password{};
-	auto alphabetSize{ alphabet.size() };
-	srand(time(0));
-	for (unsigned short i = 0; i < passwordLength; ++i)
-	{
-		randNb = rand();
-		randNb %= alphabetSize;
-		password += alphabet[randNb];
-	}
-	return password;
-}
-
 bool emile::ensureFolderExists(const std::string& dirName)
 {
 	bool folderExists = emile::folderExists(dirName);
