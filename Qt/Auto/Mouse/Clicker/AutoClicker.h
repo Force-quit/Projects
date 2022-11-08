@@ -14,13 +14,11 @@ class AutoClicker : public QWidget
 	Q_OBJECT
 
 public:
-	AutoClicker(QWidget *parent = nullptr);
+	AutoClicker(const std::string& mainConfigFolder, QWidget *parent = nullptr);
 	~AutoClicker();
-
-	static const std::string CLICKER_CONFIG_PATH;
 private:
 	Ui::AutoClickerClass ui;
-	
+	const std::string CONFIGS_PATH;
 	QIntValidator* intValidator;
 
 	QLineEdit* clickHoldTimeEdit;
