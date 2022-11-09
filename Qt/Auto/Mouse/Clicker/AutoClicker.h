@@ -8,6 +8,7 @@
 #include <QIntValidator>
 #include <QButtonGroup>
 #include <string>
+#include "../../QSmartLineEdit.h"
 
 class AutoClicker : public QWidget
 {
@@ -18,18 +19,16 @@ public:
 	~AutoClicker();
 private:
 	Ui::AutoClickerClass ui;
-	const std::string CONFIGS_PATH;
+	const std::string CONFIGS_PATH; // Defined in constructor
 	QIntValidator* intValidator;
 
-	QLineEdit* clickHoldTimeEdit;
+	QSmartLineEdit* clickHoldTimeEdit;
 	const unsigned int defaultClickHoldTime = 50;
 	unsigned int clickHoldTime;
-	bool invalidClickHoldTime;
 
-	QLineEdit* timeBetweenClicksEdit;
+	QSmartLineEdit* timeBetweenClicksEdit;
 	const unsigned int defaultTimeBetweenClicks = 200;
 	unsigned int timeBetweenClicks;
-	bool invalidTimeBetweenClicks;
 
 	QButtonGroup* clickButtonGroup;
 	bool leftClick;

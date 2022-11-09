@@ -11,11 +11,13 @@
 #include <QButtonGroup>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "../../../Utilities/utils.h"
+#include <QFocusEvent>
+#include "../../../../Utilities/utils.h"
+#include "../../QSmartLineEdit.h"
 
 AutoClicker::AutoClicker(const std::string& mainConfigFolder, QWidget* parent)
-	: QWidget(parent), clickHoldTime(defaultClickHoldTime), invalidClickHoldTime(),
-	timeBetweenClicks(defaultTimeBetweenClicks), invalidTimeBetweenClicks(),
+	: QWidget(parent), clickHoldTime(defaultClickHoldTime),
+	timeBetweenClicks(defaultTimeBetweenClicks),
 	leftClick(), CONFIGS_PATH(mainConfigFolder + '/' + "AutoClicker")
 {
 	emile::ensureFolderExists(CONFIGS_PATH);
@@ -31,8 +33,7 @@ AutoClicker::AutoClicker(const std::string& mainConfigFolder, QWidget* parent)
 	ui.setupUi(this);
 }
 
-AutoClicker::~AutoClicker()
-{}
+AutoClicker::~AutoClicker(){}
 
 QGroupBox* AutoClicker::initParameters()
 {
@@ -56,31 +57,27 @@ QGroupBox* AutoClicker::initParameters()
 QHBoxLayout* AutoClicker::initClickHoldTime()
 {
 	QHBoxLayout* clickHoldTimeLayout{ new QHBoxLayout };
-	clickHoldTimeLayout->addWidget(new QLabel("Click hold time > 0 :"));
-	clickHoldTimeEdit = new QLineEdit;
+	clickHoldTimeLayout->addWidget(new QLabel("Click hold time :"));
+	clickHoldTimeEdit = new QSmartLineEdit;
+	clickHoldTimeEdit->setFocusPolicy(Qt::ClickFocus);
 	clickHoldTimeEdit->setValidator(intValidator);
 	clickHoldTimeEdit->setText(QString::number(defaultClickHoldTime));
-	connect(clickHoldTimeEdit, &QLineEdit::textEdited, [this](const QString& text) {
-		clickHoldTime = text.toUInt();
-		if (clickHoldTime == 0)
+	connect(clickHoldTimeEdit, &QSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
+		auto temp{ text.toULongLong()};
+		if (temp > UINT_MAX)
 		{
-			if (std::atoi(text.toStdString().c_str()) > 0)
-			{
-				clickHoldTimeEdit->setText(QString::number(UINT_MAX));
-				clickHoldTime = UINT_MAX;
-			}
-			else
-				clickHoldTimeEdit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
-			invalidClickHoldTime = true;
+			clickHoldTime = UINT_MAX;
+			clickHoldTimeEdit->setText(QString::number(clickHoldTime));
 		}
-		else
+		else if (temp <= 0)
 		{
-			clickHoldTimeEdit->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }");
-			invalidClickHoldTime = false;
+			clickHoldTime = 1;
+			clickHoldTimeEdit->setText(QString::number(clickHoldTime));
 		}
 	});
 	clickHoldTimeLayout->addWidget(clickHoldTimeEdit);
 	clickHoldTimeLayout->addWidget(new QLabel("ms"));
+
 	return clickHoldTimeLayout;
 }
 
@@ -88,20 +85,20 @@ QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 {
 	QHBoxLayout* timeBetweenClickLayout{ new QHBoxLayout };
 	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval :"));
-	timeBetweenClicksEdit = new QLineEdit;
+	timeBetweenClicksEdit = new QSmartLineEdit;
 	timeBetweenClicksEdit->setValidator(intValidator);
 	timeBetweenClicksEdit->setText(QString::number(defaultTimeBetweenClicks));
-	connect(timeBetweenClicksEdit, &QLineEdit::textEdited, [this](const QString& text) {
-		timeBetweenClicks = text.toUInt();
-		if (timeBetweenClicks == 0)
+	connect(timeBetweenClicksEdit, &QSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
+		auto temp{ text.toULongLong() };
+		if (temp > UINT_MAX)
 		{
-			timeBetweenClicksEdit->setStyleSheet("QLineEdit { background: rgb(255, 0, 0); }");
-			invalidTimeBetweenClicks = true;
+			timeBetweenClicks = UINT_MAX;
+			timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
 		}
-		else
+		else if (temp <= 0)
 		{
-			timeBetweenClicksEdit->setStyleSheet("QLineEdit { background: rgb(255, 255, 255); }");
-			invalidTimeBetweenClicks = false;
+			timeBetweenClicks = 1;
+			timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
 		}
 	});
 	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
