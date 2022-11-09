@@ -1,4 +1,5 @@
 #include "AutoClicker.h"
+#include "../../QSmartLineEdit.h"
 #include <fstream>
 #include <string>
 #include <QBoxLayout>
@@ -11,24 +12,24 @@
 #include <QButtonGroup>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QTabWidget>
+#include <QTabBar>
+#include <QDir>
 #include <QFocusEvent>
-#include "../../../../Utilities/utils.h"
-#include "../../QSmartLineEdit.h"
 
 AutoClicker::AutoClicker(const std::string& mainConfigFolder, QWidget* parent)
-	: QWidget(parent), clickHoldTime(defaultClickHoldTime),
+	: QWidget(parent), clickHoldTime(defaultClickHoldTime), clickHoldTimeEdit(),
 	timeBetweenClicks(defaultTimeBetweenClicks),
 	leftClick(), CONFIGS_PATH(mainConfigFolder + '/' + "AutoClicker")
 {
-	emile::ensureFolderExists(CONFIGS_PATH);
+	QDir().mkdir(QString::fromStdString(CONFIGS_PATH));
 	intValidator = new QIntValidator;
 	intValidator->setBottom(0);
 
-	QHBoxLayout* centralLayout{ new QHBoxLayout };
-	QGroupBox* parameters = initParameters();
-	//QHBoxLayout * bottomLayout = initBottomLayout();
-	centralLayout->addWidget(parameters);
-	//centralLayout->addLayout(bottomLayout);
+	auto* centralLayout{ new QVBoxLayout };
+	centralLayout->addWidget(initParameters());
+	centralLayout->addWidget(initBottomLayout());
+	centralLayout->addLayout(initSaveAndLoad());
 	setLayout(centralLayout);
 	ui.setupUi(this);
 }
@@ -43,12 +44,10 @@ QGroupBox* AutoClicker::initParameters()
 	QHBoxLayout* clickHoldTimeLayout = initClickHoldTime();
 	QHBoxLayout* timeBetweenClicksLayout = initTimeBetweenClicks();
 	QHBoxLayout* clickButtonLayout = initClickButton();
-	QHBoxLayout* saveAndLoadLayout = initSaveAndLoad();
 
 	parametersLayout->addLayout(clickHoldTimeLayout);
 	parametersLayout->addLayout(timeBetweenClicksLayout);
 	parametersLayout->addLayout(clickButtonLayout);
-	parametersLayout->addLayout(saveAndLoadLayout);
 	
 	parameters->setLayout(parametersLayout);
 	return parameters;
@@ -56,12 +55,15 @@ QGroupBox* AutoClicker::initParameters()
 
 QHBoxLayout* AutoClicker::initClickHoldTime()
 {
-	QHBoxLayout* clickHoldTimeLayout{ new QHBoxLayout };
-	clickHoldTimeLayout->addWidget(new QLabel("Click hold time :"));
 	clickHoldTimeEdit = new QSmartLineEdit;
-	clickHoldTimeEdit->setFocusPolicy(Qt::ClickFocus);
 	clickHoldTimeEdit->setValidator(intValidator);
 	clickHoldTimeEdit->setText(QString::number(defaultClickHoldTime));
+
+	QHBoxLayout* clickHoldTimeLayout{ new QHBoxLayout };
+	clickHoldTimeLayout->addWidget(new QLabel("Click hold time :"));
+	clickHoldTimeLayout->addWidget(clickHoldTimeEdit);
+	clickHoldTimeLayout->addWidget(new QLabel("ms"));
+
 	connect(clickHoldTimeEdit, &QSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
 		auto temp{ text.toULongLong()};
 		if (temp > UINT_MAX)
@@ -74,20 +76,24 @@ QHBoxLayout* AutoClicker::initClickHoldTime()
 			clickHoldTime = 1;
 			clickHoldTimeEdit->setText(QString::number(clickHoldTime));
 		}
+		else
+			clickHoldTime = temp;
 	});
-	clickHoldTimeLayout->addWidget(clickHoldTimeEdit);
-	clickHoldTimeLayout->addWidget(new QLabel("ms"));
 
 	return clickHoldTimeLayout;
 }
 
 QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 {
-	QHBoxLayout* timeBetweenClickLayout{ new QHBoxLayout };
-	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval :"));
 	timeBetweenClicksEdit = new QSmartLineEdit;
 	timeBetweenClicksEdit->setValidator(intValidator);
 	timeBetweenClicksEdit->setText(QString::number(defaultTimeBetweenClicks));
+	
+	QHBoxLayout* timeBetweenClickLayout{ new QHBoxLayout };
+	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval :"));
+	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
+	timeBetweenClickLayout->addWidget(new QLabel("ms"));
+	
 	connect(timeBetweenClicksEdit, &QSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
 		auto temp{ text.toULongLong() };
 		if (temp > UINT_MAX)
@@ -100,28 +106,34 @@ QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 			timeBetweenClicks = 1;
 			timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
 		}
+		else
+			timeBetweenClicks = temp;
 	});
-	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
-	timeBetweenClickLayout->addWidget(new QLabel("ms"));
+
 	return timeBetweenClickLayout;
 }
 
 QHBoxLayout* AutoClicker::initClickButton()
 {
+	leftClickButton = new QRadioButton("Left");
+	leftClickButton->click();
+	rightClickButton = new QRadioButton("Right");
+
+	QButtonGroup* clickButtonGroup{ new QButtonGroup };
+	clickButtonGroup->addButton(leftClickButton);
+	clickButtonGroup->addButton(rightClickButton);
+
+	connect(clickButtonGroup, &QButtonGroup::buttonClicked, [this](QAbstractButton* button) {
+		if (button == leftClickButton)
+			leftClick = true;
+		else
+			leftClick = false;
+		
+	});
+
 	QHBoxLayout* clickButtonLayout{ new QHBoxLayout };
 	clickButtonLayout->setAlignment(Qt::AlignLeft);
 	clickButtonLayout->addWidget(new QLabel("Mouse button"));
-
-	clickButtonGroup = new QButtonGroup;
-	QRadioButton* leftClickButton{ new QRadioButton("Left") };
-	leftClickButton->click();
-	QRadioButton* rightClickButton{ new QRadioButton("Right") };
-	clickButtonGroup->addButton(leftClickButton);
-	clickButtonGroup->addButton(rightClickButton);
-	connect(clickButtonGroup, &QButtonGroup::buttonClicked, [this, leftClickButton](QAbstractButton* button) {
-		leftClick = (button == leftClickButton) ? false : true;
-	});
-
 	clickButtonLayout->addWidget(leftClickButton);
 	clickButtonLayout->addWidget(rightClickButton);
 
@@ -137,7 +149,7 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 	saveAndLoadLayout->addWidget(saveFileLabel);
 	saveAndLoadLayout->addWidget(saveFileName);
 
-	QPushButton* saveButton{ new QPushButton("Save") };
+	saveButton = new QPushButton("Save");
 	connect(saveButton, &QPushButton::clicked, [this, saveFileName]() {
 
 		QString filePath = QString::fromStdString("./" + CONFIGS_PATH);
@@ -164,7 +176,7 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 		}
 	});
 
-	QPushButton* loadButton{ new QPushButton("Load") };
+	loadButton = new QPushButton("Load");
 	connect(loadButton, &QPushButton::clicked, [this, saveFileName]() {
 
 		QString filePath = QString::fromStdString("./" + CONFIGS_PATH);
@@ -195,10 +207,52 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 			clickHoldTimeEdit->insert(QString::number(clickHoldTime));
 			timeBetweenClicksEdit->clear();
 			timeBetweenClicksEdit->insert(QString::number(timeBetweenClicks));
-			clickButtonGroup->buttons()[leftClick]->click();
+			if (leftClick)
+				leftClickButton->click();
+			else
+				rightClickButton->click();
 		}
 	});
 	saveAndLoadLayout->addWidget(saveButton);
 	saveAndLoadLayout->addWidget(loadButton);
 	return saveAndLoadLayout;
+}
+
+QGroupBox* AutoClicker::initBottomLayout() 
+{
+	QGroupBox* bottomGroupBox{ new QGroupBox("Activation") };
+	QVBoxLayout* bottomLayout{ new QVBoxLayout };
+	bottomLayout->addLayout(initActivationHintLayout());
+	bottomGroupBox->setLayout(bottomLayout);
+	return bottomGroupBox;
+}
+
+QHBoxLayout* AutoClicker::initActivationHintLayout()
+{
+	QHBoxLayout* activationHintLayout{ new QHBoxLayout };
+	QLabel* activationShortcut{ new QLabel(QString(DEFAULT_START_CHARACTER)) };
+	QPushButton* changeActivationShortcut{ new QPushButton("Change") };
+
+	activationHintLayout->addWidget(new QLabel("Activation shortcut :"));
+	activationHintLayout->addWidget(activationShortcut);
+	activationHintLayout->addWidget(changeActivationShortcut);
+	
+	QTabWidget* tabWidget{ dynamic_cast<QTabWidget*>(parent()) };
+
+	connect(changeActivationShortcut, &QPushButton::clicked, [this, changeActivationShortcut, tabWidget]() {
+		clickHoldTimeEdit->setEnabled(false);
+		timeBetweenClicksEdit->setEnabled(false);
+		leftClickButton->setEnabled(false);
+		rightClickButton->setEnabled(false);
+		saveButton->setEnabled(false);
+		loadButton->setEnabled(false);
+		changeActivationShortcut->setText("Listening...");
+		changeActivationShortcut->setEnabled(false);
+
+		for (int i = 0; i < tabWidget->count(); ++i)
+			if (i != tabWidget->currentIndex())
+				tabWidget->setTabVisible(i, false);
+
+	});
+	return activationHintLayout;
 }

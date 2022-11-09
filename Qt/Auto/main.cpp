@@ -1,5 +1,4 @@
 #include "AutoUtils.h"
-#include "Mouse/Clicker/AutoClicker.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])

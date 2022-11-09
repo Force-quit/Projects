@@ -6,8 +6,10 @@
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QIntValidator>
-#include <QButtonGroup>
+#include <QPushButton>
+#include <QRadioButton>
 #include <string>
+#include <vector>
 #include "../../QSmartLineEdit.h"
 
 class AutoClicker : public QWidget
@@ -15,23 +17,26 @@ class AutoClicker : public QWidget
 	Q_OBJECT
 
 public:
-	AutoClicker(const std::string& mainConfigFolder, QWidget *parent = nullptr);
+	AutoClicker(const std::string& mainConfigFolder, QWidget* parent = nullptr);
 	~AutoClicker();
 private:
 	Ui::AutoClickerClass ui;
 	const std::string CONFIGS_PATH; // Defined in constructor
-	QIntValidator* intValidator;
+	static const unsigned int defaultClickHoldTime = 50;
+	static const unsigned int defaultTimeBetweenClicks = 200;
+	static const char DEFAULT_START_CHARACTER = 'X';
 
-	QSmartLineEdit* clickHoldTimeEdit;
-	const unsigned int defaultClickHoldTime = 50;
 	unsigned int clickHoldTime;
-
-	QSmartLineEdit* timeBetweenClicksEdit;
-	const unsigned int defaultTimeBetweenClicks = 200;
 	unsigned int timeBetweenClicks;
-
-	QButtonGroup* clickButtonGroup;
 	bool leftClick;
+
+	QIntValidator* intValidator;
+	QSmartLineEdit* clickHoldTimeEdit;
+	QSmartLineEdit* timeBetweenClicksEdit;
+	QRadioButton* leftClickButton;
+	QRadioButton* rightClickButton;
+	QPushButton* saveButton;
+	QPushButton* loadButton;
 
 	QGroupBox* initParameters();
 	QHBoxLayout* initClickHoldTime();
@@ -39,9 +44,8 @@ private:
 	QHBoxLayout* initClickButton();
 	QHBoxLayout* initSaveAndLoad();
 
-
-
-	QHBoxLayout* initBottomLayout();
+	QGroupBox* initBottomLayout();
+	QHBoxLayout* initActivationHintLayout();
 
 	bool keepLookingForInputs;
 	void autoClickerThreadFunction();
