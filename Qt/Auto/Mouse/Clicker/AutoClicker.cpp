@@ -17,21 +17,23 @@
 #include <QDir>
 #include <QFocusEvent>
 
-AutoClicker::AutoClicker(const std::string& mainConfigFolder, QWidget* parent)
-	: QWidget(parent), clickHoldTime(defaultClickHoldTime), clickHoldTimeEdit(),
-	timeBetweenClicks(defaultTimeBetweenClicks),
-	leftClick(), CONFIGS_PATH(mainConfigFolder + '/' + "AutoClicker")
+
+AutoClicker::AutoClicker(QWidget* parent, const std::string& mainConfigFolder, const std::unordered_map<int, std::string>& VIRTUAL_KEYS)
+	: QWidget(parent), CONFIGS_PATH(mainConfigFolder + '/' + "AutoClicker"),
+	clickHoldTime(defaultClickHoldTime), timeBetweenClicks(defaultTimeBetweenClicks), leftClick(),
+	intValidator(), clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
+	saveButton(), loadButton()
 {
+	ui.setupUi(this);
 	QDir().mkdir(QString::fromStdString(CONFIGS_PATH));
 	intValidator = new QIntValidator;
 	intValidator->setBottom(0);
 
 	auto* centralLayout{ new QVBoxLayout };
 	centralLayout->addWidget(initParameters());
-	centralLayout->addWidget(initBottomLayout());
+	centralLayout->addWidget(initActivationLayout());
 	centralLayout->addLayout(initSaveAndLoad());
 	setLayout(centralLayout);
-	ui.setupUi(this);
 }
 
 AutoClicker::~AutoClicker(){}
@@ -218,7 +220,7 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 	return saveAndLoadLayout;
 }
 
-QGroupBox* AutoClicker::initBottomLayout() 
+QGroupBox* AutoClicker::initActivationLayout() 
 {
 	QGroupBox* bottomGroupBox{ new QGroupBox("Activation") };
 	QVBoxLayout* bottomLayout{ new QVBoxLayout };

@@ -7,12 +7,12 @@
 AutoUtils::AutoUtils(QWidget* parent)
 	: QMainWindow(parent)
 {
-	QDir().mkdir(QString::fromStdString(CONFIG_PATH));
 	ui.setupUi(this);
+	QDir().mkdir(QString::fromStdString(CONFIG_PATH));
 
 	QTabWidget* tab{ new QTabWidget };
 	tab->setMovable(true);
-	tab->addTab(new AutoClicker(CONFIG_PATH, tab), "Auto clicker");
+	tab->addTab(new AutoClicker(tab, CONFIG_PATH, VIRTUAL_KEYS), "Auto clicker");
 	tab->addTab(new QWidget(tab), "Test");
 	tab->addTab(new QWidget(tab), "Test");
 	tab->addTab(new QWidget(tab), "Test");

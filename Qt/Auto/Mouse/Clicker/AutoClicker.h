@@ -11,20 +11,24 @@
 #include <string>
 #include <vector>
 #include "../../QSmartLineEdit.h"
+#include <unordered_map>
+
 
 class AutoClicker : public QWidget
 {
 	Q_OBJECT
 
 public:
-	AutoClicker(const std::string& mainConfigFolder, QWidget* parent = nullptr);
+	AutoClicker(QWidget* parent, const std::string& mainConfigFolder, const std::unordered_map<int, std::string>& VIRTUAL_KEYS);
 	~AutoClicker();
+
 private:
 	Ui::AutoClickerClass ui;
-	const std::string CONFIGS_PATH; // Defined in constructor
+
 	static const unsigned int defaultClickHoldTime = 50;
 	static const unsigned int defaultTimeBetweenClicks = 200;
 	static const char DEFAULT_START_CHARACTER = 'X';
+	const std::string CONFIGS_PATH; // Defined in constructor
 
 	unsigned int clickHoldTime;
 	unsigned int timeBetweenClicks;
@@ -44,9 +48,8 @@ private:
 	QHBoxLayout* initClickButton();
 	QHBoxLayout* initSaveAndLoad();
 
-	QGroupBox* initBottomLayout();
+	QGroupBox* initActivationLayout();
 	QHBoxLayout* initActivationHintLayout();
 
-	bool keepLookingForInputs;
 	void autoClickerThreadFunction();
 };
