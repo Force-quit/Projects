@@ -12,7 +12,8 @@
 #include <vector>
 #include "../../QSmartLineEdit.h"
 #include <unordered_map>
-
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 class AutoClicker : public QWidget
 {
@@ -41,6 +42,9 @@ private:
 	QRadioButton* rightClickButton;
 	QPushButton* saveButton;
 	QPushButton* loadButton;
+
+	QMediaPlayer* mediaPlayer;
+	QAudioOutput* audioOutput;
 
 	QGroupBox* initParameters();
 	QHBoxLayout* initClickHoldTime();

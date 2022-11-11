@@ -16,13 +16,14 @@
 #include <QTabBar>
 #include <QDir>
 #include <QFocusEvent>
-
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 AutoClicker::AutoClicker(QWidget* parent, const std::string& mainConfigFolder, const std::unordered_map<int, std::string>& VIRTUAL_KEYS)
 	: QWidget(parent), CONFIGS_PATH(mainConfigFolder + '/' + "AutoClicker"),
 	clickHoldTime(defaultClickHoldTime), timeBetweenClicks(defaultTimeBetweenClicks), leftClick(),
 	intValidator(), clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton()
+	saveButton(), loadButton(), mediaPlayer(), audioOutput()
 {
 	ui.setupUi(this);
 	QDir().mkdir(QString::fromStdString(CONFIGS_PATH));
@@ -34,6 +35,12 @@ AutoClicker::AutoClicker(QWidget* parent, const std::string& mainConfigFolder, c
 	centralLayout->addWidget(initActivationLayout());
 	centralLayout->addLayout(initSaveAndLoad());
 	setLayout(centralLayout);
+
+	mediaPlayer = new QMediaPlayer;
+	audioOutput = new QAudioOutput;
+	mediaPlayer->setAudioOutput(audioOutput);
+	mediaPlayer->setSource(QUrl::fromLocalFile("activation-sound.mp3"));
+	mediaPlayer->play();
 }
 
 AutoClicker::~AutoClicker(){}
