@@ -1,7 +1,8 @@
 #include "AutoClicker.h"
 #include "../../QSmartLineEdit.h"
-#include <fstream>
+#include "../../AutoUtils.h"
 #include <string>
+#include <QFile>
 #include <QBoxLayout>
 #include <QGroupBox>
 #include <QIntValidator>
@@ -18,15 +19,19 @@
 #include <QFocusEvent>
 #include <QMediaPlayer>
 #include <QAudioOutput>
+#include <Windows.h>
+#include <vector>
 
-AutoClicker::AutoClicker(QWidget* parent, const std::string& mainConfigFolder, const std::unordered_map<int, std::string>& VIRTUAL_KEYS)
-	: QWidget(parent), CONFIGS_PATH(mainConfigFolder + '/' + "AutoClicker"),
+const QString AutoClicker::CONFIGS_PATH{ AutoUtils::ROOT_CONFIG_PATH + "/AutoClicker" };
+
+AutoClicker::AutoClicker(QWidget* parent)
+	: QWidget(parent),
 	clickHoldTime(defaultClickHoldTime), timeBetweenClicks(defaultTimeBetweenClicks), leftClick(),
 	intValidator(), clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton(), mediaPlayer(), audioOutput()
+	saveButton(), loadButton()
 {
 	ui.setupUi(this);
-	QDir().mkdir(QString::fromStdString(CONFIGS_PATH));
+	QDir().mkdir(AutoClicker::CONFIGS_PATH);
 	intValidator = new QIntValidator;
 	intValidator->setBottom(0);
 
@@ -35,15 +40,7 @@ AutoClicker::AutoClicker(QWidget* parent, const std::string& mainConfigFolder, c
 	centralLayout->addWidget(initActivationLayout());
 	centralLayout->addLayout(initSaveAndLoad());
 	setLayout(centralLayout);
-
-	mediaPlayer = new QMediaPlayer;
-	audioOutput = new QAudioOutput;
-	mediaPlayer->setAudioOutput(audioOutput);
-	mediaPlayer->setSource(QUrl::fromLocalFile("activation-sound.mp3"));
-	mediaPlayer->play();
 }
-
-AutoClicker::~AutoClicker(){}
 
 QGroupBox* AutoClicker::initParameters()
 {
@@ -57,7 +54,7 @@ QGroupBox* AutoClicker::initParameters()
 	parametersLayout->addLayout(clickHoldTimeLayout);
 	parametersLayout->addLayout(timeBetweenClicksLayout);
 	parametersLayout->addLayout(clickButtonLayout);
-	
+
 	parameters->setLayout(parametersLayout);
 	return parameters;
 }
@@ -74,7 +71,7 @@ QHBoxLayout* AutoClicker::initClickHoldTime()
 	clickHoldTimeLayout->addWidget(new QLabel("ms"));
 
 	connect(clickHoldTimeEdit, &QSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
-		auto temp{ text.toULongLong()};
+		auto temp{ text.toULongLong() };
 		if (temp > UINT_MAX)
 		{
 			clickHoldTime = UINT_MAX;
@@ -97,12 +94,12 @@ QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 	timeBetweenClicksEdit = new QSmartLineEdit;
 	timeBetweenClicksEdit->setValidator(intValidator);
 	timeBetweenClicksEdit->setText(QString::number(defaultTimeBetweenClicks));
-	
+
 	QHBoxLayout* timeBetweenClickLayout{ new QHBoxLayout };
 	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval :"));
 	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
 	timeBetweenClickLayout->addWidget(new QLabel("ms"));
-	
+
 	connect(timeBetweenClicksEdit, &QSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
 		auto temp{ text.toULongLong() };
 		if (temp > UINT_MAX)
@@ -117,7 +114,7 @@ QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 		}
 		else
 			timeBetweenClicks = temp;
-	});
+		});
 
 	return timeBetweenClickLayout;
 }
@@ -137,8 +134,8 @@ QHBoxLayout* AutoClicker::initClickButton()
 			leftClick = true;
 		else
 			leftClick = false;
-		
-	});
+
+		});
 
 	QHBoxLayout* clickButtonLayout{ new QHBoxLayout };
 	clickButtonLayout->setAlignment(Qt::AlignLeft);
@@ -152,82 +149,81 @@ QHBoxLayout* AutoClicker::initClickButton()
 QHBoxLayout* AutoClicker::initSaveAndLoad()
 {
 	QHBoxLayout* saveAndLoadLayout{ new QHBoxLayout };
-	
+
 	QLabel* saveFileLabel{ new QLabel("Current configuration :") };
 	QLabel* saveFileName{ new QLabel("Unsaved") };
+	saveButton = new QPushButton("Save");
+	loadButton = new QPushButton("Load");
 	saveAndLoadLayout->addWidget(saveFileLabel);
 	saveAndLoadLayout->addWidget(saveFileName);
-
-	saveButton = new QPushButton("Save");
-	connect(saveButton, &QPushButton::clicked, [this, saveFileName]() {
-
-		QString filePath = QString::fromStdString("./" + CONFIGS_PATH);
-		filePath = QFileDialog::getSaveFileName(this, "Save your AutoClicker configuration", filePath, "text files (*.txt)");
-
-		if (!filePath.isEmpty())
-		{
-			std::ofstream file(filePath.toStdString());
-			if (!file.good())
-			{
-				QMessageBox msgBox;
-				msgBox.setText("File error");
-				msgBox.setInformativeText("Error saving file");
-				msgBox.setStandardButtons(QMessageBox::Ok);
-				msgBox.setDefaultButton(QMessageBox::Ok);
-				msgBox.exec();
-			}
-			else
-				file << clickHoldTime << ',' << timeBetweenClicks << ',' << leftClick;
-			file.close();
-
-			QString fileName = QString::fromStdString(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
-			saveFileName->setText(fileName);
-		}
-	});
-
-	loadButton = new QPushButton("Load");
-	connect(loadButton, &QPushButton::clicked, [this, saveFileName]() {
-
-		QString filePath = QString::fromStdString("./" + CONFIGS_PATH);
-		filePath = QFileDialog::getOpenFileName(this, "Load your AutoClicker configuration", filePath, "text files (*.txt)");
-
-		if (!filePath.isEmpty())
-		{
-			std::ifstream file(filePath.toStdString());
-			if (!file.good())
-			{
-				QMessageBox msgBox;
-				msgBox.setText("File error");
-				msgBox.setInformativeText("Error loading file");
-				msgBox.setStandardButtons(QMessageBox::Ok);
-				msgBox.setDefaultButton(QMessageBox::Ok);
-				msgBox.exec();
-			}
-			else
-			{
-				char sep;
-				file >> clickHoldTime >> sep >> timeBetweenClicks >> sep >> leftClick;
-			}
-			file.close();
-
-			QString fileName = QString::fromStdString(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")).toStdString());
-			saveFileName->setText(fileName);
-			clickHoldTimeEdit->clear();
-			clickHoldTimeEdit->insert(QString::number(clickHoldTime));
-			timeBetweenClicksEdit->clear();
-			timeBetweenClicksEdit->insert(QString::number(timeBetweenClicks));
-			if (leftClick)
-				leftClickButton->click();
-			else
-				rightClickButton->click();
-		}
-	});
 	saveAndLoadLayout->addWidget(saveButton);
 	saveAndLoadLayout->addWidget(loadButton);
+
+	connect(saveButton, &QPushButton::clicked, [this, saveFileName](bool checked = false) {
+		QString filePath = QFileDialog::getSaveFileName(this, "Save your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
+
+		if (!filePath.isEmpty())
+		{
+			QFile file(filePath);
+			if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+			{
+				QTextStream out(&file);
+				out << clickHoldTime << ',' << timeBetweenClicks << ',' << leftClick;
+				saveFileName->setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
+			}
+			else
+			{
+				QMessageBox msgBox;
+				msgBox.setText("File error");
+				msgBox.setInformativeText("Error writing to file");
+				msgBox.setStandardButtons(QMessageBox::Ok);
+				msgBox.setDefaultButton(QMessageBox::Ok);
+				msgBox.exec();
+			}
+
+			file.close();
+		}
+	});
+	
+	connect(loadButton, &QPushButton::clicked, [this, saveFileName]() {
+		QString filePath = QFileDialog::getOpenFileName(this, "Load your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
+
+		if (!filePath.isEmpty())
+		{
+			QFile file(filePath);
+			if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+			{
+				QByteArray line{ file.readLine() };
+				auto test{ line.split(',') };
+				clickHoldTime = test[0].toUInt();
+				timeBetweenClicks = test[1].toUInt();
+				leftClick = test[2].toShort();
+				
+				saveFileName->setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
+				clickHoldTimeEdit->setText(QString::number(clickHoldTime));
+				timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
+				if (leftClick)	
+					leftClickButton->click();
+				else 
+					rightClickButton->click();
+			}
+			else
+			{
+				QMessageBox msgBox;
+				msgBox.setText("File error");
+				msgBox.setInformativeText("Error reading file");
+				msgBox.setStandardButtons(QMessageBox::Ok);
+				msgBox.setDefaultButton(QMessageBox::Ok);
+				msgBox.exec();
+			}
+			file.close();
+		}
+	});
+
 	return saveAndLoadLayout;
 }
 
-QGroupBox* AutoClicker::initActivationLayout() 
+QGroupBox* AutoClicker::initActivationLayout()
 {
 	QGroupBox* bottomGroupBox{ new QGroupBox("Activation") };
 	QVBoxLayout* bottomLayout{ new QVBoxLayout };
@@ -239,29 +235,45 @@ QGroupBox* AutoClicker::initActivationLayout()
 QHBoxLayout* AutoClicker::initActivationHintLayout()
 {
 	QHBoxLayout* activationHintLayout{ new QHBoxLayout };
-	QLabel* activationShortcut{ new QLabel(QString(DEFAULT_START_CHARACTER)) };
+	QLabel* activationShortcut{ new QLabel(AutoUtils::DEFAULT_ACTIVATION_KEY) };
+	activationShortcut->setAlignment(Qt::AlignCenter);
 	QPushButton* changeActivationShortcut{ new QPushButton("Change") };
 
 	activationHintLayout->addWidget(new QLabel("Activation shortcut :"));
 	activationHintLayout->addWidget(activationShortcut);
 	activationHintLayout->addWidget(changeActivationShortcut);
-	
+
 	QTabWidget* tabWidget{ dynamic_cast<QTabWidget*>(parent()) };
 
-	connect(changeActivationShortcut, &QPushButton::clicked, [this, changeActivationShortcut, tabWidget]() {
+	connect(changeActivationShortcut, &QPushButton::clicked, [this, activationShortcut, changeActivationShortcut, tabWidget]() {
 		clickHoldTimeEdit->setEnabled(false);
 		timeBetweenClicksEdit->setEnabled(false);
 		leftClickButton->setEnabled(false);
 		rightClickButton->setEnabled(false);
 		saveButton->setEnabled(false);
 		loadButton->setEnabled(false);
-		changeActivationShortcut->setText("Listening...");
+		changeActivationShortcut->setText("Press and hold");
 		changeActivationShortcut->setEnabled(false);
 
 		for (int i = 0; i < tabWidget->count(); ++i)
 			if (i != tabWidget->currentIndex())
 				tabWidget->setTabVisible(i, false);
 
+		/*std::vector<int> pressedKeys;
+		do
+		{
+
+			for (auto& i : AutoUtils::VIRTUAL_KEYS)
+			{
+				if (GetAsyncKeyState(i.first))
+				{
+					activationShortcut->setText(i.second);
+				}
+			}
+		} while (true);*/
+		
 	});
 	return activationHintLayout;
 }
+
+AutoClicker::~AutoClicker() {}

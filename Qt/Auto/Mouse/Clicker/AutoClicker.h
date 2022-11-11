@@ -8,28 +8,26 @@
 #include <QIntValidator>
 #include <QPushButton>
 #include <QRadioButton>
-#include <string>
+#include <QString>
 #include <vector>
 #include "../../QSmartLineEdit.h"
 #include <unordered_map>
-#include <QMediaPlayer>
-#include <QAudioOutput>
+#include <thread>
 
 class AutoClicker : public QWidget
 {
 	Q_OBJECT
 
 public:
-	AutoClicker(QWidget* parent, const std::string& mainConfigFolder, const std::unordered_map<int, std::string>& VIRTUAL_KEYS);
+	AutoClicker(QWidget* parent);
 	~AutoClicker();
 
 private:
 	Ui::AutoClickerClass ui;
 
-	static const unsigned int defaultClickHoldTime = 50;
-	static const unsigned int defaultTimeBetweenClicks = 200;
-	static const char DEFAULT_START_CHARACTER = 'X';
-	const std::string CONFIGS_PATH; // Defined in constructor
+	static const unsigned int defaultClickHoldTime{ 50 };
+	static const unsigned int defaultTimeBetweenClicks{ 200 };
+	static const QString CONFIGS_PATH;
 
 	unsigned int clickHoldTime;
 	unsigned int timeBetweenClicks;
@@ -43,9 +41,6 @@ private:
 	QPushButton* saveButton;
 	QPushButton* loadButton;
 
-	QMediaPlayer* mediaPlayer;
-	QAudioOutput* audioOutput;
-
 	QGroupBox* initParameters();
 	QHBoxLayout* initClickHoldTime();
 	QHBoxLayout* initTimeBetweenClicks();
@@ -54,6 +49,7 @@ private:
 
 	QGroupBox* initActivationLayout();
 	QHBoxLayout* initActivationHintLayout();
+
 
 	void autoClickerThreadFunction();
 };
