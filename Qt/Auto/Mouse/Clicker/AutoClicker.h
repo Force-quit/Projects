@@ -9,10 +9,12 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QString>
+#include <QTabWidget>
+#include <QLabel>
 #include <vector>
 #include "../../QSmartLineEdit.h"
 #include <unordered_map>
-#include <thread>
+#include <QThread>
 
 class AutoClicker : public QWidget
 {
@@ -24,6 +26,8 @@ public:
 
 private:
 	Ui::AutoClickerClass ui;
+
+	QThread workerThread;
 
 	static const unsigned int defaultClickHoldTime{ 50 };
 	static const unsigned int defaultTimeBetweenClicks{ 200 };
@@ -40,6 +44,8 @@ private:
 	QRadioButton* rightClickButton;
 	QPushButton* saveButton;
 	QPushButton* loadButton;
+	QPushButton* changeShortcutButton;
+	QTabWidget* parent;
 
 	QGroupBox* initParameters();
 	QHBoxLayout* initClickHoldTime();
@@ -48,8 +54,16 @@ private:
 	QHBoxLayout* initSaveAndLoad();
 
 	QGroupBox* initActivationLayout();
-	QHBoxLayout* initActivationHintLayout();
+	QHBoxLayout* initActivationShortcutLayout();
 
 
 	void autoClickerThreadFunction();
+
+	void saveConfiguration(QLabel& saveFileLabel);
+	void loadConfiguration(QLabel& saveFileLabel);
+private slots:
+
+	void beginLookingForInputs();
+	void stopLookingForInputs();
+
 };

@@ -21,6 +21,7 @@
 #include <QAudioOutput>
 #include <Windows.h>
 #include <vector>
+#include "../../QtShortcutPicker.h"
 
 const QString AutoClicker::CONFIGS_PATH{ AutoUtils::ROOT_CONFIG_PATH + "/AutoClicker" };
 
@@ -28,18 +29,25 @@ AutoClicker::AutoClicker(QWidget* parent)
 	: QWidget(parent),
 	clickHoldTime(defaultClickHoldTime), timeBetweenClicks(defaultTimeBetweenClicks), leftClick(),
 	intValidator(), clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton()
+	saveButton(), loadButton(), changeShortcutButton(), parent()
 {
 	ui.setupUi(this);
 	QDir().mkdir(AutoClicker::CONFIGS_PATH);
 	intValidator = new QIntValidator;
 	intValidator->setBottom(0);
+	this->parent = dynamic_cast<QTabWidget*>(parent);
 
 	auto* centralLayout{ new QVBoxLayout };
 	centralLayout->addWidget(initParameters());
 	centralLayout->addWidget(initActivationLayout());
 	centralLayout->addLayout(initSaveAndLoad());
 	setLayout(centralLayout);
+}
+
+AutoClicker::~AutoClicker()
+{
+	workerThread.quit();
+	workerThread.wait();
 }
 
 QGroupBox* AutoClicker::initParameters()
@@ -135,7 +143,7 @@ QHBoxLayout* AutoClicker::initClickButton()
 		else
 			leftClick = false;
 
-		});
+	});
 
 	QHBoxLayout* clickButtonLayout{ new QHBoxLayout };
 	clickButtonLayout->setAlignment(Qt::AlignLeft);
@@ -150,75 +158,17 @@ QHBoxLayout* AutoClicker::initSaveAndLoad()
 {
 	QHBoxLayout* saveAndLoadLayout{ new QHBoxLayout };
 
-	QLabel* saveFileLabel{ new QLabel("Current configuration :") };
-	QLabel* saveFileName{ new QLabel("Unsaved") };
+	QLabel* sectionLabel{ new QLabel("Current configuration :") };
+	QLabel* saveFileLabel{ new QLabel("Unsaved") };
 	saveButton = new QPushButton("Save");
 	loadButton = new QPushButton("Load");
+	saveAndLoadLayout->addWidget(sectionLabel);
 	saveAndLoadLayout->addWidget(saveFileLabel);
-	saveAndLoadLayout->addWidget(saveFileName);
 	saveAndLoadLayout->addWidget(saveButton);
 	saveAndLoadLayout->addWidget(loadButton);
 
-	connect(saveButton, &QPushButton::clicked, [this, saveFileName](bool checked = false) {
-		QString filePath = QFileDialog::getSaveFileName(this, "Save your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
-
-		if (!filePath.isEmpty())
-		{
-			QFile file(filePath);
-			if (file.open(QIODevice::WriteOnly | QIODevice::Text))
-			{
-				QTextStream out(&file);
-				out << clickHoldTime << ',' << timeBetweenClicks << ',' << leftClick;
-				saveFileName->setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
-			}
-			else
-			{
-				QMessageBox msgBox;
-				msgBox.setText("File error");
-				msgBox.setInformativeText("Error writing to file");
-				msgBox.setStandardButtons(QMessageBox::Ok);
-				msgBox.setDefaultButton(QMessageBox::Ok);
-				msgBox.exec();
-			}
-
-			file.close();
-		}
-	});
-	
-	connect(loadButton, &QPushButton::clicked, [this, saveFileName]() {
-		QString filePath = QFileDialog::getOpenFileName(this, "Load your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
-
-		if (!filePath.isEmpty())
-		{
-			QFile file(filePath);
-			if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-			{
-				QByteArray line{ file.readLine() };
-				auto test{ line.split(',') };
-				clickHoldTime = test[0].toUInt();
-				timeBetweenClicks = test[1].toUInt();
-				leftClick = test[2].toShort();
-				
-				saveFileName->setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
-				clickHoldTimeEdit->setText(QString::number(clickHoldTime));
-				timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
-				if (leftClick)	
-					leftClickButton->click();
-				else 
-					rightClickButton->click();
-			}
-			else
-			{
-				QMessageBox msgBox;
-				msgBox.setText("File error");
-				msgBox.setInformativeText("Error reading file");
-				msgBox.setStandardButtons(QMessageBox::Ok);
-				msgBox.setDefaultButton(QMessageBox::Ok);
-				msgBox.exec();
-			}
-			file.close();
-		}
-	});
+	connect(saveButton, &QPushButton::clicked, [this, saveFileLabel]() { saveConfiguration(*saveFileLabel); });
+	connect(loadButton, &QPushButton::clicked, [this, saveFileLabel]() { loadConfiguration(*saveFileLabel); });
 
 	return saveAndLoadLayout;
 }
@@ -227,53 +177,136 @@ QGroupBox* AutoClicker::initActivationLayout()
 {
 	QGroupBox* bottomGroupBox{ new QGroupBox("Activation") };
 	QVBoxLayout* bottomLayout{ new QVBoxLayout };
-	bottomLayout->addLayout(initActivationHintLayout());
+	bottomLayout->addLayout(initActivationShortcutLayout());
 	bottomGroupBox->setLayout(bottomLayout);
 	return bottomGroupBox;
 }
 
-QHBoxLayout* AutoClicker::initActivationHintLayout()
+QHBoxLayout* AutoClicker::initActivationShortcutLayout()
 {
 	QHBoxLayout* activationHintLayout{ new QHBoxLayout };
 	QLabel* activationShortcut{ new QLabel(AutoUtils::DEFAULT_ACTIVATION_KEY) };
 	activationShortcut->setAlignment(Qt::AlignCenter);
-	QPushButton* changeActivationShortcut{ new QPushButton("Change") };
+	changeShortcutButton = new QPushButton("Change") ;
 
 	activationHintLayout->addWidget(new QLabel("Activation shortcut :"));
 	activationHintLayout->addWidget(activationShortcut);
-	activationHintLayout->addWidget(changeActivationShortcut);
+	activationHintLayout->addWidget(changeShortcutButton);
 
-	QTabWidget* tabWidget{ dynamic_cast<QTabWidget*>(parent()) };
+	QtShortcutPicker* worker{ new QtShortcutPicker };
+	worker->moveToThread(&workerThread);
+	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+	connect(worker, &QtShortcutPicker::shortcutChanged, activationShortcut, &QLabel::setText);
+	connect(changeShortcutButton, &QPushButton::clicked, this, &AutoClicker::beginLookingForInputs);
+	connect(changeShortcutButton, &QPushButton::clicked, worker, &QtShortcutPicker::listenForInput);
+	connect(worker, &QtShortcutPicker::shortcutChosen, this, &AutoClicker::stopLookingForInputs);
 
-	connect(changeActivationShortcut, &QPushButton::clicked, [this, activationShortcut, changeActivationShortcut, tabWidget]() {
-		clickHoldTimeEdit->setEnabled(false);
-		timeBetweenClicksEdit->setEnabled(false);
-		leftClickButton->setEnabled(false);
-		rightClickButton->setEnabled(false);
-		saveButton->setEnabled(false);
-		loadButton->setEnabled(false);
-		changeActivationShortcut->setText("Press and hold");
-		changeActivationShortcut->setEnabled(false);
-
-		for (int i = 0; i < tabWidget->count(); ++i)
-			if (i != tabWidget->currentIndex())
-				tabWidget->setTabVisible(i, false);
-
-		/*std::vector<int> pressedKeys;
-		do
-		{
-
-			for (auto& i : AutoUtils::VIRTUAL_KEYS)
-			{
-				if (GetAsyncKeyState(i.first))
-				{
-					activationShortcut->setText(i.second);
-				}
-			}
-		} while (true);*/
-		
-	});
+	workerThread.start();
 	return activationHintLayout;
 }
 
-AutoClicker::~AutoClicker() {}
+void AutoClicker::saveConfiguration(QLabel& saveFileLabel)
+{
+	QString filePath = QFileDialog::getSaveFileName(this, "Save your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
+
+	if (!filePath.isEmpty())
+	{
+		QFile file(filePath);
+		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+		{
+			QTextStream out(&file);
+			out << clickHoldTime << ',' << timeBetweenClicks << ',' << leftClick;
+			saveFileLabel.setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
+		}
+		else
+		{
+			QMessageBox msgBox;
+			msgBox.setText("File error");
+			msgBox.setInformativeText("Error writing to file");
+			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			msgBox.exec();
+		}
+
+		file.close();
+	}
+}
+
+void AutoClicker::loadConfiguration(QLabel& saveFileLabel)
+{
+	QString filePath = QFileDialog::getOpenFileName(this, "Load your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
+
+	if (!filePath.isEmpty())
+	{
+		QFile file(filePath);
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			QByteArray line{ file.readLine() };
+			auto test{ line.split(',') };
+			clickHoldTime = test[0].toUInt();
+			timeBetweenClicks = test[1].toUInt();
+			leftClick = test[2].toShort();
+
+			saveFileLabel.setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
+			clickHoldTimeEdit->setText(QString::number(clickHoldTime));
+			timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
+			if (leftClick)
+				leftClickButton->click();
+			else
+				rightClickButton->click();
+		}
+		else
+		{
+			QMessageBox msgBox;
+			msgBox.setText("File error");
+			msgBox.setInformativeText("Error reading file");
+			msgBox.setStandardButtons(QMessageBox::Ok);
+			msgBox.setDefaultButton(QMessageBox::Ok);
+			msgBox.exec();
+		}
+		file.close();
+	}
+}
+
+/*
+	 _______    ___        _______    _______    _______ 
+	|       |  |   |      |       |  |       |  |       |
+	|  _____|  |   |      |   _   |  |_     _|  |  _____|
+	| |_____   |   |      |  | |  |    |   |    | |_____ 
+	|_____  |  |   |___   |  |_|  |    |   |    |_____  |
+	 _____| |  |       |  |       |    |   |     _____| |
+	|_______|  |_______|  |_______|    |___|    |_______|
+
+*/
+
+void AutoClicker::beginLookingForInputs()
+{
+	clickHoldTimeEdit->setEnabled(false);
+	timeBetweenClicksEdit->setEnabled(false);
+	leftClickButton->setEnabled(false);
+	rightClickButton->setEnabled(false);
+	saveButton->setEnabled(false);
+	loadButton->setEnabled(false);
+	changeShortcutButton->setText("Press and hold");
+	changeShortcutButton->setEnabled(false);
+
+	for (int i = 0; i < parent->count(); ++i)
+		if (i != parent->currentIndex())
+			parent->setTabVisible(i, false);
+}
+
+void AutoClicker::stopLookingForInputs()
+{
+	clickHoldTimeEdit->setEnabled(true);
+	timeBetweenClicksEdit->setEnabled(true);
+	leftClickButton->setEnabled(true);
+	rightClickButton->setEnabled(true);
+	saveButton->setEnabled(true);
+	loadButton->setEnabled(true);
+	changeShortcutButton->setText("Change");
+	changeShortcutButton->setEnabled(true);
+
+	for (int i = 0; i < parent->count(); ++i)
+		if (i != parent->currentIndex())
+			parent->setTabVisible(i, true);
+}

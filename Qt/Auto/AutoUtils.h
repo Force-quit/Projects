@@ -16,7 +16,6 @@ public:
 	AutoUtils(QWidget *parent = nullptr);
 	~AutoUtils();
 
-	static const std::unordered_map<int, QString> VIRTUAL_KEYS;
 	static void playSound(const QUrl& audioFilePath);
 	static const QString ROOT_CONFIG_PATH;
 	static const QChar DEFAULT_ACTIVATION_KEY;
