@@ -25,10 +25,7 @@ AutoUtils::AutoUtils(QWidget* parent)
 	QTabWidget* tab{ new QTabWidget };
 	tab->setMovable(true);
 	tab->addTab(new AutoClicker(tab), "Auto clicker");
-	tab->addTab(new QWidget(tab), "Test");
-	tab->addTab(new QWidget(tab), "Test");
-	tab->addTab(new QWidget(tab), "Test");
-	tab->addTab(new QWidget(tab), "Test");
+	tab->addTab(new QWidget(tab), "Input recorder");
 	setCentralWidget(tab);
 
 	resize(minimumSizeHint());	
