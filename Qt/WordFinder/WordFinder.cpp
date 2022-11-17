@@ -17,23 +17,15 @@
 #include <thread>
 #include <cstdlib>
 #include <mutex>
+#include <QDir>
+#include <QMessageBox>
 
-WordFinder::WordFinder(QWidget *parent)
-	: QMainWindow(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), searching(), stopSearch(), searchMutex(), searchThread()
+WordFinder::WordFinder(QWidget* parent)
+	: QMainWindow(parent), maxResults(DEFAULT_NB_RESULTS), wordList()
 {
 	ui.setupUi(this);
-
-	if (emile::folderExists(DEFAULT_WORD_LIST_FOLDER))
-	{
-		std::ifstream defaultFile(DEFAULT_WORD_LIST_PATH);
-		if (defaultFile.good())
-		{
-			std::string temp;
-			while (std::getline(defaultFile, temp))
-				wordList.push_back(temp);
-		}
-		defaultFile.close();
-	}
+	if (!QDir().mkdir(DEFAULT_WORD_LIST_FOLDER))
+		loadWordList(DEFAULT_WORD_LIST_PATH);
 
 	QVBoxLayout* centralLayout{ new QVBoxLayout };
 
@@ -53,58 +45,23 @@ WordFinder::WordFinder(QWidget *parent)
 	initWindow();
 }
 
-void WordFinder::searchFunction(std::string subString)
-{
-	unsigned int counter = 0;
-	QStringList results;
-	for (unsigned int i = 0; i < wordList.size() && !stopSearch && counter != maxResults; ++i)
-	{
-		if (wordList[i].find(subString) != std::string::npos)
-		{
-			results.append(QString::fromUtf8(wordList[i]));
-			++counter;
-		}
-	}
-
-	if (!stopSearch)
-	{
-		searchMutex.lock();
-		resultsComboBox->addItems(results);
-		searching = false;
-		searchMutex.unlock();
-	}
-}
-
 QGroupBox* WordFinder::initParameters()
 {
 	auto* parametersGroupBox{ new QGroupBox("Parameters") };
 	auto* wordListLayout{ new QHBoxLayout };
 	auto* wordListLabel{ new QLabel("Word list :") };
-	auto* wordListValue{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_PATH.c_str() : "") };
+	auto* wordListValue{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_PATH : "") };
 	auto* wordListButton{ new QPushButton("Select file") };
 	connect(wordListButton, &QPushButton::clicked, [this, wordListValue]() {
-		QString filePath = QString::fromStdString(DEFAULT_WORD_LIST_PATH);
-		filePath = QFileDialog::getOpenFileName(this, "Select word list", filePath, "text files (*.txt)");
-
+		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", DEFAULT_WORD_LIST_PATH, "text files (*.txt)");
 		if (!filePath.isEmpty())
 		{
-			std::ifstream file(filePath.toStdString());
-			if (!file.good())
-				MessageBox(NULL, L"Error reading file", L"File error", MB_ICONERROR);
-			else
-			{
-				wordList.clear();
-				std::string temp;
-				while (std::getline(file, temp))
-					wordList.push_back(temp);
-				wordListValue->setText(filePath);
-				resultsComboBox->clear();
-				searchInput->clear();
-			}
-
-			file.close();
+			loadWordList(filePath);
+			wordListValue->setText(filePath);
+			resultsComboBox->clear();
+			searchInput->clear();
 		}
-		});
+	});
 	wordListLayout->addWidget(wordListLabel);
 	wordListLayout->addWidget(wordListValue);
 	wordListLayout->addWidget(wordListButton);
@@ -148,7 +105,7 @@ QHBoxLayout* WordFinder::initSearch()
 	connect(searchInput, &QLineEdit::textEdited, [this](const QString& text) {
 		searchMutex.lock();
 		resultsComboBox->clear();
-		
+
 		if (searching)
 		{
 			stopSearch = true;
@@ -166,7 +123,7 @@ QHBoxLayout* WordFinder::initSearch()
 			searchThread = new std::thread([this](std::string s) {searchFunction(s); }, subString);
 			searching = true;
 		}
-	});
+		});
 	return searchLayout;
 }
 
@@ -199,6 +156,29 @@ void WordFinder::initWindow()
 	setWindowTitle("Word finder");
 	resize(minimumSizeHint());
 	setWindowIcon(QIcon("program-icon.png"));
+}
+
+void WordFinder::loadWordList(const QString& filePath)
+{
+	QFile file{ filePath };
+	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		wordList.clear();
+		QTextStream in{ &file };
+		while (!in.atEnd())
+			wordList.append(in.readLine());
+		wordList.squeeze();
+	}
+	else
+	{
+		QMessageBox msgBox;
+		msgBox.setText("File error");
+		msgBox.setInformativeText("Error reading file" + filePath);
+		msgBox.setStandardButtons(QMessageBox::Ok);
+		msgBox.setDefaultButton(QMessageBox::Ok);
+		msgBox.exec();
+	}
+	file.close();
 }
 
 WordFinder::~WordFinder() {}

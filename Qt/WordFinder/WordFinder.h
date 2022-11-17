@@ -1,16 +1,13 @@
 #pragma once
 
-#include <QMainWindow>
 #include "ui_WordFinder.h"
-#include <fstream>
-#include <string>
-#include <vector>
+#include <QMainWindow>
 #include <QGroupBox.h>
-#include <QBoxLayout.h>
-#include <QComboBox.h>
-#include <QLineEdit.h>
-#include <thread>
-#include <mutex>
+#include <QBoxLayout>
+#include <QComboBox>
+#include <QLineEdit>
+#include <QString>
+#include <QStringList>
 
 class WordFinder : public QMainWindow
 {
@@ -24,24 +21,21 @@ private:
 	Ui::WordFinderClass ui;
 	
 	const unsigned int DEFAULT_NB_RESULTS{ 25 };
-	const std::string DEFAULT_WORD_LIST_FOLDER = "Word-lists";
-	const std::string DEFAULT_WORD_LIST_PATH = DEFAULT_WORD_LIST_FOLDER + '/' + "francais.txt";
+	const QString DEFAULT_WORD_LIST_FOLDER{ "Word-lists" };
+	const QString DEFAULT_WORD_LIST_PATH{ DEFAULT_WORD_LIST_FOLDER + '/' + "francais.txt" };
 
-	std::vector<std::string> wordList;
+	QStringList wordList;
 	int maxResults;
 
 	QLineEdit* resultNbInput;
 	QLineEdit* searchInput;
 	QComboBox* resultsComboBox;
 
-	std::thread* searchThread;
-	std::mutex searchMutex;
-	bool searching;
-	bool stopSearch;
-	void searchFunction(const std::string subString);
+
 	QGroupBox* initParameters();
 	QHBoxLayout* initSearch();
 	QHBoxLayout* initResults();
 
+	void loadWordList(const QString& filePath);
 	void initWindow();
 };
