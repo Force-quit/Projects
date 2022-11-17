@@ -1,4 +1,3 @@
-#include "../../Utilities/utils.h"
 #include "WordFinder.h"
 #include <qlabel.h>
 #include <qboxlayout.h>
@@ -19,9 +18,13 @@
 #include <mutex>
 #include <QDir>
 #include <QMessageBox>
+#include <QThread>
+#include "WordFinderWorker.h"
+#include <QClipboard>
+#include <QGuiApplication>
 
 WordFinder::WordFinder(QWidget* parent)
-	: QMainWindow(parent), maxResults(DEFAULT_NB_RESULTS), wordList()
+	: QMainWindow(parent), maxResults(DEFAULT_NB_RESULTS), wordList(), worker(), workerThread()
 {
 	ui.setupUi(this);
 	if (!QDir().mkdir(DEFAULT_WORD_LIST_FOLDER))
@@ -61,7 +64,7 @@ QGroupBox* WordFinder::initParameters()
 			resultsComboBox->clear();
 			searchInput->clear();
 		}
-	});
+		});
 	wordListLayout->addWidget(wordListLabel);
 	wordListLayout->addWidget(wordListValue);
 	wordListLayout->addWidget(wordListButton);
@@ -79,10 +82,12 @@ QGroupBox* WordFinder::initParameters()
 		else
 		{
 			int result = std::atoi(text.toStdString().c_str());
-			if (result == INT_MAX) // If input too big
+			if (result == INT_MAX)
 				resultNbInput->setText(QString::number(result));
 			maxResults = result;
 		}
+
+		worker->setMaxResults(maxResults);
 		});
 	resultNbLayout->addWidget(resultNbLabel);
 	resultNbLayout->addWidget(resultNbInput);
@@ -102,28 +107,15 @@ QHBoxLayout* WordFinder::initSearch()
 	searchInput->setValidator(new QRegularExpressionValidator(QRegularExpression(QString::fromUtf8("\\p{L}+"))));
 	searchLayout->addWidget(searchLabel);
 	searchLayout->addWidget(searchInput);
-	connect(searchInput, &QLineEdit::textEdited, [this](const QString& text) {
-		searchMutex.lock();
+	worker = new WordFinderWorker(wordList, maxResults);
+	connect(searchInput, &QLineEdit::textEdited, worker, &WordFinderWorker::findWords);
+	worker->moveToThread(&workerThread);
+	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+	connect(worker, &WordFinderWorker::wordsFound, [this](const QStringList& result) {
 		resultsComboBox->clear();
-
-		if (searching)
-		{
-			stopSearch = true;
-			searchThread->join();
-			delete searchThread;
-
-			searching = false;
-			stopSearch = false;
-		}
-		searchMutex.unlock();
-
-		if (maxResults > 0 && !text.isEmpty())
-		{
-			std::string subString = text.toStdString();
-			searchThread = new std::thread([this](std::string s) {searchFunction(s); }, subString);
-			searching = true;
-		}
+		resultsComboBox->addItems(result);
 		});
+	workerThread.start();
 	return searchLayout;
 }
 
@@ -133,18 +125,7 @@ QHBoxLayout* WordFinder::initResults()
 	resultsComboBox = new QComboBox;
 	QPushButton* resultsButton{ new QPushButton("Copy") };
 	connect(resultsButton, &QPushButton::clicked, [this]() {
-		QString currentText = resultsComboBox->currentText();
-		if (!currentText.isEmpty())
-		{
-
-			std::wstring wstr = currentText.toStdWString();
-			std::string convertedString;
-			convertedString.resize(wstr.length());
-			size_t size;
-			wcstombs_s(&size, &convertedString[0], convertedString.size() + 1, wstr.c_str(), wstr.size());
-
-			emile::copyToClipBoard(convertedString);
-		}
+		QGuiApplication::clipboard()->setText(resultsComboBox->currentText());
 		});
 	resultsLayout->addWidget(resultsComboBox);
 	resultsLayout->addWidget(resultsButton);
@@ -181,4 +162,8 @@ void WordFinder::loadWordList(const QString& filePath)
 	file.close();
 }
 
-WordFinder::~WordFinder() {}
+WordFinder::~WordFinder()
+{
+	workerThread.quit();
+	workerThread.wait();
+}

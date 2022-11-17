@@ -2,12 +2,15 @@
 
 #include "ui_WordFinder.h"
 #include <QMainWindow>
-#include <QGroupBox.h>
-#include <QBoxLayout>
-#include <QComboBox>
-#include <QLineEdit>
+#include <QWidget>
 #include <QString>
 #include <QStringList>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QGroupBox>
+#include <QBoxLayout>
+#include "WordFinderWorker.h"
+#include <QThread>
 
 class WordFinder : public QMainWindow
 {
@@ -25,17 +28,18 @@ private:
 	const QString DEFAULT_WORD_LIST_PATH{ DEFAULT_WORD_LIST_FOLDER + '/' + "francais.txt" };
 
 	QStringList wordList;
-	int maxResults;
+	unsigned int maxResults;
 
 	QLineEdit* resultNbInput;
 	QLineEdit* searchInput;
 	QComboBox* resultsComboBox;
 
-
 	QGroupBox* initParameters();
 	QHBoxLayout* initSearch();
 	QHBoxLayout* initResults();
 
+	WordFinderWorker* worker;
+	QThread workerThread;
 	void loadWordList(const QString& filePath);
 	void initWindow();
 };

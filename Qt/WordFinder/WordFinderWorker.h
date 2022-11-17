@@ -10,7 +10,7 @@ class WordFinderWorker : public QObject
 	Q_OBJECT
 
 public:
-	WordFinderWorker(QObject* parent, const QStringList& wordList, const unsigned int maxResults);
+	WordFinderWorker(const QStringList& wordList, const unsigned int maxResults);
 	~WordFinderWorker();
 	void setMaxResults(const unsigned int nbResults);
 
@@ -22,7 +22,5 @@ signals:
 
 private:
 	const QStringList& wordListRef;
-	bool working;
-	bool stopWorking;
 	unsigned int maxResults;
 };
