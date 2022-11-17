@@ -1,13 +1,15 @@
-#include "AutoUtils.h"
-#include "./Mouse/Clicker/AutoClicker.h"
-#include <QTabWidget>
-#include <QIcon>
-#include <QDir>
-#include <QUrl>
-#include <QAudioOutput>
-#include <QMediaPlayer>
 #include <QString>
+#include "AutoUtils.h"
 #include <QChar>
+#include <QMediaPlayer>
+#include <QAudioOutput>
+#include <QWidget>
+#include <QMainWindow>
+#include <QDir>
+#include <QTabWidget>
+#include "Mouse/Clicker/AutoClicker.h"
+#include <QIcon>
+#include <QUrl>
 
 const QString AutoUtils::ROOT_CONFIG_PATH = "Configs";
 const QChar AutoUtils::DEFAULT_ACTIVATION_KEY{ 'X' };

@@ -1,9 +1,9 @@
-#include "QtShortcutPicker.h"
 #include <unordered_map>
-#include <Windows.h>
-#include <ctime>
-#include <QThread>
 #include <QString>
+#include "QtShortcutPicker.h"
+#include <ctime>
+#include <Windows.h>
+#include <QThread>
 #include <vector>
 
 const std::unordered_map<int, QString> QtShortcutPicker::VIRTUAL_KEYS{

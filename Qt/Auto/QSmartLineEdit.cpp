@@ -1,6 +1,7 @@
 #include "QSmartLineEdit.h"
-#include <QFocusEvent>
+#include <QWidget>
 #include <QLineEdit>
+#include <QFocusEvent>
 
 QSmartLineEdit::QSmartLineEdit(QWidget* parent)
 	: QLineEdit(parent)
