@@ -44,38 +44,39 @@ WordFinder::WordFinder(QWidget* parent)
 	QWidget* centralWidget{ new QWidget };
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
-
 	initWindow();
 }
 
 QGroupBox* WordFinder::initParameters()
 {
-	auto* parametersGroupBox{ new QGroupBox("Parameters") };
-	auto* wordListLayout{ new QHBoxLayout };
-	auto* wordListLabel{ new QLabel("Word list :") };
-	auto* wordListValue{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_PATH : "") };
-	auto* wordListButton{ new QPushButton("Select file") };
-	connect(wordListButton, &QPushButton::clicked, [this, wordListValue]() {
+	QGroupBox* parametersGroupBox{ new QGroupBox("Parameters") };
+
+	QHBoxLayout* wordListLayout{ new QHBoxLayout };
+	QLabel* wordListLabel{ new QLabel("Word list :") };
+	QLabel* wordListPath{ new QLabel(wordList.size() > 0 ? DEFAULT_WORD_LIST_PATH : "None") };
+	QPushButton* wordListButton{ new QPushButton("Select file") };
+	wordListLayout->addWidget(wordListLabel);
+	wordListLayout->addWidget(wordListPath);
+	wordListLayout->addWidget(wordListButton);
+	connect(wordListButton, &QPushButton::clicked, [this, wordListPath]() {
 		QString filePath = QFileDialog::getOpenFileName(this, "Select word list", DEFAULT_WORD_LIST_PATH, "text files (*.txt)");
 		if (!filePath.isEmpty())
 		{
 			loadWordList(filePath);
-			wordListValue->setText(filePath);
+			wordListPath->setText(filePath);
 			resultsComboBox->clear();
 			searchInput->clear();
 		}
-		});
-	wordListLayout->addWidget(wordListLabel);
-	wordListLayout->addWidget(wordListValue);
-	wordListLayout->addWidget(wordListButton);
-	auto* resultNbLayout{ new QHBoxLayout };
-	auto* resultNbLabel{ new QLabel("Max results :") };
-	resultNbInput = new QLineEdit;
+	});
+
+	QHBoxLayout* resultNbLayout{ new QHBoxLayout };
+	QLabel* resultNbLabel{ new QLabel("Max results :") };
+	QLineEdit* resultNbInput{ new QLineEdit };
 	resultNbInput->setText(QString::number(DEFAULT_NB_RESULTS));
-	auto* intValidator{ new QIntValidator };
+	QIntValidator* intValidator{ new QIntValidator };
 	intValidator->setRange(1, INT_MAX);
 	resultNbInput->setValidator(intValidator);
-	connect(resultNbInput, &QLineEdit::textEdited, [this]() {
+	connect(resultNbInput, &QLineEdit::textEdited, [this, resultNbInput]() {
 		QString text = resultNbInput->text();
 		if (text.isEmpty())
 			maxResults = 0;

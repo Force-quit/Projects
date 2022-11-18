@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ui_WordFinder.h"
 #include <QMainWindow>
 #include <QWidget>
+#include "ui_WordFinder.h"
 #include <QString>
 #include <QStringList>
 #include <QLineEdit>
@@ -30,7 +30,6 @@ private:
 	QStringList wordList;
 	unsigned int maxResults;
 
-	QLineEdit* resultNbInput;
 	QLineEdit* searchInput;
 	QComboBox* resultsComboBox;
 
@@ -40,6 +39,7 @@ private:
 
 	WordFinderWorker* worker;
 	QThread workerThread;
+
 	void loadWordList(const QString& filePath);
 	void initWindow();
 };
