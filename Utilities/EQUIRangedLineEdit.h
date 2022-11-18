@@ -2,7 +2,6 @@
 
 #include "EQSmartLineEdit.h"
 #include "ui_EQUIRangedLineEdit.h"
-#include <QIntValidator>
 
 class EQUIRangedLineEdit : public EQSmartLineEdit
 {
@@ -13,14 +12,12 @@ public:
 	~EQUIRangedLineEdit();
 
 signals:
-	unsigned int finalValue();
+	void valueValidated(unsigned int value);
 
 private:
 	Ui::EQUIRangedLineEditClass ui;
-	unsigned int bottom;
-	unsigned int top;
-
-	QIntValidator* validator;
+	const unsigned int bottom;
+	const unsigned int top;
 
 private slots:
 	void validate(const QString& text);

@@ -12,7 +12,7 @@
 #include <QTabWidget>
 #include <QLabel>
 #include <vector>
-#include "../../../../Utilities/EQSmartLineEdit.h"
+#include "../../../../Utilities/EQUIRangedLineEdit.h"
 #include <unordered_map>
 #include <QThread>
 
@@ -37,9 +37,8 @@ private:
 	unsigned int timeBetweenClicks;
 	bool leftClick;
 
-	QIntValidator* intValidator;
-	EQSmartLineEdit* clickHoldTimeEdit;
-	EQSmartLineEdit* timeBetweenClicksEdit;
+	EQUIRangedLineEdit* clickHoldTimeEdit;
+	EQUIRangedLineEdit* timeBetweenClicksEdit;
 	QRadioButton* leftClickButton;
 	QRadioButton* rightClickButton;
 	QPushButton* saveButton;

@@ -1,5 +1,5 @@
 #include "AutoClicker.h"
-#include "../../../../Utilities/EQSmartLineEdit.h"
+#include "../../../../Utilities/EQUIRangedLineEdit.h"
 #include "../../AutoUtils.h"
 #include <string>
 #include <QFile>
@@ -28,13 +28,11 @@ const QString AutoClicker::CONFIGS_PATH{ AutoUtils::ROOT_CONFIG_PATH + "/AutoCli
 AutoClicker::AutoClicker(QWidget* parent)
 	: QWidget(parent),
 	clickHoldTime(defaultClickHoldTime), timeBetweenClicks(defaultTimeBetweenClicks), leftClick(),
-	intValidator(), clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
+	clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
 	saveButton(), loadButton(), changeShortcutButton(), parent()
 {
 	ui.setupUi(this);
 	QDir().mkdir(AutoClicker::CONFIGS_PATH);
-	intValidator = new QIntValidator;
-	intValidator->setBottom(0);
 	this->parent = dynamic_cast<QTabWidget*>(parent);
 
 	auto* centralLayout{ new QVBoxLayout };
@@ -69,8 +67,7 @@ QGroupBox* AutoClicker::initParameters()
 
 QHBoxLayout* AutoClicker::initClickHoldTime()
 {
-	clickHoldTimeEdit = new EQSmartLineEdit;
-	clickHoldTimeEdit->setValidator(intValidator);
+	clickHoldTimeEdit = new EQUIRangedLineEdit(1, UINT_MAX);
 	clickHoldTimeEdit->setText(QString::number(defaultClickHoldTime));
 
 	QHBoxLayout* clickHoldTimeLayout{ new QHBoxLayout };
@@ -78,20 +75,8 @@ QHBoxLayout* AutoClicker::initClickHoldTime()
 	clickHoldTimeLayout->addWidget(clickHoldTimeEdit);
 	clickHoldTimeLayout->addWidget(new QLabel("ms"));
 
-	connect(clickHoldTimeEdit, &EQSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
-		auto temp{ text.toULongLong() };
-		if (temp > UINT_MAX)
-		{
-			clickHoldTime = UINT_MAX;
-			clickHoldTimeEdit->setText(QString::number(clickHoldTime));
-		}
-		else if (temp <= 0)
-		{
-			clickHoldTime = 1;
-			clickHoldTimeEdit->setText(QString::number(clickHoldTime));
-		}
-		else
-			clickHoldTime = temp;
+	connect(clickHoldTimeEdit, &EQUIRangedLineEdit::valueValidated, [this](unsigned int value) {
+		clickHoldTime = value;
 	});
 
 	return clickHoldTimeLayout;
@@ -99,8 +84,7 @@ QHBoxLayout* AutoClicker::initClickHoldTime()
 
 QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 {
-	timeBetweenClicksEdit = new EQSmartLineEdit;
-	timeBetweenClicksEdit->setValidator(intValidator);
+	timeBetweenClicksEdit = new EQUIRangedLineEdit(1, UINT_MAX);
 	timeBetweenClicksEdit->setText(QString::number(defaultTimeBetweenClicks));
 
 	QHBoxLayout* timeBetweenClickLayout{ new QHBoxLayout };
@@ -108,21 +92,9 @@ QHBoxLayout* AutoClicker::initTimeBetweenClicks()
 	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
 	timeBetweenClickLayout->addWidget(new QLabel("ms"));
 
-	connect(timeBetweenClicksEdit, &EQSmartLineEdit::smartFocusOutEvent, [this](const QString& text) {
-		auto temp{ text.toULongLong() };
-		if (temp > UINT_MAX)
-		{
-			timeBetweenClicks = UINT_MAX;
-			timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
-		}
-		else if (temp <= 0)
-		{
-			timeBetweenClicks = 1;
-			timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
-		}
-		else
-			timeBetweenClicks = temp;
-		});
+	connect(timeBetweenClicksEdit, &EQUIRangedLineEdit::valueValidated, [this](unsigned int value) {
+		timeBetweenClicks = value;
+	});
 
 	return timeBetweenClickLayout;
 }

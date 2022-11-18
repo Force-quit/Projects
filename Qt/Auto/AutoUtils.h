@@ -16,12 +16,12 @@ public:
 	AutoUtils(QWidget *parent = nullptr);
 	~AutoUtils();
 
-	static void playSound(const QUrl& audioFilePath);
 	static const QString ROOT_CONFIG_PATH;
 	static const QChar DEFAULT_ACTIVATION_KEY;
+	void playSound(const QUrl& audioFilePath);
 
 private:
 	Ui::AutoUtilsClass ui;
-	static QMediaPlayer* mediaPlayer;
-	static QAudioOutput* audioOutput;
+	QMediaPlayer* mediaPlayer;
+	QAudioOutput* audioOutput;
 };

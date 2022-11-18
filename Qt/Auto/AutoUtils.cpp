@@ -13,11 +13,9 @@
 
 const QString AutoUtils::ROOT_CONFIG_PATH = "Configs";
 const QChar AutoUtils::DEFAULT_ACTIVATION_KEY{ 'X' };
-QMediaPlayer* AutoUtils::mediaPlayer{};
-QAudioOutput* AutoUtils::audioOutput{};
 
 AutoUtils::AutoUtils(QWidget* parent)
-	: QMainWindow(parent)
+	: QMainWindow(parent), mediaPlayer(), audioOutput()
 {
 	ui.setupUi(this);
 	QDir().mkdir(ROOT_CONFIG_PATH);
@@ -31,26 +29,24 @@ AutoUtils::AutoUtils(QWidget* parent)
 	resize(minimumSizeHint());	
 	setWindowTitle("Auto utilities");
 	setWindowIcon(QIcon("program-icon-utilities.png"));
-	AutoUtils::playSound(QUrl("autoclicker-on.wav"));
+	playSound(QUrl("autoclicker-on.wav"));
 }
 
 void AutoUtils::playSound(const QUrl& audioFilePath)
 {
-	if (AutoUtils::mediaPlayer == nullptr)
+	if (mediaPlayer == nullptr)
 	{
-		AutoUtils::mediaPlayer = new QMediaPlayer;
-		AutoUtils::audioOutput = new QAudioOutput;
-		AutoUtils::mediaPlayer->setAudioOutput(audioOutput);
+		mediaPlayer = new QMediaPlayer;
+		audioOutput = new QAudioOutput;
+		mediaPlayer->setAudioOutput(audioOutput);
 	}
 
-	AutoUtils::mediaPlayer->setSource(audioFilePath);
-	AutoUtils::mediaPlayer->play();
+	mediaPlayer->setSource(audioFilePath);
+	mediaPlayer->play();
 }
 
 AutoUtils::~AutoUtils()
 {
-	delete AutoUtils::mediaPlayer;
-	delete AutoUtils::audioOutput;
-	AutoUtils::mediaPlayer = nullptr;
-	AutoUtils::audioOutput = nullptr;
+	delete mediaPlayer;
+	delete audioOutput;
 }
