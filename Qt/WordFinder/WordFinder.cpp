@@ -23,7 +23,6 @@
 WordFinder::WordFinder(QWidget* parent)
 	: QMainWindow(parent), wordList(), wordFinderWorker(), workerThread(), searchInput(), resultsComboBox()
 {
-	ui.setupUi(this);
 	if (!QDir().mkdir(DEFAULT_WORD_LIST_FOLDER))
 		loadWordList(DEFAULT_WORD_LIST_PATH);
 

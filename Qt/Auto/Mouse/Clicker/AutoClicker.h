@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QWidget>
-#include "ui_AutoClicker.h"
 #include <QGroupBox>
 #include <QLineEdit>
 #include <QHBoxLayout>
@@ -25,8 +24,6 @@ public:
 	~AutoClicker();
 
 private:
-	Ui::AutoClickerClass ui;
-
 	QThread workerThread;
 
 	static const unsigned int defaultClickHoldTime{ 50 };

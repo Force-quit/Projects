@@ -31,7 +31,6 @@ AutoClicker::AutoClicker(QWidget* parent)
 	clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
 	saveButton(), loadButton(), changeShortcutButton(), parent()
 {
-	ui.setupUi(this);
 	QDir().mkdir(AutoClicker::CONFIGS_PATH);
 	this->parent = dynamic_cast<QTabWidget*>(parent);
 

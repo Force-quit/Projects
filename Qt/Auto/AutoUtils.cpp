@@ -17,7 +17,6 @@ const QChar AutoUtils::DEFAULT_ACTIVATION_KEY{ 'X' };
 AutoUtils::AutoUtils(QWidget* parent)
 	: QMainWindow(parent), mediaPlayer(), audioOutput()
 {
-	ui.setupUi(this);
 	QDir().mkdir(ROOT_CONFIG_PATH);
 
 	QTabWidget* tab{ new QTabWidget };

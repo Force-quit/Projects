@@ -2,7 +2,6 @@
 
 #include <QMainWindow>
 #include <QWidget>
-#include "ui_WordFinder.h"
 #include <QString>
 #include <QStringList>
 #include <QLineEdit>
@@ -21,8 +20,6 @@ public:
 	~WordFinder();
 
 private:
-	Ui::WordFinderClass ui;
-	
 	const unsigned int DEFAULT_NB_RESULTS{ 25 };
 	const QString DEFAULT_WORD_LIST_FOLDER{ "Word-lists" };
 	const QString DEFAULT_WORD_LIST_PATH{ DEFAULT_WORD_LIST_FOLDER + '/' + "francais.txt" };

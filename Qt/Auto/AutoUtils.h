@@ -5,7 +5,6 @@
 #include <QAudioOutput>
 #include <unordered_map>
 #include <QUrl>
-#include "ui_AutoUtils.h"
 #include <QString>
 
 class AutoUtils : public QMainWindow
@@ -21,7 +20,6 @@ public:
 	void playSound(const QUrl& audioFilePath);
 
 private:
-	Ui::AutoUtilsClass ui;
 	QMediaPlayer* mediaPlayer;
 	QAudioOutput* audioOutput;
 };
