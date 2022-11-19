@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QLineEdit>
-#include "ui_EQSmartLineEdit.h"
 #include <QFocusEvent>
 
 class EQSmartLineEdit : public QLineEdit
@@ -17,7 +16,4 @@ signals:
 
 protected:
 	void focusOutEvent(QFocusEvent* e) override;
-
-private:
-	Ui::EQSmartLineEditClass ui;
 };

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "EQSmartLineEdit.h"
-#include "ui_EQUIRangedLineEdit.h"
 
 class EQUIRangedLineEdit : public EQSmartLineEdit
 {
@@ -15,7 +14,6 @@ signals:
 	void valueValidated(unsigned int value);
 
 private:
-	Ui::EQUIRangedLineEditClass ui;
 	const unsigned int bottom;
 	const unsigned int top;
 

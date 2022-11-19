@@ -2,15 +2,9 @@
 #include <QLineEdit>
 #include <QFocusEvent>
 
-EQSmartLineEdit::EQSmartLineEdit(QWidget *parent)
-	: QLineEdit(parent)
-{
-	ui.setupUi(this);
-}
+EQSmartLineEdit::EQSmartLineEdit(QWidget *parent) : QLineEdit(parent) {}
 
-EQSmartLineEdit::~EQSmartLineEdit()
-{}
-
+EQSmartLineEdit::~EQSmartLineEdit() {}
 
 void EQSmartLineEdit::focusOutEvent(QFocusEvent* e)
 {

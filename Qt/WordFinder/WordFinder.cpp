@@ -125,7 +125,7 @@ QHBoxLayout* WordFinder::initResults()
 
 void WordFinder::initWindow()
 {
-	setWindowTitle("Word finder 2.0");
+	setWindowTitle("Word finder 3.0");
 	resize(minimumSizeHint());
 	setWindowIcon(QIcon("program-icon.png"));
 }

@@ -5,7 +5,6 @@
 EQUIRangedLineEdit::EQUIRangedLineEdit(unsigned int bottom, unsigned int top, QWidget* parent)
 	: EQSmartLineEdit(parent), bottom(bottom), top(top)
 {
-	ui.setupUi(this);
 	setValidator(new QIntValidator);
 	connect(this, &EQSmartLineEdit::smartFocusOutEvent, this, &EQUIRangedLineEdit::validate);
 }
