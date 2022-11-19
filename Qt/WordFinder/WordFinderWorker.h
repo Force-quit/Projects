@@ -1,9 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <QStringList>
 #include <QString>
-#include <QStringList>
-#include <QStringList>
 
 class WordFinderWorker : public QObject
 {
@@ -12,10 +11,11 @@ class WordFinderWorker : public QObject
 public:
 	WordFinderWorker(const QStringList& wordList, const unsigned int maxResults);
 	~WordFinderWorker();
-	void setMaxResults(const unsigned int nbResults);
 
+	void queueWork();
 public slots:
 	void findWords(const QString& pattern);
+	void setMaxResults(const unsigned int nbResults);
 
 signals:
 	void wordsFound(const QStringList& results);
@@ -23,4 +23,5 @@ signals:
 private:
 	const QStringList& wordListRef;
 	unsigned int maxResults;
+	unsigned short nbCalls;
 };

@@ -1,4 +1,6 @@
 #include "EQSmartLineEdit.h"
+#include <QLineEdit>
+#include <QFocusEvent>
 
 EQSmartLineEdit::EQSmartLineEdit(QWidget *parent)
 	: QLineEdit(parent)

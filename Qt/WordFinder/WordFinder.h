@@ -28,7 +28,6 @@ private:
 	const QString DEFAULT_WORD_LIST_PATH{ DEFAULT_WORD_LIST_FOLDER + '/' + "francais.txt" };
 
 	QStringList wordList;
-	unsigned int maxResults;
 
 	QLineEdit* searchInput;
 	QComboBox* resultsComboBox;
@@ -37,7 +36,7 @@ private:
 	QHBoxLayout* initSearch();
 	QHBoxLayout* initResults();
 
-	WordFinderWorker* worker;
+	WordFinderWorker* wordFinderWorker;
 	QThread workerThread;
 
 	void loadWordList(const QString& filePath);

@@ -1,4 +1,5 @@
 #include "EQUIRangedLineEdit.h"
+#include "EQSmartLineEdit.h"
 #include <QIntValidator>
 
 EQUIRangedLineEdit::EQUIRangedLineEdit(unsigned int bottom, unsigned int top, QWidget* parent)
