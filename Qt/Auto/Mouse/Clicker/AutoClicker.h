@@ -20,7 +20,7 @@ class AutoClicker : public QWidget
 	Q_OBJECT
 
 public:
-	AutoClicker(QWidget* parent);
+	AutoClicker(QWidget* parent, const QString& parentConfigPath, const char defaultActivationKey, const short defaultActivationCode);
 	~AutoClicker();
 
 private:

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QLineEdit>
+#include <QString>
 #include <QFocusEvent>
 
 class EQSmartLineEdit : public QLineEdit

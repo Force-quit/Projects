@@ -12,11 +12,12 @@ class AutoUtils : public QMainWindow
 	Q_OBJECT
 
 public:
-	AutoUtils(QWidget *parent = nullptr);
+	AutoUtils(QWidget* parent = nullptr);
 	~AutoUtils();
 
-	static const QString ROOT_CONFIG_PATH;
-	static const QChar DEFAULT_ACTIVATION_KEY;
+	const QString ROOT_CONFIG_PATH{ "Configs" };
+	const char DEFAULT_ACTIVATION_KEY{ 'X' };
+	const short DEFAULT_ACTIVATION_CODE{ 0x58 };
 	void playSound(const QUrl& audioFilePath);
 
 private:

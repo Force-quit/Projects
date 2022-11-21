@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EQSmartLineEdit.h"
+#include <QString>
 
 class EQUIRangedLineEdit : public EQSmartLineEdit
 {
