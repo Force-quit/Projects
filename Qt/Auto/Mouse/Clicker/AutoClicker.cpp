@@ -1,7 +1,6 @@
 #include "AutoClicker.h"
 #include "../../../../Utilities/EQUIRangedLineEdit.h"
 #include "../../AutoUtils.h"
-#include <string>
 #include <QFile>
 #include <QBoxLayout>
 #include <QGroupBox>
@@ -29,16 +28,19 @@ AutoClicker::AutoClicker(QWidget* parent)
 	: QWidget(parent),
 	clickHoldTime(defaultClickHoldTime), timeBetweenClicks(defaultTimeBetweenClicks), leftClick(),
 	clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton(), changeShortcutButton(), parent()
+	saveButton(), loadButton(), changeShortcutButton(), parent(), widgetsToDisable()
 {
 	QDir().mkdir(AutoClicker::CONFIGS_PATH);
 	this->parent = dynamic_cast<EQTabWidget*>(parent);
 
-	auto* centralLayout{ new QVBoxLayout };
+	QVBoxLayout* centralLayout{ new QVBoxLayout };
 	centralLayout->addWidget(initParameters());
 	centralLayout->addWidget(initActivationLayout());
 	centralLayout->addLayout(initSaveAndLoad());
 	setLayout(centralLayout);
+	
+	widgetsToDisable.append({ clickHoldTimeEdit, timeBetweenClicksEdit,
+		leftClickButton, rightClickButton, saveButton, loadButton, changeShortcutButton });
 }
 
 AutoClicker::~AutoClicker()
@@ -251,28 +253,18 @@ void AutoClicker::loadConfiguration(QLabel& saveFileLabel)
 
 void AutoClicker::beginLookingForInputs()
 {
-	clickHoldTimeEdit->setEnabled(false);
-	timeBetweenClicksEdit->setEnabled(false);
-	leftClickButton->setEnabled(false);
-	rightClickButton->setEnabled(false);
-	saveButton->setEnabled(false);
-	loadButton->setEnabled(false);
+	for (auto i : widgetsToDisable)
+		i->setEnabled(false);
 	changeShortcutButton->setText("Press and hold");
-	changeShortcutButton->setEnabled(false);
 
 	parent->lock();
 }
 
 void AutoClicker::stopLookingForInputs()
 {
-	clickHoldTimeEdit->setEnabled(true);
-	timeBetweenClicksEdit->setEnabled(true);
-	leftClickButton->setEnabled(true);
-	rightClickButton->setEnabled(true);
-	saveButton->setEnabled(true);
-	loadButton->setEnabled(true);
+	for (auto i : widgetsToDisable)
+		i->setEnabled(true);
 	changeShortcutButton->setText("Change");
-	changeShortcutButton->setEnabled(true);
 
 	parent->unlock();
 }

@@ -14,6 +14,7 @@
 #include "../../../../Utilities/EQUIRangedLineEdit.h"
 #include <unordered_map>
 #include <QThread>
+#include <QVector>
 
 class AutoClicker : public QWidget
 {
@@ -42,6 +43,7 @@ private:
 	QPushButton* loadButton;
 	QPushButton* changeShortcutButton;
 	EQTabWidget* parent;
+	QVector<QWidget*> widgetsToDisable;
 
 	QGroupBox* initParameters();
 	QHBoxLayout* initClickHoldTime();
