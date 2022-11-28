@@ -8,19 +8,20 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QString>
-#include <QTabWidget>
+#include "../../../../Utilities/EQTabWidget.h"
 #include <QLabel>
 #include <vector>
 #include "../../../../Utilities/EQUIRangedLineEdit.h"
 #include <unordered_map>
 #include <QThread>
+#include <QVector>
 
 class AutoClicker : public QWidget
 {
 	Q_OBJECT
 
 public:
-	AutoClicker(QWidget* parent, const QString& parentConfigPath, const char defaultActivationKey, const short defaultActivationCode);
+	AutoClicker(QWidget* parent);
 	~AutoClicker();
 
 private:
@@ -41,7 +42,8 @@ private:
 	QPushButton* saveButton;
 	QPushButton* loadButton;
 	QPushButton* changeShortcutButton;
-	QTabWidget* parent;
+	EQTabWidget* parent;
+	QVector<QWidget*> widgetsToDisable;
 
 	QGroupBox* initParameters();
 	QHBoxLayout* initClickHoldTime();
@@ -54,7 +56,7 @@ private:
 
 
 	void autoClickerThreadFunction();
-
+	 
 	void saveConfiguration(QLabel& saveFileLabel);
 	void loadConfiguration(QLabel& saveFileLabel);
 private slots:

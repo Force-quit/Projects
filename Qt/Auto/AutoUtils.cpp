@@ -6,17 +6,20 @@
 #include <QWidget>
 #include <QMainWindow>
 #include <QDir>
-#include <QTabWidget>
+#include "../../Utilities/EQTabWidget.h"
 #include "Mouse/Clicker/AutoClicker.h"
 #include <QIcon>
 #include <QUrl>
+
+const QString AutoUtils::ROOT_CONFIG_PATH{ "Configs" };
+const QChar AutoUtils::DEFAULT_ACTIVATION_KEY{ 'X' };
 
 AutoUtils::AutoUtils(QWidget* parent)
 	: QMainWindow(parent), mediaPlayer(), audioOutput()
 {
 	QDir().mkdir(ROOT_CONFIG_PATH);
 
-	QTabWidget* tab{ new QTabWidget };
+	EQTabWidget* tab{ new EQTabWidget };
 	tab->setMovable(true);
 	tab->addTab(new AutoClicker(tab), "Auto clicker");
 	tab->addTab(new QWidget(tab), "Input recorder");
