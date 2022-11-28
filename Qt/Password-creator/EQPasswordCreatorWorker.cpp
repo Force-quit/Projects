@@ -10,30 +10,22 @@ EQPasswordCreatorWorker::EQPasswordCreatorWorker(QObject *parent)
 EQPasswordCreatorWorker::~EQPasswordCreatorWorker()
 {}
 
-void EQPasswordCreatorWorker::loadAlphabet(const QString & filePath)
+void EQPasswordCreatorWorker::loadAlphabet(QFile& opennedFile)
 {
-	QFile file{ filePath };
-	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-	{
-		currentAlphabet.clear();
-		QTextStream in{ &file };
-		QString line{ in.readLine() };
-		for (QChar& i : line)
-			currentAlphabet.append(i);
-	}
-	else
-	{
-		QMessageBox msgBox;
-		msgBox.setText("File error");
-		msgBox.setInformativeText("Error reading file" + filePath);
-		msgBox.setStandardButtons(QMessageBox::Ok);
-		msgBox.setDefaultButton(QMessageBox::Ok);
-		msgBox.exec();
-	}
-	file.close();
+	currentAlphabet.clear();
+	QTextStream in{ &opennedFile };
+	QString line{ in.readLine() };
+	for (QChar& i : line)
+		currentAlphabet.append(i);
 }
 
-void EQPasswordCreatorWorker::generatePassword(const unsigned int passwordSize)
+void EQPasswordCreatorWorker::setPasswordLength(const unsigned int passwordLength)
 {
 
+	this->passwordLength = passwordLength;
+}
+
+void EQPasswordCreatorWorker::generatePassword()
+{
+	
 }

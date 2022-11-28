@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QGroupBox>
 #include "EQPasswordCreatorWorker.h"
+#include <QLabel>
 
 class EQPasswordCreator : public QMainWindow
 {
@@ -14,7 +15,7 @@ public:
 	~EQPasswordCreator();
 
 public slots:
-	void setAlphabetText(const QString& text);
+	//void setAlphabetText(const QString& text);
 
 private:
 	const QString ALPHABETS_DIR{ "alphabets" };
