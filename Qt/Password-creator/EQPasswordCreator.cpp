@@ -7,23 +7,28 @@
 #include "../../Utilities/EQUIRangedLineEdit.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QListView>
+#include <QStringListModel>
+#include <QGuiApplication>
+#include <QClipboard>
 
 EQPasswordCreator::EQPasswordCreator(QWidget *parent)
 	: QMainWindow(parent), workerThread(), passwordCreatorWorker()
 {
-	passwordCreatorWorker = new EQPasswordCreatorWorker(this);
+	passwordCreatorWorker = new EQPasswordCreatorWorker(this, DEFAULT_PASSWORD_LENGTH);
 	QWidget* centralWidget{ new QWidget };
 	QHBoxLayout* centalLayout{ new QHBoxLayout };
 
 	QGroupBox* parameters = initParameters();
-
-	loadAlphabet(DEFAULT_ALPHABET_PATH);
+	QVBoxLayout* generatorLayout = initGenerator();
 
 	centalLayout->addWidget(parameters);
+	centalLayout->addLayout(generatorLayout);
 
 	centralWidget->setLayout(centalLayout);
 	setCentralWidget(centralWidget);
 	setWindowIcon(QIcon("gears.png"));
+	loadAlphabet(DEFAULT_ALPHABET_PATH);
 }
 
 QGroupBox* EQPasswordCreator::initParameters()
@@ -42,7 +47,7 @@ QGroupBox* EQPasswordCreator::initParameters()
 	QHBoxLayout* passwordLengthLayout{ new QHBoxLayout };
 	QLabel* passwordLengthLabel{ new QLabel("Password length :") };
 	EQUIRangedLineEdit* passwordLengthLineEdit{ new EQUIRangedLineEdit(0, UINT_MAX) };
-	passwordLengthLineEdit->insert(QString::number(20));
+	passwordLengthLineEdit->insert(QString::number(DEFAULT_PASSWORD_LENGTH));
 	passwordLengthLayout->addWidget(passwordLengthLabel);
 	passwordLengthLayout->addWidget(passwordLengthLineEdit);
 
@@ -58,6 +63,34 @@ QGroupBox* EQPasswordCreator::initParameters()
 
 	connect(passwordLengthLineEdit, &EQUIRangedLineEdit::valueValidated, passwordCreatorWorker, &EQPasswordCreatorWorker::setPasswordLength); 
 	return parameters;
+}
+
+QVBoxLayout* EQPasswordCreator::initGenerator()
+{
+	QVBoxLayout* generatorLayout{ new QVBoxLayout };
+
+	QListView* passwordsListView{ new QListView };
+	passwordsListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	passwordsListView->setModel(new QStringListModel({ "Hello", "World", "This is a test" }));
+
+	QPushButton* generateButton{ new QPushButton("Generate") };
+	QPushButton* copyButton{ new QPushButton("Copy") };
+
+	generatorLayout->addWidget(passwordsListView);
+	generatorLayout->addWidget(generateButton);
+	generatorLayout->addWidget(copyButton);
+
+	connect(generateButton, &QPushButton::clicked, passwordCreatorWorker, &EQPasswordCreatorWorker::generatePassword);
+	connect(passwordCreatorWorker, &EQPasswordCreatorWorker::passwordGenerated, this, &EQPasswordCreator::updatePasswordList);
+	connect(&workerThread, &QThread::finished, passwordCreatorWorker, &QObject::deleteLater);
+	passwordCreatorWorker->moveToThread(&workerThread);
+	workerThread.start();
+
+	connect(copyButton, &QPushButton::clicked, [passwordsListView](){
+		QGuiApplication::clipboard()->setText(passwordsListView->currentIndex().data().toString());
+	});
+
+	return generatorLayout;
 }
 
 void EQPasswordCreator::loadAlphabet(const QString& filePath)
@@ -78,6 +111,11 @@ void EQPasswordCreator::loadAlphabet(const QString& filePath)
 		msgBox.exec();
 	}
 	file.close();
+}
+
+void EQPasswordCreator::updatePasswordList(const QString newPassword)
+{
+	qDebug(newPassword.toStdString().c_str());
 }
 
 EQPasswordCreator::~EQPasswordCreator()

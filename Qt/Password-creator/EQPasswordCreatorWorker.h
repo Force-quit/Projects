@@ -11,7 +11,7 @@ class EQPasswordCreatorWorker  : public QObject
 	Q_OBJECT
 
 public:
-	EQPasswordCreatorWorker(QObject *parent);
+	EQPasswordCreatorWorker(QObject *parent, unsigned int passwordLength);
 	~EQPasswordCreatorWorker();
 	
 	void loadAlphabet(QFile& opennedFile);
@@ -21,9 +21,10 @@ public slots:
 	void setPasswordLength(const unsigned int passwordLength);
 
 signals:
-	void passwordGenerated(QString password);
+	void passwordGenerated(const QString password);
 
 private:
 	QVector<QChar> currentAlphabet;
 	unsigned int passwordLength;
+	unsigned int randomIndex;
 };

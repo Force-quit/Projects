@@ -5,6 +5,8 @@
 #include <QGroupBox>
 #include "EQPasswordCreatorWorker.h"
 #include <QLabel>
+#include <QVBoxLayout>
+#include <QString>
 
 class EQPasswordCreator : public QMainWindow
 {
@@ -15,17 +17,18 @@ public:
 	~EQPasswordCreator();
 
 public slots:
-	//void setAlphabetText(const QString& text);
+	void updatePasswordList(const QString newPassword);
 
 private:
 	const QString ALPHABETS_DIR{ "alphabets" };
-	const QString DEFAULT_ALPHABET_PATH{ ALPHABETS_DIR + "/allphabets.txt" };
-
+	const QString DEFAULT_ALPHABET_PATH{ ALPHABETS_DIR + "/allphabet.txt" };
+	const unsigned int DEFAULT_PASSWORD_LENGTH{ 20 };
 
 	QThread workerThread;
 	EQPasswordCreatorWorker* passwordCreatorWorker;
 	
 	QGroupBox* initParameters();
+	QVBoxLayout* initGenerator();
 	
 	QLabel* alphabetText;
 
