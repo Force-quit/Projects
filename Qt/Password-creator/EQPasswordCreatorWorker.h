@@ -6,7 +6,7 @@
 #include <QChar>
 #include <QFile>
 
-class EQPasswordCreatorWorker  : public QObject
+class EQPasswordCreatorWorker : public QObject
 {
 	Q_OBJECT
 

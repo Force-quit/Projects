@@ -9,9 +9,6 @@ EQPasswordCreatorWorker::EQPasswordCreatorWorker(unsigned int passwordLength)
 	: currentAlphabet(), passwordLength(passwordLength), randomIndex(time(0))
 {}
 
-EQPasswordCreatorWorker::~EQPasswordCreatorWorker()
-{}
-
 void EQPasswordCreatorWorker::loadAlphabet(QFile& opennedFile)
 {
 	currentAlphabet.clear();
@@ -28,8 +25,8 @@ void EQPasswordCreatorWorker::setPasswordLength(const unsigned int passwordLengt
 
 void EQPasswordCreatorWorker::generatePassword()
 {
-	QRandomGenerator rand{ randomIndex };
 	++randomIndex;
+	QRandomGenerator rand{ randomIndex };
 	auto alphabetLength{ currentAlphabet.length() };
 	QString password;
 	password.resize(passwordLength);
@@ -37,3 +34,6 @@ void EQPasswordCreatorWorker::generatePassword()
 		password[i] = currentAlphabet[rand.generateDouble() * alphabetLength];
 	emit passwordGenerated(password);
 }
+
+EQPasswordCreatorWorker::~EQPasswordCreatorWorker()
+{}
