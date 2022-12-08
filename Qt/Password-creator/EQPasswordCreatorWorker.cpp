@@ -3,9 +3,10 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QRandomGenerator>
+#include <QThread>
 
-EQPasswordCreatorWorker::EQPasswordCreatorWorker(QObject *parent, unsigned int passwordLength)
-	: QObject(parent), currentAlphabet(), passwordLength(passwordLength), randomIndex(time(0))
+EQPasswordCreatorWorker::EQPasswordCreatorWorker(unsigned int passwordLength)
+	: currentAlphabet(), passwordLength(passwordLength), randomIndex(time(0))
 {}
 
 EQPasswordCreatorWorker::~EQPasswordCreatorWorker()
@@ -22,7 +23,6 @@ void EQPasswordCreatorWorker::loadAlphabet(QFile& opennedFile)
 
 void EQPasswordCreatorWorker::setPasswordLength(const unsigned int passwordLength)
 {
-
 	this->passwordLength = passwordLength;
 }
 

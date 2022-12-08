@@ -11,11 +11,14 @@
 #include <QStringListModel>
 #include <QGuiApplication>
 #include <QClipboard>
+#include <QFile>
+#include <QDir>
+#include <QStringList>
 
-EQPasswordCreator::EQPasswordCreator(QWidget *parent)
-	: QMainWindow(parent), workerThread(), passwordCreatorWorker()
+EQPasswordCreator::EQPasswordCreator(QWidget* parent)
+	: QMainWindow(parent), workerThread(), passwordCreatorWorker(), passwordsListModel(), realPasswordList(), alphabetText()
 {
-	passwordCreatorWorker = new EQPasswordCreatorWorker(this, DEFAULT_PASSWORD_LENGTH);
+	passwordCreatorWorker = new EQPasswordCreatorWorker(DEFAULT_PASSWORD_LENGTH);
 	QWidget* centralWidget{ new QWidget };
 	QHBoxLayout* centalLayout{ new QHBoxLayout };
 
@@ -28,7 +31,9 @@ EQPasswordCreator::EQPasswordCreator(QWidget *parent)
 	centralWidget->setLayout(centalLayout);
 	setCentralWidget(centralWidget);
 	setWindowIcon(QIcon("gears.png"));
-	loadAlphabet(DEFAULT_ALPHABET_PATH);
+
+	if (QFile::exists(DEFAULT_ALPHABET_PATH))
+		loadAlphabet(DEFAULT_ALPHABET_PATH);
 }
 
 QGroupBox* EQPasswordCreator::initParameters()
@@ -37,7 +42,7 @@ QGroupBox* EQPasswordCreator::initParameters()
 	QVBoxLayout* parametersLayout{ new QVBoxLayout };
 
 	QHBoxLayout* alphabetLayout{ new QHBoxLayout };
-	QLabel* alphabetLabel{ new QLabel("Alphabet :") };
+	QLabel* alphabetLabel{ new QLabel("Character list :") };
 	alphabetText = new QLabel;
 	QPushButton* changeAlphabetButton{ new QPushButton("Change") };
 	alphabetLayout->addWidget(alphabetLabel);
@@ -46,7 +51,7 @@ QGroupBox* EQPasswordCreator::initParameters()
 
 	QHBoxLayout* passwordLengthLayout{ new QHBoxLayout };
 	QLabel* passwordLengthLabel{ new QLabel("Password length :") };
-	EQUIRangedLineEdit* passwordLengthLineEdit{ new EQUIRangedLineEdit(0, UINT_MAX) };
+	EQUIRangedLineEdit* passwordLengthLineEdit{ new EQUIRangedLineEdit(0, MAX_PASSWORD_LENGTH) };
 	passwordLengthLineEdit->insert(QString::number(DEFAULT_PASSWORD_LENGTH));
 	passwordLengthLayout->addWidget(passwordLengthLabel);
 	passwordLengthLayout->addWidget(passwordLengthLineEdit);
@@ -59,9 +64,10 @@ QGroupBox* EQPasswordCreator::initParameters()
 		QString filePath = QFileDialog::getOpenFileName(this, "Select character list", ALPHABETS_DIR, "text files (*.txt)");
 		if (!filePath.isEmpty())
 			loadAlphabet(filePath);
-	});
+		});
 
-	connect(passwordLengthLineEdit, &EQUIRangedLineEdit::valueValidated, passwordCreatorWorker, &EQPasswordCreatorWorker::setPasswordLength); 
+	connect(passwordLengthLineEdit, &EQUIRangedLineEdit::valueValidated,
+		passwordCreatorWorker, &EQPasswordCreatorWorker::setPasswordLength);
 	return parameters;
 }
 
@@ -71,7 +77,8 @@ QVBoxLayout* EQPasswordCreator::initGenerator()
 
 	QListView* passwordsListView{ new QListView };
 	passwordsListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	passwordsListView->setModel(new QStringListModel({ "Hello", "World", "This is a test" }));
+	passwordsListModel = new QStringListModel;
+	passwordsListView->setModel(passwordsListModel);
 
 	QPushButton* generateButton{ new QPushButton("Generate") };
 	QPushButton* copyButton{ new QPushButton("Copy") };
@@ -86,9 +93,10 @@ QVBoxLayout* EQPasswordCreator::initGenerator()
 	passwordCreatorWorker->moveToThread(&workerThread);
 	workerThread.start();
 
-	connect(copyButton, &QPushButton::clicked, [passwordsListView](){
-		QGuiApplication::clipboard()->setText(passwordsListView->currentIndex().data().toString());
-	});
+	connect(copyButton, &QPushButton::clicked, [this, passwordsListView]() {
+		QString& password{ realPasswordList[passwordsListView->currentIndex().row()] };
+		QGuiApplication::clipboard()->setText(password);
+		});
 
 	return generatorLayout;
 }
@@ -99,7 +107,7 @@ void EQPasswordCreator::loadAlphabet(const QString& filePath)
 	if (file.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
 		passwordCreatorWorker->loadAlphabet(file);
-		alphabetText->setText(filePath);
+		alphabetText->setText(QDir().relativeFilePath(filePath));
 	}
 	else
 	{
@@ -115,8 +123,31 @@ void EQPasswordCreator::loadAlphabet(const QString& filePath)
 
 void EQPasswordCreator::updatePasswordList(const QString newPassword)
 {
-	qDebug(newPassword.toStdString().c_str());
+	realPasswordList.append(newPassword);
+	QStringList passwordList{ passwordsListModel->stringList() };
+	if (realPasswordList.length() > MAX_SAVED_PASSWORDS)
+	{
+		realPasswordList.removeFirst();
+		passwordList.removeFirst();
+	}
+
+	if (newPassword.length() > 30)
+	{
+		QString temp;
+		for (short i = 0; i < 10; ++i)
+			temp += newPassword[i];
+		temp += " [...] ";
+		for (unsigned int i = newPassword.length() - 10; i < newPassword.length(); ++i)
+			temp += newPassword[i];
+		passwordList.append(temp);
+	}
+	else
+		passwordList.append(newPassword);
+	passwordsListModel->setStringList(passwordList);
 }
 
 EQPasswordCreator::~EQPasswordCreator()
-{}
+{
+	workerThread.quit();
+	workerThread.wait();
+}

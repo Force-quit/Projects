@@ -11,7 +11,7 @@ class EQPasswordCreatorWorker  : public QObject
 	Q_OBJECT
 
 public:
-	EQPasswordCreatorWorker(QObject *parent, unsigned int passwordLength);
+	EQPasswordCreatorWorker(unsigned int passwordLength);
 	~EQPasswordCreatorWorker();
 	
 	void loadAlphabet(QFile& opennedFile);
