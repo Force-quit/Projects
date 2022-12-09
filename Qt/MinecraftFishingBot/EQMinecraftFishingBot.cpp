@@ -17,10 +17,23 @@ EQMinecraftFishingBot::EQMinecraftFishingBot(QWidget *parent)
     QWidget* centralWidget{ new QWidget };
     QHBoxLayout* centralLayout{ new QHBoxLayout };
    
+    QVBoxLayout* parametersAndActivationLayout{ new QVBoxLayout };
+    
     QGroupBox* parameters{ initParameters() };
+
+    QHBoxLayout* activationLayout{ new QHBoxLayout };
+    QLabel* activationLabel{ new QLabel("Status :") };
+    QLabel* activationStatus{ new QLabel("Innactive") };
+    activationLayout->addWidget(activationLabel);
+    activationLayout->addWidget(activationStatus);
+
+    parametersAndActivationLayout->addWidget(parameters);
+    parametersAndActivationLayout->addLayout(activationLayout);
+    parametersAndActivationLayout->addWidget(parameters);
+
     QVBoxLayout* helperLayout{ initHelpLayout() };
 
-    centralLayout->addWidget(parameters);
+    centralLayout->addLayout(parametersAndActivationLayout);
     centralLayout->addLayout(helperLayout);
 
     centralWidget->setLayout(centralLayout);
