@@ -1,12 +1,13 @@
 #pragma once
 
 #include <QMainWindow>
-#include "ui_EQMinecraftFishingBot.h"
 #include <QImage>
 #include <QPixmap>
 #include <QLabel>
 #include <QGroupBox>
 #include <QVBoxLayout>
+#include <QThread>
+
 
 class EQMinecraftFishingBot : public QMainWindow
 {
@@ -17,15 +18,7 @@ public:
 	~EQMinecraftFishingBot();
 
 private:
-	const short screenshotPixelsOffset{ 80 };
-	unsigned int widthStartPixel;
-	unsigned int heightStartPixel;
-
-	QScreen* targetScreen;
-	QLabel* imageLabel;
 
 	QGroupBox* initParameters();
 	QVBoxLayout* initHelpLayout();
-
-	QPixmap takeScreenShot();
 };
