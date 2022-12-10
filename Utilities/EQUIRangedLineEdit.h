@@ -8,7 +8,7 @@ class EQUIRangedLineEdit : public EQSmartLineEdit
 	Q_OBJECT
 
 public:
-	EQUIRangedLineEdit(unsigned int bottom = 0, unsigned int top = 100, QWidget *parent = nullptr);
+	EQUIRangedLineEdit(unsigned int bottom = 0, unsigned int top = 100, unsigned int defaultValue = 50, QWidget *parent = nullptr);
 	~EQUIRangedLineEdit();
 
 signals:

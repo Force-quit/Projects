@@ -13,22 +13,39 @@ public:
 	EQMinecraftFishingBotWorker();
 	~EQMinecraftFishingBotWorker();
 
-	static const short DEFAULT_PIXELS_OFFSET{ 30 };
-	static const short MIN_PIXELS_OFFSET{ 20 };
-	static const short MAX_PIXELS_OFFSET{ 100 };
+	static const unsigned short DEFAULT_CAPTURE_SIZE{ 30 };
+	static const unsigned short MIN_CAPTURE_SIZE{ 20 };
+	static const unsigned short MAX_CAPTURE_SIZE{ 100 };
+
+	static const unsigned short DEFAULT_INTERVAL{ 50 };
+	static const unsigned short MIN_INTERVAL{ 1 };
+	static const unsigned short MAX_INTERVAL{ 1000 };
+
+	void stop();
 
 public slots:
-	void targetScreenChanged(QString& screenName);
+	void setCaptureInterval(const unsigned short interval);
+	void requestHelp();
+	void activate();
+	void captureSizeChanged(const unsigned short captureSize);
+	void targetScreenChanged(const QString& screenName);
 
 signals:
-	void captureTaken(QPixmap capture);
+	void captureTaken(const QPixmap& capture);
+
+private slots:
+	void captureScreen();
+	void rightClick();
 
 private:
-	short pixelsOffset;
-	unsigned int widthStartPixel;
-	unsigned int heightStartPixel;
-	QScreen* targetScreen();
+	QScreen* targetScreen;
 
-	QPixmap takeScreenShot();
+	bool active;
+	bool userActivation;
+	bool captureHelp;
 
+	unsigned short captureSize;
+	unsigned short widthStartPixel;
+	unsigned short heightStartPixel;
+	unsigned short captureInterval;
 };

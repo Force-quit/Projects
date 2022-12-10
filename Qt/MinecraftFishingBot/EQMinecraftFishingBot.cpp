@@ -10,26 +10,23 @@
 #include <QImage>
 #include "EQMinecraftFishingBotWorker.h"
 #include <QCheckBox>
+#include <QPushButton>
 
 EQMinecraftFishingBot::EQMinecraftFishingBot(QWidget *parent)
-	: QMainWindow(parent)
+	: QMainWindow(parent), worker(), workerThread()
 {
+    worker = new EQMinecraftFishingBotWorker();
+    worker->moveToThread(&workerThread);
+    workerThread.start();
+
     QWidget* centralWidget{ new QWidget };
     QHBoxLayout* centralLayout{ new QHBoxLayout };
    
     QVBoxLayout* parametersAndActivationLayout{ new QVBoxLayout };
-    
     QGroupBox* parameters{ initParameters() };
-
-    QHBoxLayout* activationLayout{ new QHBoxLayout };
-    QLabel* activationLabel{ new QLabel("Status :") };
-    QLabel* activationStatus{ new QLabel("Innactive") };
-    activationLayout->addWidget(activationLabel);
-    activationLayout->addWidget(activationStatus);
-
+    QGroupBox* activationGroupBox{ initActivationLayout() };
     parametersAndActivationLayout->addWidget(parameters);
-    parametersAndActivationLayout->addLayout(activationLayout);
-    parametersAndActivationLayout->addWidget(parameters);
+    parametersAndActivationLayout->addWidget(activationGroupBox);
 
     QVBoxLayout* helperLayout{ initHelpLayout() };
 
@@ -38,6 +35,37 @@ EQMinecraftFishingBot::EQMinecraftFishingBot(QWidget *parent)
 
     centralWidget->setLayout(centralLayout);
     setCentralWidget(centralWidget);
+}
+
+QGroupBox* EQMinecraftFishingBot::initActivationLayout()
+{
+    QGroupBox* activationGroupBox{ new QGroupBox("Activation") };
+    QVBoxLayout* activationLayout{ new QVBoxLayout };
+
+    QHBoxLayout* activationHintLayout{ new QHBoxLayout };
+    QLabel* activationHintLabel{ new QLabel("Current activation shortcut :") };
+    QLabel* activationHintText{ new QLabel("SHIFT") };
+    activationHintLayout->addWidget(activationHintLabel);
+    activationHintLayout->addWidget(activationHintText);
+
+    QHBoxLayout* activationStatusLayout{ new QHBoxLayout };
+    QLabel* activationLabel{ new QLabel("Status :") };
+    QLabel* activationStatusText{ new QLabel("Innactive") };
+    QPushButton* activateButton{ new QPushButton("Start") };
+    activationStatusLayout->addWidget(activationLabel);
+    activationStatusLayout->addWidget(activationStatusText);
+    activationStatusLayout->addWidget(activateButton);
+
+    activationLayout->addLayout(activationHintLayout);
+    activationLayout->addLayout(activationStatusLayout);
+
+    connect(activateButton, &QPushButton::clicked, [activateButton]() {
+        activateButton->setText(activateButton->text() == "Start" ? "Stop" : "Start");
+    });
+    connect(activateButton, &QPushButton::clicked, worker, &EQMinecraftFishingBotWorker::activate);
+
+    activationGroupBox->setLayout(activationLayout);
+    return activationGroupBox;
 }
 
 QGroupBox* EQMinecraftFishingBot::initParameters()
@@ -57,16 +85,30 @@ QGroupBox* EQMinecraftFishingBot::initParameters()
 
     QHBoxLayout* captureSizeLayout{ new QHBoxLayout };
     QLabel* captureSizeLabel{ new QLabel("Capture size :") };
-    unsigned int min{ EQMinecraftFishingBotWorker::MIN_PIXELS_OFFSET };
-    unsigned int max{ EQMinecraftFishingBotWorker::MAX_PIXELS_OFFSET };
-    EQUIRangedLineEdit* captureSizeLineEdit{ new EQUIRangedLineEdit(min, max) };
-    captureSizeLineEdit->setText(QString::number(EQMinecraftFishingBotWorker::DEFAULT_PIXELS_OFFSET));
+    unsigned int min{ EQMinecraftFishingBotWorker::MIN_CAPTURE_SIZE };
+    unsigned int max{ EQMinecraftFishingBotWorker::MAX_CAPTURE_SIZE };
+    unsigned int defaultValue{ EQMinecraftFishingBotWorker::DEFAULT_CAPTURE_SIZE };
+    EQUIRangedLineEdit* captureSizeLineEdit{ new EQUIRangedLineEdit(min, max, defaultValue) };
     captureSizeLayout->addWidget(captureSizeLabel);
     captureSizeLayout->addWidget(captureSizeLineEdit);
 
+    QHBoxLayout* captureIntervalLayout{ new QHBoxLayout };
+    QLabel* captureIntervalLabel{ new QLabel("Capture interval :") };
+    min = EQMinecraftFishingBotWorker::MIN_INTERVAL;
+    max = EQMinecraftFishingBotWorker::MAX_INTERVAL;
+    defaultValue = EQMinecraftFishingBotWorker::DEFAULT_INTERVAL;
+    EQUIRangedLineEdit* captureIntervalLineEdit{ new EQUIRangedLineEdit(min, max, defaultValue) };
+    captureIntervalLayout->addWidget(captureIntervalLabel);
+    captureIntervalLayout->addWidget(captureIntervalLineEdit);
+
     parametersLayout->addLayout(targetScreenLayout);
     parametersLayout->addLayout(captureSizeLayout);
+    parametersLayout->addLayout(captureIntervalLayout);
 
+    connect(targetScreenComboBox, &QComboBox::currentTextChanged, worker, &EQMinecraftFishingBotWorker::targetScreenChanged);
+    connect(captureSizeLineEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQMinecraftFishingBotWorker::captureSizeChanged);
+    connect(captureIntervalLineEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQMinecraftFishingBotWorker::setCaptureInterval);
+   
     parameters->setLayout(parametersLayout);
     return parameters;
 }
@@ -84,21 +126,33 @@ QVBoxLayout* EQMinecraftFishingBot::initHelpLayout()
    
     QLabel* helpLabel2{ new QLabel("Your capture") };
     helpLabel2->setAlignment(Qt::AlignHCenter);
-    QLabel* helpYourCapture{ new QLabel };
-    helpYourCapture->setPixmap(QPixmap::fromImage(QImage("captureExample.png")));
-    helpYourCapture->setAlignment(Qt::AlignHCenter);
+    userCapture = new QLabel;
+    userCapture->setAlignment(Qt::AlignHCenter);
+    
     QHBoxLayout* displayYourCaptureLayout{ new QHBoxLayout };
     displayYourCaptureLayout->setAlignment(Qt::AlignCenter);
     QCheckBox* displayYourCapture{ new QCheckBox("Show your capture") };
     displayYourCaptureLayout->addWidget(displayYourCapture);
 
-
     helpLayout->addWidget(helpLabel);
     helpLayout->addWidget(helpExample);
     helpLayout->addWidget(helpLabel2);
-    helpLayout->addWidget(helpYourCapture);
+    helpLayout->addWidget(userCapture);
     helpLayout->addLayout(displayYourCaptureLayout);
+
+    connect(displayYourCapture, &QCheckBox::stateChanged, worker, &EQMinecraftFishingBotWorker::requestHelp);
+    connect(worker, &EQMinecraftFishingBotWorker::captureTaken, this, &EQMinecraftFishingBot::displayCapture);
     return helpLayout;
 }
 
-EQMinecraftFishingBot::~EQMinecraftFishingBot() {}
+void EQMinecraftFishingBot::displayCapture(const QPixmap capture)
+{
+    userCapture->setPixmap(capture);
+}
+
+EQMinecraftFishingBot::~EQMinecraftFishingBot() 
+{
+    worker->stop();
+    workerThread.quit();
+    workerThread.wait();
+}

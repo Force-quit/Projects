@@ -7,7 +7,7 @@
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QThread>
-
+#include "EQMinecraftFishingBotWorker.h"
 
 class EQMinecraftFishingBot : public QMainWindow
 {
@@ -17,8 +17,16 @@ public:
 	EQMinecraftFishingBot(QWidget *parent = nullptr);
 	~EQMinecraftFishingBot();
 
-private:
+public slots:
+	void displayCapture(const QPixmap capture);
 
+private:
+	QThread workerThread;
+	EQMinecraftFishingBotWorker* worker;
+
+	QLabel* userCapture;
+
+	QGroupBox* initActivationLayout();
 	QGroupBox* initParameters();
 	QVBoxLayout* initHelpLayout();
 };

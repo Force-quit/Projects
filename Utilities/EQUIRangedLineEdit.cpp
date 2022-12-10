@@ -1,12 +1,14 @@
 #include "EQUIRangedLineEdit.h"
 #include "EQSmartLineEdit.h"
 #include <QIntValidator>
+#include <QString>
 
-EQUIRangedLineEdit::EQUIRangedLineEdit(unsigned int bottom, unsigned int top, QWidget* parent)
+EQUIRangedLineEdit::EQUIRangedLineEdit(unsigned int bottom, unsigned int top, unsigned int defaultValue, QWidget* parent)
 	: EQSmartLineEdit(parent), bottom(bottom), top(top)
 {
 	setValidator(new QIntValidator);
 	connect(this, &EQSmartLineEdit::smartFocusOutEvent, this, &EQUIRangedLineEdit::validate);
+	setText(QString::number(defaultValue));
 }
 
 void EQUIRangedLineEdit::validate(const QString& text)

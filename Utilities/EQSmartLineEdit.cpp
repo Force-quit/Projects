@@ -2,7 +2,12 @@
 #include <QLineEdit>
 #include <QFocusEvent>
 
-EQSmartLineEdit::EQSmartLineEdit(QWidget *parent) : QLineEdit(parent) {}
+EQSmartLineEdit::EQSmartLineEdit(QWidget *parent) 
+	: QLineEdit(parent)
+{
+	// TODO Temporary 
+	connect(this, &QLineEdit::returnPressed, this, &QWidget::clearFocus);
+}
 
 EQSmartLineEdit::~EQSmartLineEdit() {}
 
