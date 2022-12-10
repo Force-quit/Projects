@@ -13,7 +13,7 @@ public:
 	EQMinecraftFishingBotWorker();
 	~EQMinecraftFishingBotWorker();
 
-	static const unsigned short DEFAULT_CAPTURE_SIZE{ 30 };
+	static const unsigned short DEFAULT_CAPTURE_SIZE{ 40 };
 	static const unsigned short MIN_CAPTURE_SIZE{ 20 };
 	static const unsigned short MAX_CAPTURE_SIZE{ 100 };
 

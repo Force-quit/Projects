@@ -4,6 +4,7 @@
 #include <QScreen>
 #include <QSize>
 #include <QTimer>
+#include "../../Utilities/utils.h"
 
 EQMinecraftFishingBotWorker::EQMinecraftFishingBotWorker()
 	: captureSize(DEFAULT_CAPTURE_SIZE), heightStartPixel(), widthStartPixel(), captureInterval(DEFAULT_INTERVAL),
@@ -14,20 +15,9 @@ EQMinecraftFishingBotWorker::EQMinecraftFishingBotWorker()
 
 void EQMinecraftFishingBotWorker::captureSizeChanged(const unsigned short captureSize)
 {
-	//TODO fix this
-	int diff{ abs(this->captureSize - captureSize) };
-
-	if (this->captureSize < captureSize)
-	{
-		heightStartPixel -= diff;
-		widthStartPixel -= diff;
-	}
-	else
-	{
-		heightStartPixel += diff;
-		widthStartPixel += diff;
-	}
-	
+	QSize targetScreenSize{ targetScreen->size() };
+	widthStartPixel = targetScreenSize.width() / 2 - captureSize / 2 - 2;
+	heightStartPixel = targetScreenSize.height() / 2 - captureSize / 2 - 5;
 	this->captureSize = captureSize;
 }
 
@@ -38,9 +28,7 @@ void EQMinecraftFishingBotWorker::targetScreenChanged(const QString& screenName)
 		if (screenName == screen->name())
 		{
 			targetScreen = screen;
-			QSize targetScreenSize{ targetScreen->size() };
-			widthStartPixel = targetScreenSize.width() / 2 - captureSize / 2;
-			heightStartPixel = targetScreenSize.height() / 2 - captureSize / 2;
+			captureSizeChanged(captureSize);
 			break;
 		}
 	}
@@ -72,9 +60,13 @@ void EQMinecraftFishingBotWorker::captureScreen()
 		}
 
 		if (!hasBlack)
-			qDebug("RightClicking");
-		else
-			qDebug("no");
+		{
+			emile::rightClickDown();
+			QTimer::singleShot(20, this, &emile::rightClickUp);
+			QTimer::singleShot(300, []() {emile::rightClick();});
+			stop();
+			return;
+		}
 	}
 	
 	if (userActivation || captureHelp)

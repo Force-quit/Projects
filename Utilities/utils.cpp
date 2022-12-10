@@ -100,24 +100,24 @@ void emile::releaseKey(INPUT& input)
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void emile::fullKeyPress(const char key)
+void emile::fullKeyPress(const char key, unsigned int pressDuration)
 {
 	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
-	emile::fullKeyPress(keyCode);
+	emile::fullKeyPress(keyCode, pressDuration);
 }
 
-void emile::fullKeyPress(const int keyCode)
+void emile::fullKeyPress(const int keyCode, unsigned int pressDuration)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
 	i.ki.wVk = keyCode;
-	emile::fullKeyPress(i);
+	emile::fullKeyPress(i, pressDuration);
 }
 
-void emile::fullKeyPress(INPUT& input)
+void emile::fullKeyPress(INPUT& input, unsigned int pressDuration)
 {
 	emile::pressKey(input);
-	Sleep(40);
+	Sleep(pressDuration);
 	emile::releaseKey(input);
 }
 

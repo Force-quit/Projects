@@ -27,9 +27,9 @@ namespace emile
 	void releaseKey(const char key);
 	void releaseKey(const int keyCode);
 	void releaseKey(INPUT& input);
-	void fullKeyPress(const char key);
-	void fullKeyPress(const int keyCode);
-	void fullKeyPress(INPUT& input);
+	void fullKeyPress(const char key, unsigned int pressDuration = 20);
+	void fullKeyPress(const int keyCode, unsigned int pressDuration = 20);
+	void fullKeyPress(INPUT& input, unsigned int pressDuration = 20);
 
 	void ctrlV();
 

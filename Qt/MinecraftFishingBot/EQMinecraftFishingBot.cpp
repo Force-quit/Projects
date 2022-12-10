@@ -118,7 +118,7 @@ QVBoxLayout* EQMinecraftFishingBot::initHelpLayout()
     QVBoxLayout* helpLayout{ new QVBoxLayout };
     helpLayout->setAlignment(Qt::AlignCenter);
 
-    QLabel* helpLabel{ new QLabel("Match your capture to look like this")};
+    QLabel* helpLabel{ new QLabel("Position your camera so you have\n the fishing line in your capture, like this")};
     helpLabel->setAlignment(Qt::AlignHCenter);
     QLabel* helpExample{ new QLabel };
     helpExample->setPixmap(QPixmap::fromImage(QImage("captureExample.png")));
