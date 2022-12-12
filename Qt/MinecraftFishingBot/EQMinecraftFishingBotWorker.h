@@ -4,6 +4,7 @@
 #include <QString>
 #include <QScreen>
 #include <QPixmap>
+#include "../../Utilities/EQKeyboardListener/EQKeyboardListener.h"
 
 class EQMinecraftFishingBotWorker  : public QObject
 {
@@ -26,20 +27,18 @@ public:
 public slots:
 	void setCaptureInterval(const unsigned short interval);
 	void requestHelp();
-	void activate();
 	void captureSizeChanged(const unsigned short captureSize);
 	void targetScreenChanged(const QString& screenName);
 
 signals:
 	void captureTaken(const QPixmap& capture);
+	void stateChanged(const bool isActive);
 
 private slots:
 	void captureScreen();
-	void rightClick();
 
 private:
 	QScreen* targetScreen;
-
 	bool active;
 	bool userActivation;
 	bool captureHelp;
@@ -48,4 +47,7 @@ private:
 	unsigned short widthStartPixel;
 	unsigned short heightStartPixel;
 	unsigned short captureInterval;
+
+	EQKeyboardListener* shortcutListener;
+	void activate();
 };

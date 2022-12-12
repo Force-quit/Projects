@@ -4,6 +4,7 @@
 #include <QImage>
 #include <QPixmap>
 #include <QLabel>
+#include <QPushButton>
 #include <QGroupBox>
 #include <QVBoxLayout>
 #include <QThread>

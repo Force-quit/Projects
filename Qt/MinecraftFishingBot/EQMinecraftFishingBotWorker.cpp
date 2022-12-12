@@ -5,13 +5,17 @@
 #include <QSize>
 #include <QTimer>
 #include "../../Utilities/utils.h"
+#include <Windows.h>
 
 EQMinecraftFishingBotWorker::EQMinecraftFishingBotWorker()
 	: captureSize(DEFAULT_CAPTURE_SIZE), heightStartPixel(), widthStartPixel(), captureInterval(DEFAULT_INTERVAL),
-	active(), captureHelp(), userActivation(), targetScreen()
+	active(), captureHelp(), userActivation(), targetScreen(), shortcutListener()
 {
 	targetScreenChanged(QGuiApplication::primaryScreen()->name());
+	shortcutListener = new EQKeyboardListener(EQKeyboardListener::LCONTROL, 10);
+	connect(shortcutListener, &EQKeyboardListener::keyPressed, this, &EQMinecraftFishingBotWorker::activate);
 }
+
 
 void EQMinecraftFishingBotWorker::captureSizeChanged(const unsigned short captureSize)
 {
@@ -34,15 +38,9 @@ void EQMinecraftFishingBotWorker::targetScreenChanged(const QString& screenName)
 	}
 }
 
-void EQMinecraftFishingBotWorker::rightClick()
-{
-
-}
-
 void EQMinecraftFishingBotWorker::captureScreen()
 {
 	QPixmap capture = targetScreen->grabWindow(0, widthStartPixel, heightStartPixel, captureSize, captureSize);
-	auto a = capture.size();
 	if (captureHelp)
 		emit captureTaken(capture);
 
@@ -61,10 +59,9 @@ void EQMinecraftFishingBotWorker::captureScreen()
 
 		if (!hasBlack)
 		{
-			emile::rightClickDown();
-			QTimer::singleShot(20, this, &emile::rightClickUp);
-			QTimer::singleShot(300, []() {emile::rightClick();});
-			stop();
+			emile::rightClick();
+			QTimer::singleShot(500, [](){emile::rightClick();});
+			QTimer::singleShot(2000, this, &EQMinecraftFishingBotWorker::captureScreen);
 			return;
 		}
 	}
@@ -88,12 +85,12 @@ void EQMinecraftFishingBotWorker::requestHelp()
 void EQMinecraftFishingBotWorker::activate()
 {
 	userActivation = !userActivation;
+	emit stateChanged(userActivation);
 	if (userActivation && !active)
 	{
 		active = true;
 		QTimer::singleShot(captureInterval, this, &EQMinecraftFishingBotWorker::captureScreen);
 	}
-
 }
 
 void EQMinecraftFishingBotWorker::setCaptureInterval(const unsigned short interval)
@@ -106,4 +103,7 @@ void EQMinecraftFishingBotWorker::stop()
 	captureHelp = false;
 }
 
-EQMinecraftFishingBotWorker::~EQMinecraftFishingBotWorker() {}
+EQMinecraftFishingBotWorker::~EQMinecraftFishingBotWorker() 
+{
+	delete shortcutListener;
+}

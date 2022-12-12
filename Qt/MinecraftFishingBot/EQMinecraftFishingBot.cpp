@@ -44,27 +44,27 @@ QGroupBox* EQMinecraftFishingBot::initActivationLayout()
 
     QHBoxLayout* activationHintLayout{ new QHBoxLayout };
     QLabel* activationHintLabel{ new QLabel("Current activation shortcut :") };
-    QLabel* activationHintText{ new QLabel("SHIFT") };
+    QLabel* activationHintText{ new QLabel("CTRL") };
     activationHintLayout->addWidget(activationHintLabel);
     activationHintLayout->addWidget(activationHintText);
 
     QHBoxLayout* activationStatusLayout{ new QHBoxLayout };
     QLabel* activationLabel{ new QLabel("Status :") };
     QLabel* activationStatusText{ new QLabel("Innactive") };
-    QPushButton* activateButton{ new QPushButton("Start") };
     activationStatusLayout->addWidget(activationLabel);
     activationStatusLayout->addWidget(activationStatusText);
-    activationStatusLayout->addWidget(activateButton);
 
     activationLayout->addLayout(activationHintLayout);
     activationLayout->addLayout(activationStatusLayout);
 
-    connect(activateButton, &QPushButton::clicked, [activateButton]() {
-        activateButton->setText(activateButton->text() == "Start" ? "Stop" : "Start");
-    });
-    connect(activateButton, &QPushButton::clicked, worker, &EQMinecraftFishingBotWorker::activate);
-
     activationGroupBox->setLayout(activationLayout);
+    
+    connect(worker, &EQMinecraftFishingBotWorker::stateChanged, [activationStatusText](const bool isActive) {
+        if (isActive)
+            activationStatusText->setText("Active");
+        else
+            activationStatusText->setText("Innactive");
+    });
     return activationGroupBox;
 }
 
