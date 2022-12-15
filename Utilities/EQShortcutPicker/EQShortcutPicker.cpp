@@ -7,13 +7,13 @@
 #include <QPushButton>
 
 EQShortcutPicker::EQShortcutPicker(QString labelText, QWidget *parent)
-	: QWidget(parent), workerThread()
+	: QWidget(parent), workerThread(), changeShortcutButton()
 {
 	QHBoxLayout* centralLayout{ new QHBoxLayout };
 	
 	QLabel* label{ new QLabel(labelText) };
-	QLabel* shortcutText{ new QLabel(EQShortcutPickerWorker::DEFAULT_SHORTCUT) };
-	QPushButton* changeShortcutButton{ new QPushButton("Change") };
+	shortcutText = new QLabel(EQShortcutPickerWorker::DEFAULT_SHORTCUT);
+	changeShortcutButton = new QPushButton("Change");
 
 	centralLayout->addWidget(label);
 	centralLayout->addWidget(shortcutText);
@@ -23,18 +23,25 @@ EQShortcutPicker::EQShortcutPicker(QString labelText, QWidget *parent)
 	EQShortcutPickerWorker* worker{ new EQShortcutPickerWorker };
 	connect(changeShortcutButton, &QPushButton::clicked, changeShortcutButton, &QWidget::setEnabled);
 	connect(changeShortcutButton, &QPushButton::clicked, worker, &EQShortcutPickerWorker::startListening);
+	connect(changeShortcutButton, SIGNAL(clicked()), this, SIGNAL(startedListening()));
+
 	
 	connect(worker, &EQShortcutPickerWorker::shortcutChanged, shortcutText, &QLabel::setText);
-	connect(worker, &EQShortcutPickerWorker::shortcutSelected, [this, changeShortcutButton](QVector<int> virtualKeys) {
-		changeShortcutButton->setEnabled(true);
-		emit shortcutChanged(virtualKeys);
-	});
+	connect(worker, &EQShortcutPickerWorker::shortcutSelected, this, &EQShortcutPicker::shortcutChosen);
 
+	QThread::currentThread()->setObjectName("Main thread");
+	workerThread.setObjectName("Worker thread");
 	worker->moveToThread(&workerThread);
 	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
 	workerThread.start();
 
 	setLayout(centralLayout);
+}
+
+void EQShortcutPicker::shortcutChosen(QVector<int> virtualKeys)
+{
+	changeShortcutButton->setEnabled(true);
+	emit shortcutChanged(virtualKeys);
 }
 
 EQShortcutPicker::~EQShortcutPicker()

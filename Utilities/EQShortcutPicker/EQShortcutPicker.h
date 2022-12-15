@@ -4,6 +4,9 @@
 #include <QString>
 #include <QThread>
 #include <QVector>
+#include <QPushButton>
+#include "EQShortcutPickerWorker.h"
+#include <QLabel>
 
 class EQShortcutPicker : public QWidget
 {
@@ -13,9 +16,19 @@ public:
 	EQShortcutPicker(QString labelText, QWidget *parent = nullptr);
 	~EQShortcutPicker();
 
+
+	const static int DEFAULT_CODE{ EQShortcutPickerWorker::DEFAULT_CODE };
+
 signals:
 	void shortcutChanged(QVector<int> virtualKeys);
+	void startedListening();
 	
+private slots:
+	void shortcutChosen(QVector<int> virtualKeys);
+
 private:
 	QThread workerThread;
+	QPushButton* changeShortcutButton;
+	QLabel* shortcutText;
+
 };
