@@ -21,9 +21,9 @@ public slots:
 	void startListening();
 
 signals:
-	void shortcutChanged(const QString newShortcutText);
+	void shortcutTextChanged(const QString newShortcutText);
 	void shortcutSelected();
-	void shortcutFinalised(QVector<int> virtualKeys);
+	void shortcutReady(QVector<int> virtualKeys);
 
 private slots:
 	void listenLoop();
@@ -32,8 +32,10 @@ private slots:
 
 private:
 	static const QMap<int, QString> VIRTUAL_KEYS;
-	static const unsigned short HOLD_TIME_TO_CONFIRM{ 3000 };
+	static const unsigned short HOLD_TIME_TO_CONFIRM{ 2000 };
 
+
+	bool inputChanged;
 	bool active;
 	QMap<int, QString> pressedKeys;
 	QTimer* timer;

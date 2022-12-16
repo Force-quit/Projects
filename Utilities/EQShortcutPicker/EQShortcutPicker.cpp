@@ -14,6 +14,7 @@ EQShortcutPicker::EQShortcutPicker(QString labelText, QWidget *parent)
 	QLabel* label{ new QLabel(labelText) };
 	shortcutText = new QLabel(EQShortcutPickerWorker::DEFAULT_SHORTCUT);
 	changeShortcutButton = new QPushButton("Change");
+	changeShortcutButton->setFocusPolicy(Qt::NoFocus);
 
 	centralLayout->addWidget(label);
 	centralLayout->addWidget(shortcutText);
@@ -25,15 +26,10 @@ EQShortcutPicker::EQShortcutPicker(QString labelText, QWidget *parent)
 	connect(changeShortcutButton, SIGNAL(clicked()), this, SIGNAL(startedListening()));
 	connect(changeShortcutButton, &QPushButton::clicked, worker, &EQShortcutPickerWorker::startListening);
 	
-	connect(worker, &EQShortcutPickerWorker::shortcutChanged, shortcutText, &QLabel::setText);
-
+	connect(worker, &EQShortcutPickerWorker::shortcutTextChanged, shortcutText, &QLabel::setText);
 	connect(worker, &EQShortcutPickerWorker::shortcutSelected, this, &EQShortcutPicker::shortcutChosen);
-
-	connect(worker, &EQShortcutPickerWorker::shortcutFinalised, this, &EQShortcutPicker::shortcutChanged);
+	connect(worker, &EQShortcutPickerWorker::shortcutReady, this, &EQShortcutPicker::shortcutChanged);
 	
-
-	QThread::currentThread()->setObjectName("Main thread");
-	workerThread.setObjectName("Worker thread");
 	worker->moveToThread(&workerThread);
 	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
 	workerThread.start();

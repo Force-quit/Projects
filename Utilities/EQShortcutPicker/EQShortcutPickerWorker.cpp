@@ -8,7 +8,7 @@
 const QString EQShortcutPickerWorker::DEFAULT_SHORTCUT{ "CTRL" };
 
 EQShortcutPickerWorker::EQShortcutPickerWorker()
-	: timer(), pressedKeys(), active()
+	: timer(), pressedKeys(), active(), inputChanged()
 {
 	
 }
@@ -19,6 +19,7 @@ void EQShortcutPickerWorker::startListening()
 	if (timer == nullptr)
 	{
 		timer = new QTimer;
+		timer->setSingleShot(true);
 		connect(timer, &QTimer::timeout, this, &EQShortcutPickerWorker::emitShortcutSelected);
 	}
 
@@ -29,13 +30,14 @@ void EQShortcutPickerWorker::startListening()
 		i.next();
 		GetAsyncKeyState(i.key());
 	}
+
 	active = true;
 	QTimer::singleShot(10, this, &EQShortcutPickerWorker::listenLoop);
 }
 
 void EQShortcutPickerWorker::listenLoop()
 {
-	bool inputChanged{};
+	inputChanged = false;
 
 	QMapIterator<int, QString> i(VIRTUAL_KEYS);
 	while (i.hasNext()) 
@@ -67,7 +69,7 @@ void EQShortcutPickerWorker::listenLoop()
 		for (QString text : pressedKeys.values())
 			textToShow += text + " + ";
 		textToShow.chop(3);
-		emit shortcutChanged(textToShow);
+		emit shortcutTextChanged(textToShow);
 	}
 
 	if (active)
@@ -87,7 +89,7 @@ void EQShortcutPickerWorker::waitForShortcutRelease()
 	{
 		if (!GetAsyncKeyState(i))
 		{
-			emit shortcutFinalised(pressedKeys.keys());
+			emit shortcutReady(pressedKeys.keys());
 			return;
 		}
 	}

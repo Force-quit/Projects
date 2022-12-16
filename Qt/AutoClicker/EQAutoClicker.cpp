@@ -1,4 +1,5 @@
 #include "EQAutoClicker.h"
+#include "EQAutoClickerWorker.h"
 #include "../../Utilities/EQUIRangedLineEdit.h"
 #include <QFile>
 #include <QBoxLayout>
@@ -11,99 +12,106 @@
 #include <QButtonGroup>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "../../../../Utilities/EQTabWidget.h"
+#include "../../Utilities/EQShortcutPicker/EQShortcutPicker.h"
+#include "../../Utilities/EQKeyboardListener/EQKeyboardListener.h"
 #include <QTabBar>
 #include <QDir>
 #include <QFocusEvent>
 #include <QMediaPlayer>
 #include <QAudioOutput>
 #include <Windows.h>
-#include <vector>
+#include <QIcon>
+#include <QVector>
 
 const QString EQAutoClicker::CONFIGS_PATH{ "Configs" };
 
 EQAutoClicker::EQAutoClicker(QWidget *parent)
 	: QMainWindow(parent),
-	clickHoldTime(DEFAULT_CLICK_HOLD_TIME), timeBetweenClicks(DEFAULT_BETWEEN_TIME), leftClick(),
 	clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton(), changeShortcutButton(), widgetsToDisable()
+	saveButton(), loadButton(), widgetsToDisable(), worker(), configurationText()
 {
-	
+	QDir().mkdir(CONFIGS_PATH);
+	worker = new EQAutoClickerWorker;
+
+	QVBoxLayout* centralLayout{ new QVBoxLayout };
+	centralLayout->addWidget(initParameters());
+	centralLayout->addWidget(initActivationLayout());
+
+	widgetsToDisable.append({ clickHoldTimeEdit, timeBetweenClicksEdit,
+		leftClickButton, rightClickButton, saveButton, loadButton });
+
+	QWidget* centralWidget{ new QWidget };
+	centralWidget->setLayout(centralLayout);
+	setCentralWidget(centralWidget);
+	setWindowIcon(QIcon("mouse.png"));
 }
 
 QGroupBox* EQAutoClicker::initParameters()
 {
 	QGroupBox* parameters{ new QGroupBox("Parameters") };
 	QVBoxLayout* parametersLayout{ new QVBoxLayout };
-
-	QHBoxLayout* clickHoldTimeLayout = initClickHoldTime();
-	QHBoxLayout* timeBetweenClicksLayout = initTimeBetweenClicks();
-	QHBoxLayout* clickButtonLayout = initClickButton();
-
-	parametersLayout->addLayout(clickHoldTimeLayout);
-	parametersLayout->addLayout(timeBetweenClicksLayout);
-	parametersLayout->addLayout(clickButtonLayout);
-
+	parametersLayout->addLayout(initClickHoldTime());
+	parametersLayout->addLayout(initTimeBetweenClicks());
+	parametersLayout->addLayout(initClickButton());
+	parametersLayout->addLayout(initSaveAndLoad());
 	parameters->setLayout(parametersLayout);
 	return parameters;
 }
 
 QHBoxLayout* EQAutoClicker::initClickHoldTime()
 {
-	clickHoldTimeEdit = new EQUIRangedLineEdit(1, UINT_MAX);
-	clickHoldTimeEdit->setText(QString::number(defaultClickHoldTime));
-
 	QHBoxLayout* clickHoldTimeLayout{ new QHBoxLayout };
+
 	clickHoldTimeLayout->addWidget(new QLabel("Click hold time :"));
+
+	clickHoldTimeEdit = new EQUIRangedLineEdit(EQAutoClickerWorker::MIN_TIME, EQAutoClickerWorker::MAX_TIME);
+	clickHoldTimeEdit->setText(QString::number(EQAutoClickerWorker::DEFAULT_CLICK_HOLD_TIME));
 	clickHoldTimeLayout->addWidget(clickHoldTimeEdit);
+
 	clickHoldTimeLayout->addWidget(new QLabel("ms"));
 
-	connect(clickHoldTimeEdit, &EQUIRangedLineEdit::valueValidated, [this](unsigned int value) {
-		clickHoldTime = value;
-		});
+	connect(clickHoldTimeEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQAutoClickerWorker::setClickHoldTime);
 
 	return clickHoldTimeLayout;
 }
 
 QHBoxLayout* EQAutoClicker::initTimeBetweenClicks()
 {
-	timeBetweenClicksEdit = new EQUIRangedLineEdit(1, UINT_MAX);
-	timeBetweenClicksEdit->setText(QString::number(defaultTimeBetweenClicks));
-
 	QHBoxLayout* timeBetweenClickLayout{ new QHBoxLayout };
+
 	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval :"));
+
+	timeBetweenClicksEdit = new EQUIRangedLineEdit(EQAutoClickerWorker::MIN_TIME, EQAutoClickerWorker::MAX_TIME);
+	timeBetweenClicksEdit->setText(QString::number(EQAutoClickerWorker::DEFAULT_BETWEEN_TIME));
 	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
+
 	timeBetweenClickLayout->addWidget(new QLabel("ms"));
 
-	connect(timeBetweenClicksEdit, &EQUIRangedLineEdit::valueValidated, [this](unsigned int value) {
-		timeBetweenClicks = value;
-		});
+	connect(timeBetweenClicksEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQAutoClickerWorker::setTimeBetweenClicks);
 
 	return timeBetweenClickLayout;
 }
 
 QHBoxLayout* EQAutoClicker::initClickButton()
 {
+	QHBoxLayout* clickButtonLayout{ new QHBoxLayout };
+	clickButtonLayout->setAlignment(Qt::AlignLeft);
+
+	clickButtonLayout->addWidget(new QLabel("Mouse button"));
+
+	QButtonGroup* clickButtonGroup{ new QButtonGroup };
 	leftClickButton = new QRadioButton("Left");
 	leftClickButton->click();
 	rightClickButton = new QRadioButton("Right");
-
-	QButtonGroup* clickButtonGroup{ new QButtonGroup };
 	clickButtonGroup->addButton(leftClickButton);
 	clickButtonGroup->addButton(rightClickButton);
 
-	connect(clickButtonGroup, &QButtonGroup::buttonClicked, [this](QAbstractButton* button) {
-		if (button == leftClickButton)
-			leftClick = true;
-		else
-			leftClick = false;
-		});
-
-	QHBoxLayout* clickButtonLayout{ new QHBoxLayout };
-	clickButtonLayout->setAlignment(Qt::AlignLeft);
-	clickButtonLayout->addWidget(new QLabel("Mouse button"));
 	clickButtonLayout->addWidget(leftClickButton);
 	clickButtonLayout->addWidget(rightClickButton);
+
+	connect(clickButtonGroup, &QButtonGroup::buttonClicked, [this](QAbstractButton* pressedButton) {
+		worker->setLeftClick(pressedButton == leftClickButton);
+	});
 
 	return clickButtonLayout;
 }
@@ -112,17 +120,17 @@ QHBoxLayout* EQAutoClicker::initSaveAndLoad()
 {
 	QHBoxLayout* saveAndLoadLayout{ new QHBoxLayout };
 
-	QLabel* sectionLabel{ new QLabel("Current configuration :") };
-	QLabel* saveFileLabel{ new QLabel("Unsaved") };
+	QLabel* configurationLabel{ new QLabel("Current configuration :") };
+	configurationText =  new QLabel("Unsaved");
 	saveButton = new QPushButton("Save");
 	loadButton = new QPushButton("Load");
-	saveAndLoadLayout->addWidget(sectionLabel);
-	saveAndLoadLayout->addWidget(saveFileLabel);
+	saveAndLoadLayout->addWidget(configurationLabel);
+	saveAndLoadLayout->addWidget(configurationText);
 	saveAndLoadLayout->addWidget(saveButton);
 	saveAndLoadLayout->addWidget(loadButton);
 
-	connect(saveButton, &QPushButton::clicked, [this, saveFileLabel]() { saveConfiguration(*saveFileLabel); });
-	connect(loadButton, &QPushButton::clicked, [this, saveFileLabel]() { loadConfiguration(*saveFileLabel); });
+	connect(saveButton, &QPushButton::clicked, this, &EQAutoClicker::saveConfiguration);
+	connect(loadButton, &QPushButton::clicked, this, &EQAutoClicker::loadConfiguration);
 
 	return saveAndLoadLayout;
 }
@@ -130,36 +138,62 @@ QHBoxLayout* EQAutoClicker::initSaveAndLoad()
 QGroupBox* EQAutoClicker::initActivationLayout()
 {
 	QGroupBox* bottomGroupBox{ new QGroupBox("Activation") };
-	QVBoxLayout* bottomLayout{ new QVBoxLayout };
-	bottomLayout->addLayout(initActivationShortcutLayout());
-	bottomGroupBox->setLayout(bottomLayout);
+
+	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
+
+	EQShortcutPicker* shortcutPicker{ new EQShortcutPicker("Activation shortcut :") };
+	QLabel* activationStatusText{ new QLabel("Innactive")};
+	activationStatusText->setAlignment(Qt::AlignCenter);
+
+	groupBoxLayout->addWidget(shortcutPicker);
+	groupBoxLayout->addWidget(activationStatusText);
+
+	bottomGroupBox->setLayout(groupBoxLayout);
+
+	EQKeyboardListener* listener{ new EQKeyboardListener(QVector<int>{EQShortcutPicker::DEFAULT_CODE}) };
+	listener->startListening();
+
+	connect(shortcutPicker, &EQShortcutPicker::startedListening, this, &EQAutoClicker::disableWidgets);
+	connect(shortcutPicker, &EQShortcutPicker::startedListening, listener, &EQKeyboardListener::stopListening);
+
+	connect(shortcutPicker, &EQShortcutPicker::shortcutChanged, listener, &EQKeyboardListener::setTargetKeys);
+	connect(shortcutPicker, &EQShortcutPicker::shortcutChanged, this, &EQAutoClicker::enableWidgets);
+	connect(shortcutPicker, &EQShortcutPicker::shortcutChanged, listener, &EQKeyboardListener::startListening);
+
+	connect(listener, &EQKeyboardListener::targetKeysPressed, worker, &EQAutoClickerWorker::activate);
+	
+	connect(worker, &EQAutoClickerWorker::activated, this, &EQAutoClicker::disableWidgets);
+	connect(worker, &EQAutoClickerWorker::activated, [activationStatusText]() {
+		activationStatusText->setText("Active");
+	});
+
+	connect(worker, &EQAutoClickerWorker::deactivated, this, &EQAutoClicker::enableWidgets);
+	connect(worker, &EQAutoClickerWorker::deactivated, [activationStatusText]() {
+		activationStatusText->setText("Innactive");
+	});
+
+	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+	connect(&workerThread, &QThread::finished, listener, &QObject::deleteLater);
+	worker->moveToThread(&workerThread);
+	shortcutPicker->moveToThread(&workerThread);
+	workerThread.start();
+
 	return bottomGroupBox;
 }
 
-QHBoxLayout* EQAutoClicker::initActivationShortcutLayout()
+void EQAutoClicker::disableWidgets()
 {
-	QHBoxLayout* activationHintLayout{ new QHBoxLayout };
-	QLabel* activationShortcut{ new QLabel(AutoUtils::DEFAULT_ACTIVATION_KEY) };
-	activationShortcut->setAlignment(Qt::AlignCenter);
-	changeShortcutButton = new QPushButton("Change");
-
-	activationHintLayout->addWidget(new QLabel("Activation shortcut :"));
-	activationHintLayout->addWidget(activationShortcut);
-	activationHintLayout->addWidget(changeShortcutButton);
-
-	QtShortcutPicker* worker{ new QtShortcutPicker };
-	worker->moveToThread(&workerThread);
-	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
-	connect(worker, &QtShortcutPicker::shortcutChanged, activationShortcut, &QLabel::setText);
-	connect(changeShortcutButton, &QPushButton::clicked, this, &AutoClicker::beginLookingForInputs);
-	connect(changeShortcutButton, &QPushButton::clicked, worker, &QtShortcutPicker::listenForInput);
-	connect(worker, &QtShortcutPicker::shortcutChosen, this, &AutoClicker::stopLookingForInputs);
-
-	workerThread.start();
-	return activationHintLayout;
+	for (auto i : widgetsToDisable)
+		i->setEnabled(false);
 }
 
-void EQAutoClicker::saveConfiguration(QLabel& saveFileLabel)
+void EQAutoClicker::enableWidgets()
+{
+	for (auto i : widgetsToDisable)
+		i->setEnabled(true);
+}
+
+void EQAutoClicker::saveConfiguration()
 {
 	QString filePath = QFileDialog::getSaveFileName(this, "Save your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
 
@@ -169,8 +203,8 @@ void EQAutoClicker::saveConfiguration(QLabel& saveFileLabel)
 		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 		{
 			QTextStream out(&file);
-			out << clickHoldTime << ',' << timeBetweenClicks << ',' << leftClick;
-			saveFileLabel.setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
+			out << worker->getClickHoldTime() << ',' << worker->getTimeBetweenClicks() << ',' << worker->isTargetLeftClick();
+			configurationText->setText(QDir().relativeFilePath(filePath));
 		}
 		else
 		{
@@ -186,7 +220,7 @@ void EQAutoClicker::saveConfiguration(QLabel& saveFileLabel)
 	}
 }
 
-void EQAutoClicker::loadConfiguration(QLabel& saveFileLabel)
+void EQAutoClicker::loadConfiguration()
 {
 	QString filePath = QFileDialog::getOpenFileName(this, "Load your AutoClicker configuration", CONFIGS_PATH, "text files (*.txt)");
 
@@ -195,16 +229,14 @@ void EQAutoClicker::loadConfiguration(QLabel& saveFileLabel)
 		QFile file(filePath);
 		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
 		{
-			QByteArray line{ file.readLine() };
-			auto test{ line.split(',') };
-			clickHoldTime = test[0].toUInt();
-			timeBetweenClicks = test[1].toUInt();
-			leftClick = test[2].toShort();
+			QByteArrayList valuesList{ file.readLine().split(',') };
+			worker->setClickHoldTime(valuesList[0].toUInt());
+			worker->setTimeBetweenClicks(valuesList[1].toUInt());
 
-			saveFileLabel.setText(CONFIGS_PATH + filePath.mid(filePath.lastIndexOf("/")));
-			clickHoldTimeEdit->setText(QString::number(clickHoldTime));
-			timeBetweenClicksEdit->setText(QString::number(timeBetweenClicks));
-			if (leftClick)
+			configurationText->setText(QDir().relativeFilePath(filePath));
+			clickHoldTimeEdit->setText(QString::number(worker->getClickHoldTime()));
+			timeBetweenClicksEdit->setText(QString::number(worker->getTimeBetweenClicks()));
+			if (valuesList[2].toShort())
 				leftClickButton->click();
 			else
 				rightClickButton->click();
