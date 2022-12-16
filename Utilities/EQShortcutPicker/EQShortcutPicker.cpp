@@ -22,12 +22,15 @@ EQShortcutPicker::EQShortcutPicker(QString labelText, QWidget *parent)
 
 	EQShortcutPickerWorker* worker{ new EQShortcutPickerWorker };
 	connect(changeShortcutButton, &QPushButton::clicked, changeShortcutButton, &QWidget::setEnabled);
-	connect(changeShortcutButton, &QPushButton::clicked, worker, &EQShortcutPickerWorker::startListening);
 	connect(changeShortcutButton, SIGNAL(clicked()), this, SIGNAL(startedListening()));
-
+	connect(changeShortcutButton, &QPushButton::clicked, worker, &EQShortcutPickerWorker::startListening);
 	
 	connect(worker, &EQShortcutPickerWorker::shortcutChanged, shortcutText, &QLabel::setText);
+
 	connect(worker, &EQShortcutPickerWorker::shortcutSelected, this, &EQShortcutPicker::shortcutChosen);
+
+	connect(worker, &EQShortcutPickerWorker::shortcutFinalised, this, &EQShortcutPicker::shortcutChanged);
+	
 
 	QThread::currentThread()->setObjectName("Main thread");
 	workerThread.setObjectName("Worker thread");
@@ -38,11 +41,11 @@ EQShortcutPicker::EQShortcutPicker(QString labelText, QWidget *parent)
 	setLayout(centralLayout);
 }
 
-void EQShortcutPicker::shortcutChosen(QVector<int> virtualKeys)
+void EQShortcutPicker::shortcutChosen()
 {
 	changeShortcutButton->setEnabled(true);
-	emit shortcutChanged(virtualKeys);
 }
+
 
 EQShortcutPicker::~EQShortcutPicker()
 {

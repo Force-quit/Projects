@@ -21,12 +21,14 @@ public slots:
 	void startListening();
 
 signals:
-	void shortcutSelected(QVector<int> virtualKeys);
 	void shortcutChanged(const QString newShortcutText);
+	void shortcutSelected();
+	void shortcutFinalised(QVector<int> virtualKeys);
 
 private slots:
 	void listenLoop();
 	void emitShortcutSelected();
+	void waitForShortcutRelease();
 
 private:
 	static const QMap<int, QString> VIRTUAL_KEYS;

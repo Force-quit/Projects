@@ -16,8 +16,11 @@ EQShortcutPickerWorker::EQShortcutPickerWorker()
 void EQShortcutPickerWorker::startListening()
 {
 	pressedKeys.clear();
-	timer = new QTimer;
-	connect(timer, &QTimer::timeout, this, &EQShortcutPickerWorker::emitShortcutSelected);
+	if (timer == nullptr)
+	{
+		timer = new QTimer;
+		connect(timer, &QTimer::timeout, this, &EQShortcutPickerWorker::emitShortcutSelected);
+	}
 
 	// Clear current input buffer
 	QMapIterator<int, QString> i(VIRTUAL_KEYS);
@@ -74,10 +77,22 @@ void EQShortcutPickerWorker::listenLoop()
 void EQShortcutPickerWorker::emitShortcutSelected()
 {
 	active = false;
-	emit shortcutSelected(pressedKeys.keys());
-	disconnect(timer, &QTimer::timeout, this, &EQShortcutPickerWorker::emitShortcutSelected);
-	delete timer;
-	timer = nullptr;
+	emit shortcutSelected();
+	QTimer::singleShot(10, this, &EQShortcutPickerWorker::waitForShortcutRelease);
+}
+
+void EQShortcutPickerWorker::waitForShortcutRelease()
+{
+	for (auto& i : pressedKeys.keys())
+	{
+		if (!GetAsyncKeyState(i))
+		{
+			emit shortcutFinalised(pressedKeys.keys());
+			return;
+		}
+	}
+
+	QTimer::singleShot(10, this, &EQShortcutPickerWorker::waitForShortcutRelease);
 }
 
 const QMap<int, QString> EQShortcutPickerWorker::VIRTUAL_KEYS{

@@ -24,7 +24,7 @@ signals:
 	void startedListening();
 	
 private slots:
-	void shortcutChosen(QVector<int> virtualKeys);
+	void shortcutChosen();
 
 private:
 	QThread workerThread;
