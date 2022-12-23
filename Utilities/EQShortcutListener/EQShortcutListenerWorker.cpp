@@ -1,26 +1,26 @@
-#include "EQShortcutPickerWorker.h"
+#include "EQShortcutListenerWorker.h"
 #include <QThread>
 #include <QTimer>
 #include <QMapIterator>
 #include <Windows.h>
 
+const QString EQShortcutListenerWorker::DEFAULT_SHORTCUT{ "RCONTROL" };
+const QVector<int> EQShortcutListenerWorker::DEFAULT_CODE{ 0xA3 };
 
-const QString EQShortcutPickerWorker::DEFAULT_SHORTCUT{ "CTRL" };
-
-EQShortcutPickerWorker::EQShortcutPickerWorker()
+EQShortcutListenerWorker::EQShortcutListenerWorker()
 	: timer(), pressedKeys(), active(), inputChanged()
 {
 	
 }
 
-void EQShortcutPickerWorker::startListening()
+void EQShortcutListenerWorker::startListening()
 {
 	pressedKeys.clear();
 	if (timer == nullptr)
 	{
 		timer = new QTimer;
 		timer->setSingleShot(true);
-		connect(timer, &QTimer::timeout, this, &EQShortcutPickerWorker::emitShortcutSelected);
+		connect(timer, &QTimer::timeout, this, &EQShortcutListenerWorker::emitShortcutSelected);
 	}
 
 	// Clear current input buffer
@@ -32,10 +32,10 @@ void EQShortcutPickerWorker::startListening()
 	}
 
 	active = true;
-	QTimer::singleShot(10, this, &EQShortcutPickerWorker::listenLoop);
+	QTimer::singleShot(10, this, &EQShortcutListenerWorker::listenLoop);
 }
 
-void EQShortcutPickerWorker::listenLoop()
+void EQShortcutListenerWorker::listenLoop()
 {
 	inputChanged = false;
 
@@ -73,17 +73,17 @@ void EQShortcutPickerWorker::listenLoop()
 	}
 
 	if (active)
-		QTimer::singleShot(10, this, &EQShortcutPickerWorker::listenLoop);
+		QTimer::singleShot(10, this, &EQShortcutListenerWorker::listenLoop);
 }
 
-void EQShortcutPickerWorker::emitShortcutSelected()
+void EQShortcutListenerWorker::emitShortcutSelected()
 {
 	active = false;
 	emit shortcutSelected();
-	QTimer::singleShot(10, this, &EQShortcutPickerWorker::waitForShortcutRelease);
+	QTimer::singleShot(10, this, &EQShortcutListenerWorker::waitForShortcutRelease);
 }
 
-void EQShortcutPickerWorker::waitForShortcutRelease()
+void EQShortcutListenerWorker::waitForShortcutRelease()
 {
 	for (auto& i : pressedKeys.keys())
 	{
@@ -94,10 +94,10 @@ void EQShortcutPickerWorker::waitForShortcutRelease()
 		}
 	}
 
-	QTimer::singleShot(10, this, &EQShortcutPickerWorker::waitForShortcutRelease);
+	QTimer::singleShot(10, this, &EQShortcutListenerWorker::waitForShortcutRelease);
 }
 
-const QMap<int, QString> EQShortcutPickerWorker::VIRTUAL_KEYS{
+const QMap<int, QString> EQShortcutListenerWorker::VIRTUAL_KEYS{
 	{0x01,	"LBUTTON"},
 	{0x02,	"RBUTTON"},
 	{0x03,	"CANCEL"},
@@ -354,4 +354,4 @@ const QMap<int, QString> EQShortcutPickerWorker::VIRTUAL_KEYS{
 	{0xFE,	"Clear"} 
 };
 
-EQShortcutPickerWorker::~EQShortcutPickerWorker() {}
+EQShortcutListenerWorker::~EQShortcutListenerWorker() {}

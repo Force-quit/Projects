@@ -4,8 +4,8 @@
 #include <Windows.h>
 #include <QVector>
 
-EQKeyboardListener::EQKeyboardListener(QVector<int> virtualKeys, unsigned short checkInterval)
-	: targetKeys(virtualKeys), checkInterval(checkInterval), canTrigger(true), pressedKeys(), listening()
+EQKeyboardListener::EQKeyboardListener(QVector<int> targetKeys, unsigned short checkInterval)
+	: targetKeys(targetKeys), checkInterval(checkInterval), canTrigger(true), pressedKeys(), listening()
 {
 
 }
@@ -15,16 +15,11 @@ void EQKeyboardListener::setTargetKeys(QVector<int> virtualKeys)
 	targetKeys = virtualKeys;
 }
 
-void EQKeyboardListener::setCheckInterval(unsigned short newInterval)
-{
-	checkInterval = newInterval;
-}
-
 void EQKeyboardListener::check()
 {
 	pressedKeys = 0;
 
-	for (auto& i : targetKeys)
+	for (int& i : targetKeys)
 	{
 		if (GetAsyncKeyState(i))
 			++pressedKeys;

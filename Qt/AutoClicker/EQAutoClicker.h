@@ -6,6 +6,7 @@
 #include "EQAutoClickerWorker.h"
 #include <QThread>
 #include "../../Utilities/EQUIRangedLineEdit.h"
+#include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
 #include <QRadioButton>
 #include <QPushButton>
 #include <QVector>
@@ -33,6 +34,8 @@ private:
 	EQAutoClickerWorker* worker;
 	QThread workerThread;
 
+
+	EQShortcutListener* shortcutListener;
 	EQUIRangedLineEdit* clickHoldTimeEdit;
 	EQUIRangedLineEdit* timeBetweenClicksEdit;
 	QRadioButton* leftClickButton;

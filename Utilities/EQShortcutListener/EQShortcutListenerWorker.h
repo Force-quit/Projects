@@ -6,15 +6,15 @@
 #include <QMap>
 #include <QTimer>
 
-class EQShortcutPickerWorker  : public QObject
+class EQShortcutListenerWorker : public QObject
 {
 	Q_OBJECT
 
 public:
-	EQShortcutPickerWorker();
-	~EQShortcutPickerWorker();
+	EQShortcutListenerWorker();
+	~EQShortcutListenerWorker();
 
-	const static int DEFAULT_CODE{ 0x11 };
+	const static QVector<int> DEFAULT_CODE;
 	const static QString DEFAULT_SHORTCUT;
 
 public slots:

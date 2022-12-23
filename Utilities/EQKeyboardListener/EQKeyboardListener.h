@@ -10,11 +10,8 @@ class EQKeyboardListener : public QWidget
 	Q_OBJECT
 
 public:
-
-	EQKeyboardListener(QVector<int> virtualKeys, unsigned short checkInterval = 50);
+	EQKeyboardListener(QVector<int> targetKeys, unsigned short checkInterval = 50);
 	~EQKeyboardListener();
-
-	void setCheckInterval(unsigned short newInterval);
 
 public slots:
 	void setTargetKeys(QVector<int> virtualKeys);
@@ -29,7 +26,7 @@ private slots:
 
 private:
 	QVector<int> targetKeys;
-	unsigned short checkInterval;
+	const unsigned short checkInterval;
 	unsigned short pressedKeys;
 	bool canTrigger;
 

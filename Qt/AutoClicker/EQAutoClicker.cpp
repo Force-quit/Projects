@@ -12,8 +12,7 @@
 #include <QButtonGroup>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "../../Utilities/EQShortcutPicker/EQShortcutPicker.h"
-#include "../../Utilities/EQKeyboardListener/EQKeyboardListener.h"
+#include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
 #include <QTabBar>
 #include <QDir>
 #include <QFocusEvent>
@@ -28,7 +27,7 @@ const QString EQAutoClicker::CONFIGS_PATH{ "Configs" };
 EQAutoClicker::EQAutoClicker(QWidget *parent)
 	: QMainWindow(parent),
 	clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton(), widgetsToDisable(), worker(), configurationText()
+	saveButton(), loadButton(), widgetsToDisable(), worker(), configurationText(), shortcutListener()
 {
 	QDir().mkdir(CONFIGS_PATH);
 	worker = new EQAutoClickerWorker;
@@ -44,6 +43,7 @@ EQAutoClicker::EQAutoClicker(QWidget *parent)
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 	setWindowIcon(QIcon("mouse.png"));
+	shortcutListener->startListening();
 }
 
 QGroupBox* EQAutoClicker::initParameters()
@@ -141,26 +141,18 @@ QGroupBox* EQAutoClicker::initActivationLayout()
 
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
 
-	EQShortcutPicker* shortcutPicker{ new EQShortcutPicker("Activation shortcut :") };
+	shortcutListener = new EQShortcutListener("Activation shortcut :");
 	QLabel* activationStatusText{ new QLabel("Innactive")};
 	activationStatusText->setAlignment(Qt::AlignCenter);
 
-	groupBoxLayout->addWidget(shortcutPicker);
+	groupBoxLayout->addWidget(shortcutListener);
 	groupBoxLayout->addWidget(activationStatusText);
 
 	bottomGroupBox->setLayout(groupBoxLayout);
 
-	EQKeyboardListener* listener{ new EQKeyboardListener(QVector<int>{EQShortcutPicker::DEFAULT_CODE}) };
-	listener->startListening();
-
-	connect(shortcutPicker, &EQShortcutPicker::startedListening, this, &EQAutoClicker::disableWidgets);
-	connect(shortcutPicker, &EQShortcutPicker::startedListening, listener, &EQKeyboardListener::stopListening);
-
-	connect(shortcutPicker, &EQShortcutPicker::shortcutChanged, listener, &EQKeyboardListener::setTargetKeys);
-	connect(shortcutPicker, &EQShortcutPicker::shortcutChanged, this, &EQAutoClicker::enableWidgets);
-	connect(shortcutPicker, &EQShortcutPicker::shortcutChanged, listener, &EQKeyboardListener::startListening);
-
-	connect(listener, &EQKeyboardListener::targetKeysPressed, worker, &EQAutoClickerWorker::activate);
+	connect(shortcutListener, &EQShortcutListener::startedChangingShortcut, this, &EQAutoClicker::disableWidgets);
+	connect(shortcutListener, &EQShortcutListener::stoppedChangingShortcut, this, &EQAutoClicker::enableWidgets);
+	connect(shortcutListener, &EQShortcutListener::shortcutPressed, worker, &EQAutoClickerWorker::activate);
 	
 	connect(worker, &EQAutoClickerWorker::activated, this, &EQAutoClicker::disableWidgets);
 	connect(worker, &EQAutoClickerWorker::activated, [activationStatusText]() {
@@ -173,9 +165,7 @@ QGroupBox* EQAutoClicker::initActivationLayout()
 	});
 
 	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
-	connect(&workerThread, &QThread::finished, listener, &QObject::deleteLater);
 	worker->moveToThread(&workerThread);
-	shortcutPicker->moveToThread(&workerThread);
 	workerThread.start();
 
 	return bottomGroupBox;
