@@ -18,7 +18,7 @@ void EQAutoClickerWorker::setTimeBetweenClicks(unsigned int timeBetween)
 	timeBetweenClicks = timeBetween;
 }
 
-void EQAutoClickerWorker::activate()
+void EQAutoClickerWorker::switchState()
 {
 	active = !active;
 	if (active)
@@ -50,6 +50,11 @@ void EQAutoClickerWorker::clickUp()
 void EQAutoClickerWorker::setLeftClick(bool leftClick)
 {
 	this->leftClick = leftClick;
+}
+
+bool EQAutoClickerWorker::isActive() const
+{
+	return active;
 }
 
 unsigned int EQAutoClickerWorker::getClickHoldTime() const

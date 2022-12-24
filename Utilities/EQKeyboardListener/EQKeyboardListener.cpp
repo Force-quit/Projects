@@ -49,3 +49,8 @@ void EQKeyboardListener::startListening()
 }
 
 EQKeyboardListener::~EQKeyboardListener() {}
+
+QVector<int> EQKeyboardListener::getTargetKeys() const
+{
+	return targetKeys;
+}

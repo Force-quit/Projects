@@ -21,11 +21,12 @@ public:
 	unsigned int getTimeBetweenClicks() const;
 	bool isTargetLeftClick() const;
 	void setLeftClick(bool leftClick);
+	bool isActive() const;
 
 public slots:
 	void setClickHoldTime(unsigned int holdTime);
 	void setTimeBetweenClicks(unsigned int timeBetween);
-	void activate();
+	void switchState();
 
 signals:
 	void activated();

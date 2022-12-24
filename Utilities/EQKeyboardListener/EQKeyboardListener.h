@@ -13,6 +13,7 @@ public:
 	EQKeyboardListener(QVector<int> targetKeys, unsigned short checkInterval = 50);
 	~EQKeyboardListener();
 
+	QVector<int> getTargetKeys() const;
 public slots:
 	void setTargetKeys(QVector<int> virtualKeys);
 	void stopListening();

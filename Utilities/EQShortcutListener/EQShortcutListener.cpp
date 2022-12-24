@@ -46,6 +46,16 @@ void EQShortcutListener::changingShortcut()
 	emit startedChangingShortcut();
 }
 
+void EQShortcutListener::disableButton()
+{
+	changeShortcutButton->setDisabled(true);
+}
+
+void EQShortcutListener::enableButton()
+{
+	changeShortcutButton->setEnabled(true);
+}
+
 void EQShortcutListener::shortcutChosen()
 {
 	changeShortcutButton->setEnabled(true);
@@ -75,4 +85,14 @@ EQShortcutListener::~EQShortcutListener()
 {
 	workerThread.quit();
 	workerThread.wait();
+}
+
+QVector<int> EQShortcutListener::getTargetKeys() const
+{
+	return keyboardListener->getTargetKeys();
+}
+
+void EQShortcutListener::setTargetKeys(QVector<int>& targetKeys)
+{
+	keyboardListener->setTargetKeys(targetKeys);
 }

@@ -27,7 +27,7 @@ const QString EQAutoClicker::CONFIGS_PATH{ "Configs" };
 EQAutoClicker::EQAutoClicker(QWidget *parent)
 	: QMainWindow(parent),
 	clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton(), widgetsToDisable(), worker(), configurationText(), shortcutListener()
+	saveButton(), loadButton(), widgetsToDisable(), worker(), configurationText(), shortcutListener(), activationStatusText()
 {
 	QDir().mkdir(CONFIGS_PATH);
 	worker = new EQAutoClickerWorker;
@@ -36,14 +36,15 @@ EQAutoClicker::EQAutoClicker(QWidget *parent)
 	centralLayout->addWidget(initParameters());
 	centralLayout->addWidget(initActivationLayout());
 
-	widgetsToDisable.append({ clickHoldTimeEdit, timeBetweenClicksEdit,
-		leftClickButton, rightClickButton, saveButton, loadButton });
-
 	QWidget* centralWidget{ new QWidget };
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 	setWindowIcon(QIcon("mouse.png"));
-	shortcutListener->startListening();
+
+	widgetsToDisable.append({ clickHoldTimeEdit, timeBetweenClicksEdit,
+		leftClickButton, rightClickButton, saveButton, loadButton });
+
+	shortcutListener->startListening();;
 }
 
 QGroupBox* EQAutoClicker::initParameters()
@@ -137,50 +138,51 @@ QHBoxLayout* EQAutoClicker::initSaveAndLoad()
 
 QGroupBox* EQAutoClicker::initActivationLayout()
 {
-	QGroupBox* bottomGroupBox{ new QGroupBox("Activation") };
-
+	QGroupBox* activationGroupBox{ new QGroupBox("Activation") };
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
 
 	shortcutListener = new EQShortcutListener("Activation shortcut :");
-	QLabel* activationStatusText{ new QLabel("Innactive")};
-	activationStatusText->setAlignment(Qt::AlignCenter);
+
+	QHBoxLayout* activationStatusLayout{ new QHBoxLayout };
+	activationStatusLayout->setAlignment(Qt::AlignCenter);
+	QLabel* activationStatusLabel{ new QLabel("Status :") };
+	activationStatusText = new QLabel("Innactive");
+	activationStatusLayout->addWidget(activationStatusLabel);
+	activationStatusLayout->addWidget(activationStatusText);
 
 	groupBoxLayout->addWidget(shortcutListener);
-	groupBoxLayout->addWidget(activationStatusText);
-
-	bottomGroupBox->setLayout(groupBoxLayout);
+	groupBoxLayout->addLayout(activationStatusLayout);
+	activationGroupBox->setLayout(groupBoxLayout);
 
 	connect(shortcutListener, &EQShortcutListener::startedChangingShortcut, this, &EQAutoClicker::disableWidgets);
 	connect(shortcutListener, &EQShortcutListener::stoppedChangingShortcut, this, &EQAutoClicker::enableWidgets);
-	connect(shortcutListener, &EQShortcutListener::shortcutPressed, worker, &EQAutoClickerWorker::activate);
+	connect(shortcutListener, &EQShortcutListener::shortcutPressed, worker, &EQAutoClickerWorker::switchState);
 	
 	connect(worker, &EQAutoClickerWorker::activated, this, &EQAutoClicker::disableWidgets);
-	connect(worker, &EQAutoClickerWorker::activated, [activationStatusText]() {
-		activationStatusText->setText("Active");
-	});
-
 	connect(worker, &EQAutoClickerWorker::deactivated, this, &EQAutoClicker::enableWidgets);
-	connect(worker, &EQAutoClickerWorker::deactivated, [activationStatusText]() {
-		activationStatusText->setText("Innactive");
-	});
 
 	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
 	worker->moveToThread(&workerThread);
 	workerThread.start();
 
-	return bottomGroupBox;
+	return activationGroupBox;
 }
 
 void EQAutoClicker::disableWidgets()
 {
 	for (auto i : widgetsToDisable)
-		i->setEnabled(false);
+		i->setDisabled(true);
+	shortcutListener->disableButton();
+	if (worker->isActive())
+		activationStatusText->setText("Active");
 }
 
 void EQAutoClicker::enableWidgets()
 {
 	for (auto i : widgetsToDisable)
 		i->setEnabled(true);
+	shortcutListener->enableButton();
+	activationStatusText->setText("Innactive");
 }
 
 void EQAutoClicker::saveConfiguration()

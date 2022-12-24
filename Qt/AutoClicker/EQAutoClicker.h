@@ -43,6 +43,7 @@ private:
 	QPushButton* saveButton;
 	QPushButton* loadButton;
 	QLabel* configurationText;
+	QLabel* activationStatusText;
 	QVector<QWidget*> widgetsToDisable;
 
 	QGroupBox* initParameters();
