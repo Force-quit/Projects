@@ -34,7 +34,6 @@ private:
 	static const QMap<int, QString> VIRTUAL_KEYS;
 	static const unsigned short HOLD_TIME_TO_CONFIRM{ 2000 };
 
-
 	bool inputChanged;
 	bool active;
 	QMap<int, QString> pressedKeys;

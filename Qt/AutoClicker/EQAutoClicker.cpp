@@ -16,8 +16,6 @@
 #include <QTabBar>
 #include <QDir>
 #include <QFocusEvent>
-#include <QMediaPlayer>
-#include <QAudioOutput>
 #include <Windows.h>
 #include <QIcon>
 #include <QVector>
@@ -195,7 +193,13 @@ void EQAutoClicker::saveConfiguration()
 		if (file.open(QIODevice::WriteOnly | QIODevice::Text))
 		{
 			QTextStream out(&file);
-			out << worker->getClickHoldTime() << ',' << worker->getTimeBetweenClicks() << ',' << worker->isTargetLeftClick();
+			out << worker->getClickHoldTime() << ',' << worker->getTimeBetweenClicks() << ',' << worker->isTargetLeftClick() << '\n';
+
+			QVector<int> shortcutKeys = shortcutListener->getTargetKeys();
+			for (int i = 0; i < shortcutKeys.size() - 1; ++i)
+				out << i << ',';
+			out << shortcutKeys[shortcutKeys.size() - 1];
+
 			configurationText->setText(QDir().relativeFilePath(filePath));
 		}
 		else

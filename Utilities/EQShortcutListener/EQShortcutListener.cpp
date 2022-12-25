@@ -95,4 +95,5 @@ QVector<int> EQShortcutListener::getTargetKeys() const
 void EQShortcutListener::setTargetKeys(QVector<int>& targetKeys)
 {
 	keyboardListener->setTargetKeys(targetKeys);
+	// TODO change text
 }
