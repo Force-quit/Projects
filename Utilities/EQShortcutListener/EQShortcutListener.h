@@ -18,7 +18,9 @@ public:
 	~EQShortcutListener();
 
 	QVector<int> getTargetKeys() const;
+	// TODO
 	void setTargetKeys(QVector<int>& targetKeys);
+
 public slots:
 	void startListening();
 	void stopListening();

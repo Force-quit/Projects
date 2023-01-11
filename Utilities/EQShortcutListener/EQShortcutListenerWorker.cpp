@@ -355,13 +355,3 @@ const QMap<int, QString> EQShortcutListenerWorker::VIRTUAL_KEYS{
 };
 
 EQShortcutListenerWorker::~EQShortcutListenerWorker() {}
-
-QString EQShortcutListenerWorker::vkCodesToString(QVector<int>& codes)
-{
-	QString text;
-	for (int& i : codes)
-	{
-
-	}
-	return QString();
-}
