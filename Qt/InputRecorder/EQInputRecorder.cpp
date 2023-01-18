@@ -54,7 +54,10 @@ QGroupBox* EQInputRecorder::initRecordingGroupBox()
 	scanningThreadsLayout->addWidget(scanningThreadsLineEdit);
 	scanningThreadsLayout->addWidget(scanningThreadsHint);
 
+	QPushButton* startRecording{ new QPushButton("Start recording") };
+
 	groupBoxLayout->addLayout(scanningThreadsLayout);
+	groupBoxLayout->addWidget(startRecording);
 	recordingGroupBox->setLayout(groupBoxLayout);
 	return recordingGroupBox;
 }
@@ -63,11 +66,9 @@ QGroupBox* EQInputRecorder::initPlayingGroupBox()
 {
 	QGroupBox* currentRecordingGroupBox{ new QGroupBox("Playback") };
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
-	QLabel* currentRecordingLabel{ new QLabel("Current recording :") };
-	currentRecordingText = new QLabel("None");
+	QPushButton* startPlayback{ new QPushButton("Start playback") };
 
-	groupBoxLayout->addWidget(currentRecordingLabel);
-	groupBoxLayout->addWidget(currentRecordingText);
+	groupBoxLayout->addWidget(startPlayback);
 	currentRecordingGroupBox->setLayout(groupBoxLayout);
 	return currentRecordingGroupBox;
 }
