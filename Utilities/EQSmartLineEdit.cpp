@@ -9,10 +9,10 @@ EQSmartLineEdit::EQSmartLineEdit(QWidget *parent)
 	connect(this, &QLineEdit::returnPressed, this, &QWidget::clearFocus);
 }
 
-EQSmartLineEdit::~EQSmartLineEdit() {}
-
 void EQSmartLineEdit::focusOutEvent(QFocusEvent* e)
 {
 	QLineEdit::focusOutEvent(e);
 	emit smartFocusOutEvent(text());
 }
+
+EQSmartLineEdit::~EQSmartLineEdit() {}

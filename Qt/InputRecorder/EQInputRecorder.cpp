@@ -3,6 +3,8 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QIcon>
+#include <QPushButton>
+#include "../../Utilities/EQUIRangedLineEdit.h"
 
 EQInputRecorder::EQInputRecorder(QWidget *parent)
 	: QMainWindow(parent), currentRecordingText()
@@ -27,9 +29,14 @@ QGroupBox* EQInputRecorder::initTopGroupBox()
 	QHBoxLayout* groupBoxLayout{ new QHBoxLayout };
 	QLabel* currentRecordingLabel{ new QLabel("Current recording :") };
 	currentRecordingText = new QLabel("None");
+	QPushButton* saveButton{ new QPushButton("Save")};
+	QPushButton* loadButton{ new QPushButton("Load") };
+
 
 	groupBoxLayout->addWidget(currentRecordingLabel);
 	groupBoxLayout->addWidget(currentRecordingText);
+	groupBoxLayout->addWidget(saveButton);
+	groupBoxLayout->addWidget(loadButton);
 	currentRecordingGroupBox->setLayout(groupBoxLayout);
 	return currentRecordingGroupBox;
 }
@@ -38,11 +45,16 @@ QGroupBox* EQInputRecorder::initRecordingGroupBox()
 {
 	QGroupBox* recordingGroupBox{ new QGroupBox("Record") };
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
-	QLabel* currentRecordingLabel{ new QLabel("Current recording :") };
-	currentRecordingText = new QLabel("None");
 
-	groupBoxLayout->addWidget(currentRecordingLabel);
-	groupBoxLayout->addWidget(currentRecordingText);
+	QHBoxLayout* scanningThreadsLayout{ new QHBoxLayout };
+	QLabel* scanningThreadLabel{ new QLabel("Scaning threads :") };
+	EQUIRangedLineEdit* scanningThreadsLineEdit{ new EQUIRangedLineEdit(1, 50) };
+	QLabel* scanningThreadsHint{ new QLabel("(higher is better)") };
+	scanningThreadsLayout->addWidget(scanningThreadLabel);
+	scanningThreadsLayout->addWidget(scanningThreadsLineEdit);
+	scanningThreadsLayout->addWidget(scanningThreadsHint);
+
+	groupBoxLayout->addLayout(scanningThreadsLayout);
 	recordingGroupBox->setLayout(groupBoxLayout);
 	return recordingGroupBox;
 }
