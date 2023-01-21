@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QGroupBox>
+#include <QLabel>
 
 class EQInputRecorder : public QMainWindow
 {
@@ -11,5 +13,9 @@ public:
 	~EQInputRecorder();
 
 private:
+	QLabel* currentRecordingText;
 
+	QGroupBox* initTopGroupBox();
+	QGroupBox* initRecordingGroupBox();
+	QGroupBox* initPlayingGroupBox();
 };
