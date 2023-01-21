@@ -1,4 +1,0 @@
-ffmpeg -i "Y:\C++\BadApple\Bad_Apple.mp4" "Y:\C++\BadApple\frames/%d.png"
-
-compatible avec filesystem::directory_iterator:
-ffmpeg -i "Y:\C++\BadApple\Bad_Apple.mp4" "Y:\C++\BadApple\frames/%04d.png"
