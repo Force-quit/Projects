@@ -5,40 +5,47 @@
 #include <QIcon>
 #include <QPushButton>
 #include "../../Utilities/EQUIRangedLineEdit.h"
+#include "EQInputRecorderWorker.h"
+#include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
 
 EQInputRecorder::EQInputRecorder(QWidget *parent)
-	: QMainWindow(parent), currentRecordingText()
+	: QMainWindow(parent), workerThread(), worker{new EQInputRecorderWorker}
 {
+	worker->moveToThread(&workerThread);
+	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+	workerThread.start();
+
 	QWidget* centralWidget{ new QWidget };
 	QVBoxLayout* centralLayout{ new QVBoxLayout };
+
+	QGroupBox* ouputGroupBox{ initOutputGroupBox() };
 
 	QHBoxLayout* bottomLayout{ new QHBoxLayout };
 	bottomLayout->addWidget(initRecordingGroupBox());
 	bottomLayout->addWidget(initPlayingGroupBox());
 
-	centralLayout->addWidget(initTopGroupBox());
+	centralLayout->addWidget(ouputGroupBox);
 	centralLayout->addLayout(bottomLayout);
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
 	setWindowIcon(QIcon("inputRecorder.png"));
 }
 
-QGroupBox* EQInputRecorder::initTopGroupBox()
+
+QGroupBox* EQInputRecorder::initOutputGroupBox()
 {
-	QGroupBox* currentRecordingGroupBox{ new QGroupBox("Recording selection") };
+	QGroupBox* outputGroupBox{ new QGroupBox("Output") };
 	QHBoxLayout* groupBoxLayout{ new QHBoxLayout };
-	QLabel* currentRecordingLabel{ new QLabel("Current recording :") };
-	currentRecordingText = new QLabel("None");
-	QPushButton* saveButton{ new QPushButton("Save")};
-	QPushButton* loadButton{ new QPushButton("Load") };
+	groupBoxLayout->setAlignment(Qt::AlignLeft);
 
+	QLabel* outputLabel{ new QLabel("Current status :") };
+	QLabel* ouputText{ new QLabel("Inactive") };
+	connect(worker, &EQInputRecorderWorker::textChanged, ouputText, &QLabel::setText);
 
-	groupBoxLayout->addWidget(currentRecordingLabel);
-	groupBoxLayout->addWidget(currentRecordingText);
-	groupBoxLayout->addWidget(saveButton);
-	groupBoxLayout->addWidget(loadButton);
-	currentRecordingGroupBox->setLayout(groupBoxLayout);
-	return currentRecordingGroupBox;
+	groupBoxLayout->addWidget(outputLabel);
+	groupBoxLayout->addWidget(ouputText);
+	outputGroupBox->setLayout(groupBoxLayout);
+	return outputGroupBox;
 }
 
 QGroupBox* EQInputRecorder::initRecordingGroupBox()
@@ -55,7 +62,10 @@ QGroupBox* EQInputRecorder::initRecordingGroupBox()
 	scanningThreadsLayout->addWidget(scanningThreadsHint);
 
 	QPushButton* startRecording{ new QPushButton("Start recording") };
+	connect(startRecording, &QPushButton::clicked, worker, &EQInputRecorderWorker::startRecording);
 
+	EQShortcutListener* stopRecordingListener{ new EQShortcutListener("Stop recording shortcut : ") };
+	//TODO
 	groupBoxLayout->addLayout(scanningThreadsLayout);
 	groupBoxLayout->addWidget(startRecording);
 	recordingGroupBox->setLayout(groupBoxLayout);
@@ -67,10 +77,15 @@ QGroupBox* EQInputRecorder::initPlayingGroupBox()
 	QGroupBox* currentRecordingGroupBox{ new QGroupBox("Playback") };
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
 	QPushButton* startPlayback{ new QPushButton("Start playback") };
+	connect(startPlayback, &QPushButton::clicked, worker, &EQInputRecorderWorker::startPlayback);
 
 	groupBoxLayout->addWidget(startPlayback);
 	currentRecordingGroupBox->setLayout(groupBoxLayout);
 	return currentRecordingGroupBox;
 }
 
-EQInputRecorder::~EQInputRecorder() {}
+EQInputRecorder::~EQInputRecorder() 
+{
+	workerThread.quit();
+	workerThread.wait();
+}

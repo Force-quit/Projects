@@ -3,6 +3,8 @@
 #include <QMainWindow>
 #include <QGroupBox>
 #include <QLabel>
+#include <QThread>
+#include "EQInputRecorderWorker.h"
 
 class EQInputRecorder : public QMainWindow
 {
@@ -13,9 +15,10 @@ public:
 	~EQInputRecorder();
 
 private:
-	QLabel* currentRecordingText;
-
-	QGroupBox* initTopGroupBox();
+	QGroupBox* initOutputGroupBox();
 	QGroupBox* initRecordingGroupBox();
 	QGroupBox* initPlayingGroupBox();
+
+	EQInputRecorderWorker* worker;
+	QThread workerThread;
 };
