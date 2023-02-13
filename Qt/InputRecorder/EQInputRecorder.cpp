@@ -64,8 +64,9 @@ QGroupBox* EQInputRecorder::initRecordingGroupBox()
 	QPushButton* startRecording{ new QPushButton("Start recording") };
 	connect(startRecording, &QPushButton::clicked, worker, &EQInputRecorderWorker::startRecording);
 
-	EQShortcutListener* stopRecordingListener{ new EQShortcutListener("Stop recording shortcut : ") };
 	//TODO
+	EQShortcutListener* stopRecordingListener{ new EQShortcutListener("Stop recording shortcut : ") };
+	
 	groupBoxLayout->addLayout(scanningThreadsLayout);
 	groupBoxLayout->addWidget(startRecording);
 	recordingGroupBox->setLayout(groupBoxLayout);

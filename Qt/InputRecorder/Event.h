@@ -1,9 +1,7 @@
 #pragma once
 
-class Event
+struct Event
 {
-public:
-	Event(const long time);
-
 	const long positionInTime;
+	Event(long time);
 };
