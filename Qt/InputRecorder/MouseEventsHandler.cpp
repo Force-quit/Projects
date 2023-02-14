@@ -12,15 +12,38 @@ const std::vector<uint8_t> MouseEventsHandler::MOUSE_CLICK_VK
 	VK_XBUTTON2
 };
 
-MouseEventsHandler::MouseEventsHandler()
+MouseEventsHandler::MouseEventsHandler(clock_t& currentRecTime, bool& continueListening)
+	: currentRecTime{ currentRecTime }, continueListening{ continueListening },
+	mouseClickEvents(), mousePressedKeys(), mouseKeysToRemove(),
+	mouseMoveEvents()
 {
 
 }
 
 void MouseEventsHandler::checkEvents()
 {
-	checkMouseClickEvents();
-	checkMouseMoveEvents();
+	POINT initalMousePos{};
+	GetCursorPos(&initalMousePos);
+	mouseMoveEvents.push_back(MouseMoveEvent(currentRecTime, initalMousePos));
+
+	while (continueListening)
+	{
+		checkMouseClickEvents();
+		checkMouseMoveEvents();
+	}
+
+	if (mouseMoveEvents.size() == 1)
+		mouseMoveEvents.clear();
+}
+
+std::vector<MouseClickEvent> MouseEventsHandler::getMouseClickEvents() const
+{
+	return mouseClickEvents;
+}
+
+std::vector<MouseMoveEvent> MouseEventsHandler::getMouseMoveEvents() const
+{
+	return mouseMoveEvents;
 }
 
 void MouseEventsHandler::checkMouseClickEvents()
@@ -56,5 +79,6 @@ void MouseEventsHandler::checkMouseClickEvents()
 
 void MouseEventsHandler::checkMouseMoveEvents()
 {
-
+	lastMousePosition = mouseMoveEvents.back().position;
+	if 
 }

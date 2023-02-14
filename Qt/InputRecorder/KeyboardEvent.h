@@ -6,4 +6,6 @@ struct KeyboardEvent : public Event
 {
 	DWORD vkCode, dwFlags;
 	KeyboardEvent(long time, DWORD vkCode, DWORD dwFlags);
+
+	void play(INPUT& input) override;
 };
