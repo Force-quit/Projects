@@ -11,9 +11,11 @@ class MouseEventsHandler : public QObject
 
 public:
 	MouseEventsHandler(clock_t& currentRecTime, bool& continueListening);
-	void checkEvents();
 	std::vector<MouseClickEvent> getMouseClickEvents() const;
 	std::vector<MouseMoveEvent> getMouseMoveEvents() const;
+
+public slots:
+	void startListening();
 
 private:
 	const clock_t& currentRecTime;
@@ -25,8 +27,6 @@ private:
 	void checkMouseClickEvents();
 
 	std::vector<MouseMoveEvent> mouseMoveEvents;
-	POINT& lastMousePosition;
-	POINT& currentMousePosition;
 	void checkMouseMoveEvents();
 
 	const static std::vector<uint8_t> MOUSE_CLICK_VK;

@@ -20,7 +20,7 @@ MouseEventsHandler::MouseEventsHandler(clock_t& currentRecTime, bool& continueLi
 
 }
 
-void MouseEventsHandler::checkEvents()
+void MouseEventsHandler::startListening()
 {
 	POINT initalMousePos{};
 	GetCursorPos(&initalMousePos);
@@ -48,7 +48,7 @@ std::vector<MouseMoveEvent> MouseEventsHandler::getMouseMoveEvents() const
 
 void MouseEventsHandler::checkMouseClickEvents()
 {
-	for (auto virtualKey : MOUSE_CLICK_VK)
+	/*for (auto virtualKey : MOUSE_CLICK_VK)
 	{
 		if (GetAsyncKeyState(virtualKey))
 		{
@@ -75,10 +75,14 @@ void MouseEventsHandler::checkMouseClickEvents()
 			mousePressedKeys.erase(keyToRemove);
 		mouseKeysToRemove.clear();
 	}
+	*/
 }
 
 void MouseEventsHandler::checkMouseMoveEvents()
 {
-	lastMousePosition = mouseMoveEvents.back().position;
-	if 
+	const POINT* lastMousePosition = &mouseMoveEvents.back().position;
+	POINT currentCursorPos{};
+	GetCursorPos(&currentCursorPos);
+	if (currentCursorPos.x != lastMousePosition->x || currentCursorPos.y != lastMousePosition->y)
+		mouseMoveEvents.push_back(MouseMoveEvent(currentRecTime, currentCursorPos));
 }
