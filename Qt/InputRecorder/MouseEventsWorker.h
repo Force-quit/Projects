@@ -3,14 +3,16 @@
 #include <QObject>
 #include <vector>
 #include <set>
-#include "MouseClickEvent.h"
 
-class MouseEventsHandler : public QObject
+#include "MouseClickEvent.h"
+#include "MouseMoveEvent.h"
+
+class MouseEventsWorker : public QObject
 {
 	Q_OBJECT
 
 public:
-	MouseEventsHandler(clock_t& currentRecTime, bool& continueListening);
+	MouseEventsWorker(clock_t& currentRecTime, bool& continueListening);
 	std::vector<MouseClickEvent> getMouseClickEvents() const;
 	std::vector<MouseMoveEvent> getMouseMoveEvents() const;
 
@@ -29,5 +31,5 @@ private:
 	std::vector<MouseMoveEvent> mouseMoveEvents;
 	void checkMouseMoveEvents();
 
-	const static std::vector<uint8_t> MOUSE_CLICK_VK;
+	const std::vector<uint8_t> MOUSE_CLICK_VK;
 };

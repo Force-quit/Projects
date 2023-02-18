@@ -53,21 +53,12 @@ QGroupBox* EQInputRecorder::initRecordingGroupBox()
 	QGroupBox* recordingGroupBox{ new QGroupBox("Record") };
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
 
-	QHBoxLayout* scanningThreadsLayout{ new QHBoxLayout };
-	QLabel* scanningThreadLabel{ new QLabel("Scaning threads :") };
-	EQUIRangedLineEdit* scanningThreadsLineEdit{ new EQUIRangedLineEdit(1, 50) };
-	QLabel* scanningThreadsHint{ new QLabel("(higher is better)") };
-	scanningThreadsLayout->addWidget(scanningThreadLabel);
-	scanningThreadsLayout->addWidget(scanningThreadsLineEdit);
-	scanningThreadsLayout->addWidget(scanningThreadsHint);
-
 	QPushButton* startRecording{ new QPushButton("Start recording") };
 	connect(startRecording, &QPushButton::clicked, worker, &EQInputRecorderWorker::startRecording);
 
 	//TODO
 	EQShortcutListener* stopRecordingListener{ new EQShortcutListener("Stop recording shortcut : ") };
 	
-	groupBoxLayout->addLayout(scanningThreadsLayout);
 	groupBoxLayout->addWidget(startRecording);
 	recordingGroupBox->setLayout(groupBoxLayout);
 	return recordingGroupBox;

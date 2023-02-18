@@ -1,11 +1,10 @@
 #pragma once
-#include "Event.h"
 #include <Windows.h>
 
-struct KeyboardEvent : public Event
+struct KeyboardEvent
 {
-	DWORD vkCode, dwFlags;
+	const DWORD vkCode, dwFlags;
+	const long eventPlayTime;
 	KeyboardEvent(long time, DWORD vkCode, DWORD dwFlags);
-
-	void play(INPUT& input) override;
+	void play(INPUT& input) const;
 };

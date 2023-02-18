@@ -2,10 +2,10 @@
 #include <Windows.h>
 
 MouseMoveEvent::MouseMoveEvent(long time, POINT& position)
-	: Event(time), position(position)
+	: eventPlayTime(time), position(position)
 {}
 
-void MouseMoveEvent::play(INPUT& input)
+void MouseMoveEvent::play() const
 {
 	SetCursorPos(position.x, position.y);
 }

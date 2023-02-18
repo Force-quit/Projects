@@ -1,26 +1,22 @@
-#include "MouseEventsHandler.h"
+#include "MouseEventsWorker.h"
 
 #include <Windows.h>
 #include <ctime>
+#include <vector>
 
-const std::vector<uint8_t> MouseEventsHandler::MOUSE_CLICK_VK
-{
-	VK_LBUTTON,
-	VK_RBUTTON,
-	VK_MBUTTON,
-	VK_XBUTTON1,
-	VK_XBUTTON2
-};
+#include "MouseMoveEvent.h"
+#include "MouseClickEvent.h"
 
-MouseEventsHandler::MouseEventsHandler(clock_t& currentRecTime, bool& continueListening)
+MouseEventsWorker::MouseEventsWorker(clock_t& currentRecTime, bool& continueListening)
 	: currentRecTime{ currentRecTime }, continueListening{ continueListening },
 	mouseClickEvents(), mousePressedKeys(), mouseKeysToRemove(),
-	mouseMoveEvents()
+	mouseMoveEvents(),
+	MOUSE_CLICK_VK{ VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_XBUTTON1, VK_XBUTTON2 }
 {
 
 }
 
-void MouseEventsHandler::startListening()
+void MouseEventsWorker::startListening()
 {
 	POINT initalMousePos{};
 	GetCursorPos(&initalMousePos);
@@ -36,17 +32,17 @@ void MouseEventsHandler::startListening()
 		mouseMoveEvents.clear();
 }
 
-std::vector<MouseClickEvent> MouseEventsHandler::getMouseClickEvents() const
+std::vector<MouseClickEvent> MouseEventsWorker::getMouseClickEvents() const
 {
 	return mouseClickEvents;
 }
 
-std::vector<MouseMoveEvent> MouseEventsHandler::getMouseMoveEvents() const
+std::vector<MouseMoveEvent> MouseEventsWorker::getMouseMoveEvents() const
 {
 	return mouseMoveEvents;
 }
 
-void MouseEventsHandler::checkMouseClickEvents()
+void MouseEventsWorker::checkMouseClickEvents()
 {
 	/*for (auto virtualKey : MOUSE_CLICK_VK)
 	{
@@ -78,7 +74,7 @@ void MouseEventsHandler::checkMouseClickEvents()
 	*/
 }
 
-void MouseEventsHandler::checkMouseMoveEvents()
+void MouseEventsWorker::checkMouseMoveEvents()
 {
 	const POINT* lastMousePosition = &mouseMoveEvents.back().position;
 	POINT currentCursorPos{};

@@ -3,18 +3,20 @@
 #include <QString>
 #include <Windows.h>
 #include <vector>
-#include "MouseEventsHandler.h"
+#include "MouseEventsWorker.h"
 
 EQInputRecorderWorker::EQInputRecorderWorker()
-	: currentRecordingTime{}, continueListening{}, 
-	mouseEventsWorker{ new MouseEventsHandler(currentRecordingTime, continueListening)}, mouseEventsThread(),
-	allEvents()
+	: recordingTime{}, continueListening{}, 
+	mouseEventsWorker{ new MouseEventsWorker(recordingTime, continueListening)}, mouseEventsHandlerThread(),
+	keyboardEventsHandler(this, recordingTime, continueListening),
+	mouseMoveEvents(), mouseClickEvents(), keyboardEvents()
 {
-	mouseEventsWorker->moveToThread(&mouseEventsThread);
-	connect(&mouseEventsThread, &QThread::finished, mouseEventsWorker, &QObject::deleteLater);
-	mouseEventsThread.start();
+	mouseEventsWorker->moveToThread(&mouseEventsHandlerThread);
+	connect(&mouseEventsHandlerThread, &QThread::finished, mouseEventsWorker, &QObject::deleteLater);
+	mouseEventsHandlerThread.start();
 
-	connect(this, &EQInputRecorderWorker::startListening, mouseEventsWorker, &MouseEventsHandler::startListening);
+	connect(this, &EQInputRecorderWorker::startListening, mouseEventsWorker, &MouseEventsWorker::startListening);
+	connect(this, &EQInputRecorderWorker::startListening, &keyboardEventsHandler, &KeyboardEventsHandler::startListening);
 }
 
 void EQInputRecorderWorker::startRecording()
@@ -29,21 +31,60 @@ void EQInputRecorderWorker::startPlayback()
 
 void EQInputRecorderWorker::startRealRecording()
 {
-	currentRecordingTime = std::clock();
+	clock_t start{ std::clock() };
+	recordingTime = start;
 	continueListening = true;
 	emit startListening();
 	
 	while (!GetAsyncKeyState(VK_ESCAPE))
-		currentRecordingTime = std::clock();
+	{
+		recordingTime = std::clock() - start;
+	}
 	continueListening = false;
 
-	mouseEventsThread.wait();
-	allEvents.push_back(mouseEventsWorker->getMouseMoveEvents());
+	mouseEventsHandlerThread.wait();
+	mouseMoveEvents = mouseEventsWorker->getMouseMoveEvents();
+	mouseClickEvents = mouseEventsWorker->getMouseClickEvents();
+
 }
 
 void EQInputRecorderWorker::startRealPlayBack()
 {
-	qDebug("play");
+	auto mouseMoveEventsIt = mouseMoveEvents.begin();
+	auto mouseClickEventsIt = mouseClickEvents.begin();
+	auto keyboardEventsIt = keyboardEvents.begin();
+
+	long currentPlaybackTime{};
+	clock_t playbackStart{ std::clock() };
+
+	MouseMoveEvent* nextMouseMoveEvent{};
+	MouseClickEvent* nextMouseClickEvent{};
+	KeyboardEvent* nextKeyboardEvent{};
+	INPUT input{};
+
+	do
+	{
+		currentPlaybackTime = std::clock() - playbackStart;
+
+		while (mouseMoveEventsIt != mouseMoveEvents.end() && mouseMoveEventsIt->eventPlayTime <= recordingTime)
+		{
+			mouseMoveEventsIt->play();
+			++mouseMoveEventsIt;
+		}
+
+		while (mouseClickEventsIt != mouseClickEvents.end() && mouseClickEventsIt->eventPlayTime <= recordingTime)
+		{
+			mouseClickEventsIt->play(input);
+			++mouseClickEventsIt;
+		}
+		
+		while (keyboardEventsIt != keyboardEvents.end() && keyboardEventsIt->eventPlayTime <= recordingTime)
+		{
+			keyboardEventsIt->play(input);
+			++keyboardEventsIt;
+		}
+
+	} while (currentPlaybackTime < recordingTime);
 }
 
 void EQInputRecorderWorker::setupTimers(const bool recording)
@@ -73,6 +114,6 @@ void EQInputRecorderWorker::setupTimers(const bool recording)
 
 EQInputRecorderWorker::~EQInputRecorderWorker() 
 {
-	mouseEventsThread.quit();
-	mouseEventsThread.wait();
+	mouseEventsHandlerThread.quit();
+	mouseEventsHandlerThread.wait();
 }

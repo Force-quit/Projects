@@ -1,10 +1,10 @@
 #include "KeyboardEvent.h"
 
 KeyboardEvent::KeyboardEvent(long time, DWORD vkCode, DWORD dwFlags)
-	: Event(time), vkCode(vkCode), dwFlags(dwFlags)
+	: eventPlayTime(time), vkCode(vkCode), dwFlags(dwFlags)
 {}
 
-void KeyboardEvent::play(INPUT& input)
+void KeyboardEvent::play(INPUT& input) const
 {
 	input.type = INPUT_KEYBOARD;
 	input.ki.wVk = vkCode;

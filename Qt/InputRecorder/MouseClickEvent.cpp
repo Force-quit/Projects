@@ -2,15 +2,15 @@
 #include <Windows.h>
 
 MouseClickEvent::MouseClickEvent(long time, POINT& position, DWORD mouseData, DWORD dwFlags)
-	: MouseMoveEvent(time, position), mouseData(mouseData), dwFlags(dwFlags)
+	: eventPlayTime(time), eventPosition(position), mouseData(mouseData), dwFlags(dwFlags)
 {}
 
-void MouseClickEvent::play(INPUT& input)
+void MouseClickEvent::play(INPUT& input) const
 {
 	input.type = INPUT_MOUSE;
 	input.mi.dwFlags = dwFlags;
-	input.mi.dx = position.x;
-	input.mi.dy = position.y;
+	input.mi.dx = eventPosition.x;
+	input.mi.dy = eventPosition.y;
 	input.mi.mouseData = mouseData;
 	SendInput(1, &input, sizeof(INPUT));
 }

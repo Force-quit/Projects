@@ -1,12 +1,10 @@
 #pragma once
-
-#include "Event.h"
 #include <Windows.h>
 
-struct MouseMoveEvent : public Event
+struct MouseMoveEvent
 {
 	const POINT position;
+	const long eventPlayTime;
 	MouseMoveEvent(long time, POINT& position);
-
-	void play(INPUT& input) override;
+	void play() const;
 };
