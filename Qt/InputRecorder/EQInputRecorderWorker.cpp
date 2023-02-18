@@ -3,13 +3,18 @@
 #include <QString>
 #include <Windows.h>
 #include <vector>
-#include "MouseEvent.h"
+#include "MouseEventsHandler.h"
 
 EQInputRecorderWorker::EQInputRecorderWorker()
-	: start(), keyboardEvents(), keyboardPressedKeys(), keyboardKeysToRemove(),
-	mouseEvents(), mousePressedKeys(), mouseKeysToRemove()
+	: currentRecordingTime{}, continueListening{}, 
+	mouseEventsWorker{ new MouseEventsHandler(currentRecordingTime, continueListening)}, mouseEventsThread(),
+	allEvents()
 {
+	mouseEventsWorker->moveToThread(&mouseEventsThread);
+	connect(&mouseEventsThread, &QThread::finished, mouseEventsWorker, &QObject::deleteLater);
+	mouseEventsThread.start();
 
+	connect(this, &EQInputRecorderWorker::startListening, mouseEventsWorker, &MouseEventsHandler::startListening);
 }
 
 void EQInputRecorderWorker::startRecording()
@@ -24,22 +29,16 @@ void EQInputRecorderWorker::startPlayback()
 
 void EQInputRecorderWorker::startRealRecording()
 {
-	keyboardEvents.clear();
-	keyboardPressedKeys.clear();
-	keyboardKeysToRemove.clear();
-
-	mouseEvents.clear();
-	mousePressedKeys.clear();
-	mouseKeysToRemove.clear();
-
-	start = std::clock();
-
+	currentRecordingTime = std::clock();
+	continueListening = true;
+	emit startListening();
+	
 	while (!GetAsyncKeyState(VK_ESCAPE))
-	{
-		checkKeyboardEvents();
-		checkMouseEvents();
-	}
-	Event a(3);
+		currentRecordingTime = std::clock();
+	continueListening = false;
+
+	mouseEventsThread.wait();
+	allEvents.push_back(mouseEventsWorker->getMouseMoveEvents());
 }
 
 void EQInputRecorderWorker::startRealPlayBack()
@@ -72,32 +71,8 @@ void EQInputRecorderWorker::setupTimers(const bool recording)
 	});
 }
 
-void EQInputRecorderWorker::checkKeyboardEvents()
+EQInputRecorderWorker::~EQInputRecorderWorker() 
 {
-	for (uint8_t virtualKey : KEYBOARD_VK)
-	{
-		if (GetAsyncKeyState(virtualKey))
-		{
-			if (!keyboardPressedKeys.contains(virtualKey))
-			{
-				keyboardEvents.push_back(Event(std::clock() - start));
-				keyboardPressedKeys.insert(virtualKey);
-			}
-		}
-
-		for (uint8_t pressedKey : keyboardPressedKeys)
-		{
-			if (!GetAsyncKeyState(pressedKey))
-			{
-				keyboardEvents.push_back(Event(std::clock() - start));
-				keyboardKeysToRemove.push_back(pressedKey);
-			}
-		}
-
-		for (uint8_t keyToRemove : keyboardKeysToRemove)
-			keyboardPressedKeys.erase(keyToRemove);
-		keyboardKeysToRemove.clear();
-	}
+	mouseEventsThread.quit();
+	mouseEventsThread.wait();
 }
-
-EQInputRecorderWorker::~EQInputRecorderWorker() {}

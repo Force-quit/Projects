@@ -6,6 +6,8 @@
 #include "Event.h"
 #include <set>
 #include <Windows.h>
+#include "MouseEventsHandler.h"
+#include <QThread>
 
 class EQInputRecorderWorker  : public QObject
 {
@@ -23,16 +25,23 @@ signals:
 	void textChanged(const QString& newText);
 
 private:
+
+signals:
+	void startListening();
+
+private:
 	const uint8_t COUNTDOWN{ 3 };
 	void setupTimers(const bool recording);
 
 	void startRealRecording();
 	void startRealPlayBack();
 
-	std::vector<Event> keyboardEvents;	
-	std::set<uint8_t> keyboardPressedKeys;
-	std::vector<uint8_t> keyboardKeysToRemove;
-	void checkKeyboardEvents();
+	std::vector<Event> allEvents;
+
+	QThread mouseEventsThread;
+	MouseEventsHandler* mouseEventsWorker;
+	bool continueListening;
+	clock_t currentRecordingTime;
 
 	const std::vector<uint8_t> KEYBOARD_VK
 	{ 
