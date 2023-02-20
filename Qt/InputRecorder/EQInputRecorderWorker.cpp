@@ -4,19 +4,23 @@
 #include <Windows.h>
 #include <vector>
 #include "MouseEventsWorker.h"
+#include <QVector>
 
 EQInputRecorderWorker::EQInputRecorderWorker()
-	: recordingTime{}, continueListening{}, 
-	mouseEventsWorker{ new MouseEventsWorker(recordingTime, continueListening)}, mouseEventsHandlerThread(),
-	keyboardEventsHandler(this, recordingTime, continueListening),
+	: recordingTime{}, nbVectorsReceived{},
+	mouseEventsWorker{ new MouseEventsWorker(recordingTime)}, mouseEventsThread(),
+	keyboardEventsHandler(this, recordingTime),
 	mouseMoveEvents(), mouseClickEvents(), keyboardEvents()
 {
-	mouseEventsWorker->moveToThread(&mouseEventsHandlerThread);
-	connect(&mouseEventsHandlerThread, &QThread::finished, mouseEventsWorker, &QObject::deleteLater);
-	mouseEventsHandlerThread.start();
+	mouseEventsWorker->moveToThread(&mouseEventsThread);
+	connect(&mouseEventsThread, &QThread::finished, mouseEventsWorker, &QObject::deleteLater);
+	mouseEventsThread.start();
 
 	connect(this, &EQInputRecorderWorker::startListening, mouseEventsWorker, &MouseEventsWorker::startListening);
-	connect(this, &EQInputRecorderWorker::startListening, &keyboardEventsHandler, &KeyboardEventsHandler::startListening);
+	connect(mouseEventsWorker, &MouseEventsWorker::mouseMoveEventsReady, this, &EQInputRecorderWorker::setMouseMoveEvents);
+	connect(mouseEventsWorker, &MouseEventsWorker::mouseClickEventsReady, this, &EQInputRecorderWorker::setMouseClickEvents);
+
+	//connect(this, &EQInputRecorderWorker::startListening, &keyboardEventsHandler, &KeyboardEventsHandler::startListening);
 }
 
 void EQInputRecorderWorker::startRecording()
@@ -29,23 +33,37 @@ void EQInputRecorderWorker::startPlayback()
 	setupTimers(false);
 }
 
+void EQInputRecorderWorker::setMouseClickEvents(QVector<MouseClickEvent>& mouseClickEvents)
+{
+	this->mouseClickEvents = mouseClickEvents;
+	++nbVectorsReceived;
+}
+
+void EQInputRecorderWorker::setMouseMoveEvents(QVector<MouseMoveEvent>& mouseMoveEvents)
+{
+	this->mouseMoveEvents = mouseMoveEvents;
+	++nbVectorsReceived;
+}
+
+void EQInputRecorderWorker::setKeyboardEvents(QVector<KeyboardEvent>& keyboardEvents)
+{
+	this->keyboardEvents = keyboardEvents;
+	++nbVectorsReceived;
+}
+
 void EQInputRecorderWorker::startRealRecording()
 {
 	clock_t start{ std::clock() };
 	recordingTime = start;
-	continueListening = true;
 	emit startListening();
 	
 	while (!GetAsyncKeyState(VK_ESCAPE))
 	{
 		recordingTime = std::clock() - start;
 	}
-	continueListening = false;
 
-	mouseEventsHandlerThread.wait();
-	mouseMoveEvents = mouseEventsWorker->getMouseMoveEvents();
-	mouseClickEvents = mouseEventsWorker->getMouseClickEvents();
-
+	mouseEventsThread.requestInterruption();
+	keyboardEventsHandler.requestInterruption();
 }
 
 void EQInputRecorderWorker::startRealPlayBack()
@@ -66,25 +84,26 @@ void EQInputRecorderWorker::startRealPlayBack()
 	{
 		currentPlaybackTime = std::clock() - playbackStart;
 
-		while (mouseMoveEventsIt != mouseMoveEvents.end() && mouseMoveEventsIt->eventPlayTime <= recordingTime)
+		while (mouseMoveEventsIt != mouseMoveEvents.end() && mouseMoveEventsIt->getPlayTime() <= recordingTime)
 		{
 			mouseMoveEventsIt->play();
 			++mouseMoveEventsIt;
 		}
 
-		while (mouseClickEventsIt != mouseClickEvents.end() && mouseClickEventsIt->eventPlayTime <= recordingTime)
+		while (mouseClickEventsIt != mouseClickEvents.end() && mouseClickEventsIt->getPlayTime() <= recordingTime)
 		{
 			mouseClickEventsIt->play(input);
 			++mouseClickEventsIt;
 		}
 		
-		while (keyboardEventsIt != keyboardEvents.end() && keyboardEventsIt->eventPlayTime <= recordingTime)
+		while (keyboardEventsIt != keyboardEvents.end() && keyboardEventsIt->getPlayTime() <= recordingTime)
 		{
 			keyboardEventsIt->play(input);
 			++keyboardEventsIt;
 		}
 
 	} while (currentPlaybackTime < recordingTime);
+	emit textChanged("Finished playback");
 }
 
 void EQInputRecorderWorker::setupTimers(const bool recording)
@@ -114,6 +133,6 @@ void EQInputRecorderWorker::setupTimers(const bool recording)
 
 EQInputRecorderWorker::~EQInputRecorderWorker() 
 {
-	mouseEventsHandlerThread.quit();
-	mouseEventsHandlerThread.wait();
+	mouseEventsThread.quit();
+	mouseEventsThread.wait();
 }

@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QString>
 #include <vector>
+#include <QVector>
 #include <set>
 #include <Windows.h>
 #include <QThread>
@@ -27,31 +28,33 @@ public slots:
 	void startRecording();
 	void startPlayback();
 
+
 signals:
 	void textChanged(const QString& newText);
 
-private:
+private slots:
+	void setMouseClickEvents(QVector<MouseClickEvent>& mouseClickEvents);
+	void setMouseMoveEvents(QVector<MouseMoveEvent>& mouseMoveEvents);
+	void setKeyboardEvents(QVector<KeyboardEvent>& keyboardEvents);
 
 signals:
 	void startListening();
 
 private:
-	const uint8_t COUNTDOWN{ 3 };
+	const uint8_t COUNTDOWN{ 1 };
 	void setupTimers(const bool recording);
 
 	void startRealRecording();
 	void startRealPlayBack();
 
-	std::vector<MouseClickEvent> mouseClickEvents;
-	std::vector<MouseMoveEvent> mouseMoveEvents;
-	std::vector<KeyboardEvent> keyboardEvents;
+	uint8_t nbVectorsReceived;
+	QVector<MouseClickEvent> mouseClickEvents;
+	QVector<MouseMoveEvent> mouseMoveEvents;
+	QVector<KeyboardEvent> keyboardEvents;
 
-
-	QThread mouseEventsHandlerThread;
+	QThread mouseEventsThread;
 	MouseEventsWorker* mouseEventsWorker;
-
 	KeyboardEventsHandler keyboardEventsHandler;
 
-	bool continueListening;
 	clock_t recordingTime;
 };

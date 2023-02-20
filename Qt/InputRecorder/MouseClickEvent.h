@@ -1,11 +1,16 @@
 #pragma once
 #include <Windows.h>
 
-struct MouseClickEvent
+class MouseClickEvent
 {
-	const POINT eventPosition;
-	const DWORD mouseData, dwFlags;
-	const long eventPlayTime;
+public:
 	MouseClickEvent(long time, POINT& position, DWORD mouseData, DWORD dwFlags);
 	void play(INPUT& input) const;
+	MouseClickEvent& operator=(const MouseClickEvent& other);
+	long getPlayTime() const;
+
+private:
+	POINT eventPosition;
+	DWORD mouseData, dwFlags;
+	long eventPlayTime;
 };

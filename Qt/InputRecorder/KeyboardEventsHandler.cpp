@@ -4,8 +4,7 @@
 #include <algorithm>
 #include <random>
 
-KeyboardEventsHandler::KeyboardEventsHandler(QObject* parent, clock_t& currentRecTime, bool& continueListening)
-	: QObject(parent), KEYBOARD_VK{
+std::vector<uint8_t> KeyboardEventsHandler::KEYBOARD_VK {
 		VK_BACK,
 		VK_TAB,
 		VK_CLEAR,
@@ -109,14 +108,24 @@ KeyboardEventsHandler::KeyboardEventsHandler(QObject* parent, clock_t& currentRe
 		VK_F9,
 		VK_F10,
 		VK_F11,
-		VK_F12 }, workersThreads(), workers()
-{
-	auto rng = std::default_random_engine{};
-	std::shuffle(std::begin(KEYBOARD_VK), std::end(KEYBOARD_VK), rng);
+		VK_F12 
+};
 
-	for (uint8_t i{}; i < NB_THREADS; ++i)
+KeyboardEventsHandler::KeyboardEventsHandler(QObject* parent, clock_t& currentRecTime)
+	: QObject(parent), workersThreads(), workers()
+{
+	/*std::shuffle(std::begin(KEYBOARD_VK), std::end(KEYBOARD_VK), std::default_random_engine{});
+
+	const uint8_t nbThread{ static_cast<uint8_t>(std::ceil(KEYBOARD_VK.size() / KEYS_PER_THREAD)) };
+
+	uint8_t currentVkIndex{};
+	for (uint8_t i{}; i < nbThread; ++i)
 	{
-		workers.push_back( new KeyboardEventsWorker(currentRecTime, continueListening));
+		std::vector<uint8_t> keys;
+		for (uint8_t j{}; j < KEYS_PER_THREAD && currentVkIndex != KEYBOARD_VK.size(); ++j)
+			keys.push_back(KEYBOARD_VK[currentVkIndex++]);
+
+		workers.push_back( new KeyboardEventsWorker(currentRecTime, keys));
 		workersThreads.push_back( new QThread());
 
 		KeyboardEventsWorker* lastWorker{ workers.back() };
@@ -127,12 +136,32 @@ KeyboardEventsHandler::KeyboardEventsHandler(QObject* parent, clock_t& currentRe
 
 		connect(this, &KeyboardEventsHandler::listen, lastWorker, &KeyboardEventsWorker::startListening);
 		connect(lastThread, &QThread::finished, lastWorker, &QObject::deleteLater);
-	}
+	}*/
 }
 
 void KeyboardEventsHandler::startListening()
 {
 	emit listen();
+}
+
+std::vector<KeyboardEvent> KeyboardEventsHandler::getKeyboardEvents() const
+{
+	std::vector<KeyboardEvent> events;
+	for (uint8_t i = 0; i < workersThreads.size(); ++i)
+	{
+		workersThreads[i]->wait();
+		KeyboardEventsWorker* keyboardWorker{ workers[i] };
+		std::vector<KeyboardEvent> workersEvents{ keyboardWorker->getKeyboardEvents() };
+		events.insert(std::begin(events), std::begin(workersEvents), std::end(workersEvents));
+	}
+	
+	return events;
+}
+
+void KeyboardEventsHandler::requestInterruption()
+{
+	for (QThread* i : workersThreads)
+		i->requestInterruption();
 }
 
 KeyboardEventsHandler::~KeyboardEventsHandler()
@@ -144,9 +173,4 @@ KeyboardEventsHandler::~KeyboardEventsHandler()
 		currentThread->wait();
 		delete currentThread;
 	}
-}
-
-std::vector<KeyboardEvent> KeyboardEventsHandler::getKeyboardEvents() const
-{
-	return std::vector<KeyboardEvent>();
 }

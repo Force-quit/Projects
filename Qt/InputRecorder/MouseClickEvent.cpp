@@ -14,3 +14,17 @@ void MouseClickEvent::play(INPUT& input) const
 	input.mi.mouseData = mouseData;
 	SendInput(1, &input, sizeof(INPUT));
 }
+
+MouseClickEvent& MouseClickEvent::operator=(const MouseClickEvent& other)
+{
+	eventPlayTime = other.eventPlayTime;
+	eventPosition = other.eventPosition;
+	mouseData = other.mouseData;
+	dwFlags = other.dwFlags;
+	return *this;
+}
+
+long MouseClickEvent::getPlayTime() const
+{
+	return eventPlayTime;
+}

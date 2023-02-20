@@ -1,10 +1,15 @@
 #pragma once
 #include <Windows.h>
 
-struct KeyboardEvent
+class KeyboardEvent
 {
-	const DWORD vkCode, dwFlags;
-	const long eventPlayTime;
+public:
 	KeyboardEvent(long time, DWORD vkCode, DWORD dwFlags);
+	bool operator<(const KeyboardEvent& other) const;
+	KeyboardEvent& operator=(const KeyboardEvent& other);
 	void play(INPUT& input) const;
+	long getPlayTime() const;
+private:
+	DWORD vkCode, dwFlags;
+	long eventPlayTime;
 };

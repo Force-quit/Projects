@@ -3,12 +3,13 @@
 #include <Windows.h>
 #include <ctime>
 #include <vector>
+#include <QThread>
 
 #include "MouseMoveEvent.h"
 #include "MouseClickEvent.h"
 
-MouseEventsWorker::MouseEventsWorker(clock_t& currentRecTime, bool& continueListening)
-	: currentRecTime{ currentRecTime }, continueListening{ continueListening },
+MouseEventsWorker::MouseEventsWorker(clock_t& currentRecTime)
+	: currentRecTime{ currentRecTime },
 	mouseClickEvents(), mousePressedKeys(), mouseKeysToRemove(),
 	mouseMoveEvents(),
 	MOUSE_CLICK_VK{ VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_XBUTTON1, VK_XBUTTON2 }
@@ -22,7 +23,7 @@ void MouseEventsWorker::startListening()
 	GetCursorPos(&initalMousePos);
 	mouseMoveEvents.push_back(MouseMoveEvent(currentRecTime, initalMousePos));
 
-	while (continueListening)
+	while (!QThread::currentThread()->isInterruptionRequested())
 	{
 		checkMouseClickEvents();
 		checkMouseMoveEvents();
@@ -30,31 +31,24 @@ void MouseEventsWorker::startListening()
 
 	if (mouseMoveEvents.size() == 1)
 		mouseMoveEvents.clear();
-}
-
-std::vector<MouseClickEvent> MouseEventsWorker::getMouseClickEvents() const
-{
-	return mouseClickEvents;
-}
-
-std::vector<MouseMoveEvent> MouseEventsWorker::getMouseMoveEvents() const
-{
-	return mouseMoveEvents;
+	
+	emit mouseMoveEventsReady(mouseMoveEvents);
+	emit mouseClickEventsReady(mouseClickEvents);
 }
 
 void MouseEventsWorker::checkMouseClickEvents()
 {
-	/*for (auto virtualKey : MOUSE_CLICK_VK)
+	/*for (uint8_t targetKey : MOUSE_CLICK_VK)
 	{
-		if (GetAsyncKeyState(virtualKey))
+		if (GetAsyncKeyState(targetKey))
 		{
-			if (!mousePressedKeys.contains(virtualKey))
+			if (!mousePressedKeys.contains(targetKey))
 			{
 				POINT position;
 				DWORD mouseData{}, dwFlags{};
 				GetCursorPos(&position);
-				mouseClickEvents.push_back(MouseClickEvent(std::clock() - start, position, mouseData, dwFlags));
-				mousePressedKeys.insert(virtualKey);
+				mouseClickEvents.push_back(MouseClickEvent(currentRecTime, position, mouseData, dwFlags));
+				mousePressedKeys.insert(targetKey);
 			}
 		}
 
@@ -62,7 +56,10 @@ void MouseEventsWorker::checkMouseClickEvents()
 		{
 			if (!GetAsyncKeyState(pressedKey))
 			{
-				mouseClickEvents.push_back(Event(std::clock() - start));
+				POINT position;
+				DWORD mouseData{}, dwFlags{};
+				GetCursorPos(&position);
+				mouseClickEvents.push_back(MouseClickEvent(std::clock() - start));
 				mouseKeysToRemove.push_back(pressedKey);
 			}
 		}
@@ -70,8 +67,7 @@ void MouseEventsWorker::checkMouseClickEvents()
 		for (uint8_t keyToRemove : mouseKeysToRemove)
 			mousePressedKeys.erase(keyToRemove);
 		mouseKeysToRemove.clear();
-	}
-	*/
+	}*/
 }
 
 void MouseEventsWorker::checkMouseMoveEvents()

@@ -4,14 +4,15 @@
 #include <ctime>
 #include <forward_list>
 #include "KeyboardEvent.h"
-
+#include <vector>
+#include <set>
 
 class KeyboardEventsWorker  : public QObject
 {
 	Q_OBJECT
 
 public:
-	KeyboardEventsWorker(clock_t& currentRecTime, bool& continueListening);
+	KeyboardEventsWorker(clock_t& currentRecTime, std::vector<uint8_t> keys);
 	~KeyboardEventsWorker();
 
 	std::vector<KeyboardEvent> getKeyboardEvents() const;
@@ -21,8 +22,9 @@ public slots:
 
 private:
 	const clock_t& currentRecTime;
-	const bool& continueListening;
+	const std::vector<uint8_t> targetKeys;
 
+	std::set<uint8_t> pressedKeys;
+	std::vector<uint8_t> keysToRemove;
 	std::forward_list<KeyboardEvent> keyboardEvents;
-
 };
