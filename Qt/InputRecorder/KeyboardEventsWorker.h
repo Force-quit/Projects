@@ -16,12 +16,14 @@ public:
 	~KeyboardEventsWorker();
 
 	std::vector<KeyboardEvent> getKeyboardEvents() const;
+	void stopListening();
 
 public slots:
 	void startListening();
 
 private:
 	const clock_t& currentRecTime;
+	bool continueListening;
 	const std::vector<uint8_t> targetKeys;
 
 	std::set<uint8_t> pressedKeys;

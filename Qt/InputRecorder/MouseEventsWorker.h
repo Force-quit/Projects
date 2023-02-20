@@ -14,6 +14,7 @@ class MouseEventsWorker : public QObject
 
 public:
 	MouseEventsWorker(clock_t& currentRecTime);
+	void stopListening();
 
 public slots:
 	void startListening();
@@ -24,6 +25,7 @@ signals:
 
 private:
 	const clock_t& currentRecTime;
+	bool continueListening;
 
 	QVector<MouseClickEvent> mouseClickEvents;
 	std::set<uint8_t> mousePressedKeys;

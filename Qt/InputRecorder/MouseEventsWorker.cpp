@@ -9,7 +9,7 @@
 #include "MouseClickEvent.h"
 
 MouseEventsWorker::MouseEventsWorker(clock_t& currentRecTime)
-	: currentRecTime{ currentRecTime },
+	: currentRecTime{ currentRecTime }, continueListening{},
 	mouseClickEvents(), mousePressedKeys(), mouseKeysToRemove(),
 	mouseMoveEvents(),
 	MOUSE_CLICK_VK{ VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_XBUTTON1, VK_XBUTTON2 }
@@ -17,13 +17,19 @@ MouseEventsWorker::MouseEventsWorker(clock_t& currentRecTime)
 
 }
 
+void MouseEventsWorker::stopListening()
+{
+	continueListening = false;
+}
+
 void MouseEventsWorker::startListening()
 {
 	POINT initalMousePos{};
 	GetCursorPos(&initalMousePos);
 	mouseMoveEvents.push_back(MouseMoveEvent(currentRecTime, initalMousePos));
+	continueListening = true;
 
-	while (!QThread::currentThread()->isInterruptionRequested())
+	while (continueListening)
 	{
 		checkMouseClickEvents();
 		checkMouseMoveEvents();

@@ -4,12 +4,13 @@
 #include <QThread>
 
 KeyboardEventsWorker::KeyboardEventsWorker(clock_t& currentRecTime, std::vector<uint8_t> keys)
-	: currentRecTime(currentRecTime), targetKeys(keys),	pressedKeys(), keysToRemove()
+	: currentRecTime(currentRecTime), targetKeys(keys),	pressedKeys(), keysToRemove(), continueListening{}
 {}
 
 void KeyboardEventsWorker::startListening()
 {
-	while (!QThread::currentThread()->isInterruptionRequested())
+	continueListening = true;
+	while (continueListening)
 	{
 		for (auto currentKey : targetKeys)
 		{
@@ -48,4 +49,9 @@ std::vector<KeyboardEvent> KeyboardEventsWorker::getKeyboardEvents() const
 	for (auto& i : keyboardEvents)
 		events.push_back(i);
 	return events;
+}
+
+void KeyboardEventsWorker::stopListening()
+{
+	continueListening = false;
 }

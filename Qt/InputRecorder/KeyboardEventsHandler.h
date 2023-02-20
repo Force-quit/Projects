@@ -16,7 +16,7 @@ public:
 	KeyboardEventsHandler(QObject* parent, clock_t& currentRecTime);
 	~KeyboardEventsHandler();
 	std::vector<KeyboardEvent> getKeyboardEvents() const;
-	void requestInterruption();
+	void stopListening();
 
 public slots:
 	void startListening();

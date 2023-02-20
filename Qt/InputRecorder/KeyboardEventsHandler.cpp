@@ -158,10 +158,10 @@ std::vector<KeyboardEvent> KeyboardEventsHandler::getKeyboardEvents() const
 	return events;
 }
 
-void KeyboardEventsHandler::requestInterruption()
+void KeyboardEventsHandler::stopListening()
 {
-	for (QThread* i : workersThreads)
-		i->requestInterruption();
+	for (KeyboardEventsWorker* i : workers)
+		i->stopListening();
 }
 
 KeyboardEventsHandler::~KeyboardEventsHandler()

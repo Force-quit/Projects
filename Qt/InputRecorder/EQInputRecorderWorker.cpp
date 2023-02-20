@@ -62,8 +62,8 @@ void EQInputRecorderWorker::startRealRecording()
 		recordingTime = std::clock() - start;
 	}
 
-	mouseEventsThread.requestInterruption();
-	keyboardEventsHandler.requestInterruption();
+	mouseEventsWorker.stopListening();
+	keyboardEventsHandler.stopListening();
 }
 
 void EQInputRecorderWorker::startRealPlayBack()
