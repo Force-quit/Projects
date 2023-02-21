@@ -3,9 +3,10 @@
 #include "EQKeyboardEvent.h"
 #include <QThread>
 #include <QVector>
+#include <forward_list>
 
 KeyboardEventsWorker::KeyboardEventsWorker(clock_t& currentRecTime, QVector<uint8_t> keys)
-	: currentRecTime(currentRecTime), targetKeys(keys), pressedKeys(), keysToRemove(), continueListening{},
+	: currentRecTime(currentRecTime), targetKeys(keys), pressedKeys(), keysToRemove(), continueListening{}, keyboardEvents(),
 	readyToShare{}
 {}
 
@@ -15,13 +16,13 @@ void KeyboardEventsWorker::startListening()
 	
 	while (continueListening)
 	{
-		/*for (uint8_t currentKey : targetKeys)
+		for (uint8_t currentKey : targetKeys)
 		{
 			if (GetAsyncKeyState(currentKey))
 			{
 				if (!pressedKeys.contains(currentKey))
 				{
-					keyboardEvents.push_front(KeyboardEvent(currentRecTime, currentKey, 0));
+					keyboardEvents.push_front(EQKeyboardEvent(currentRecTime, currentKey, 0));
 					pressedKeys.insert(currentKey);
 				}
 			}
@@ -30,16 +31,17 @@ void KeyboardEventsWorker::startListening()
 			{
 				if (!GetAsyncKeyState(pressedKey))
 				{
-					keyboardEvents.push_front(KeyboardEvent(currentRecTime, currentKey, KEYEVENTF_KEYUP));
+					keyboardEvents.push_front(EQKeyboardEvent(currentRecTime, pressedKey, KEYEVENTF_KEYUP));
 					keysToRemove.push_back(pressedKey);
 				}
 			}
 
 			for (uint8_t keyToRemove : keysToRemove)
-				pressedKeys.erase(keyToRemove);
+				pressedKeys.remove(keyToRemove);
 			keysToRemove.clear();
-		}*/
+		}
 
+		QThread::msleep(1);
 	}
 
 	readyToShare = true;

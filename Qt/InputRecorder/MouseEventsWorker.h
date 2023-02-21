@@ -4,6 +4,7 @@
 #include <QVector>
 #include <QSet>
 #include <QHash>
+#include <forward_list>
 
 #include "EQMouseClickEvent.h"
 #include "EQMouseMoveEvent.h"
@@ -34,12 +35,12 @@ private:
 	POINT lastMousePos;
 	POINT tempMousePos; 
 
-	QVector<EQMouseClickEvent> mouseClickEvents;
+	std::forward_list<EQMouseClickEvent> mouseClickEvents;
 	QSet<uint8_t> mousePressedKeys;
 	QVector<uint8_t> mouseKeysToRemove;
 	void checkMouseClickEvents();
 
-	QVector<EQMouseMoveEvent> mouseMoveEvents;
+	std::forward_list<EQMouseMoveEvent> mouseMoveEvents;
 	void checkMouseMoveEvents();
 
 	void reset();

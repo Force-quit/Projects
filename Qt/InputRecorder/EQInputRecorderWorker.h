@@ -32,6 +32,7 @@ public slots:
 signals:
 	void textChanged(const QString& newText);
 	void finishedRecording();
+	void finishedPlayback();
 
 private slots:
 
@@ -45,16 +46,16 @@ private:
 	void startRealRecording();
 	void startRealPlayBack();
 
-	uint8_t nbVectorsReceived;
+	bool userStopPlayback() const;
+
 
 	QVector<EQMouseClickEvent> mouseClickEvents;
 	QVector<EQMouseMoveEvent> mouseMoveEvents;
 	QVector<EQKeyboardEvent> keyboardEvents;
+	clock_t recordingTime;
 
 	QThread mouseEventsThread;
 	MouseEventsWorker* mouseEventsWorker;
-
 	KeyboardEventsHandler keyboardEventsHandler;
 
-	clock_t recordingTime;
 };

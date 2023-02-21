@@ -16,6 +16,7 @@ public:
 	bool operator<(const EQKeyboardEvent& other) const;
 
 	void play(INPUT& input) const;
+	DWORD getVkCode() const;
 
 private:
 	DWORD vkCode;

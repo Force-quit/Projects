@@ -14,6 +14,11 @@ void EQKeyboardEvent::play(INPUT & input) const
 	SendInput(1, &input, sizeof(INPUT));
 }
 
+DWORD EQKeyboardEvent::getVkCode() const
+{
+	return vkCode;
+}
+
 EQKeyboardEvent::~EQKeyboardEvent()
 {}
 

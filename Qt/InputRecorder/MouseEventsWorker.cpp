@@ -41,7 +41,11 @@ void MouseEventsWorker::startListening()
 	{
 		checkMouseClickEvents();
 		checkMouseMoveEvents();
+		QThread::msleep(1);
 	}
+
+	mouseClickEvents.reverse();
+	mouseMoveEvents.reverse();
 
 	readyToShare = true;
 }
@@ -58,12 +62,18 @@ bool MouseEventsWorker::isReadyToShare() const
 
 QVector<EQMouseClickEvent> MouseEventsWorker::getMouseClickEvents() const
 {
-	return mouseClickEvents;
+	QVector<EQMouseClickEvent> events;
+	for (EQMouseClickEvent i : mouseClickEvents)
+		events.push_back(i);
+	return events;
 }
 
 QVector<EQMouseMoveEvent> MouseEventsWorker::getMouseMoveEvents() const
 {
-	return mouseMoveEvents;
+	QVector<EQMouseMoveEvent> events;
+	for (EQMouseMoveEvent i : mouseMoveEvents)
+		events.push_back(i);
+	return events;
 }
 
 void MouseEventsWorker::checkMouseClickEvents()
@@ -74,10 +84,7 @@ void MouseEventsWorker::checkMouseClickEvents()
 		{
 			if (!mousePressedKeys.contains(targetKey))
 			{
-				auto f = keyDownFlags[targetKey];
-
-				GetCursorPos(&tempMousePos);
-				mouseClickEvents.push_back(EQMouseClickEvent(currentRecTime, tempMousePos, mouseData[targetKey], keyDownFlags[targetKey]));
+				mouseClickEvents.push_front(EQMouseClickEvent(currentRecTime, lastMousePos, mouseData[targetKey], keyDownFlags[targetKey]));
 				mousePressedKeys.insert(targetKey);
 			}
 		}
@@ -86,8 +93,7 @@ void MouseEventsWorker::checkMouseClickEvents()
 		{
 			if (!GetAsyncKeyState(pressedKey))
 			{
-				GetCursorPos(&tempMousePos);
-				mouseClickEvents.push_back(EQMouseClickEvent(currentRecTime, tempMousePos, mouseData[pressedKey], keyUpFlags[pressedKey]));
+				mouseClickEvents.push_front(EQMouseClickEvent(currentRecTime, lastMousePos, mouseData[pressedKey], keyUpFlags[pressedKey]));
 				mouseKeysToRemove.push_back(pressedKey);
 			}
 		}
@@ -104,7 +110,7 @@ void MouseEventsWorker::checkMouseMoveEvents()
 	if (tempMousePos.x != lastMousePos.x || tempMousePos.y != lastMousePos.y)
 	{
 		lastMousePos = tempMousePos;
-		mouseMoveEvents.push_back(EQMouseMoveEvent(currentRecTime, lastMousePos));
+		mouseMoveEvents.push_front(EQMouseMoveEvent(currentRecTime, lastMousePos));
 	}
 }
 
@@ -115,6 +121,7 @@ void MouseEventsWorker::reset()
 	readyToShare = false;
 	mouseClickEvents.clear();
 	mousePressedKeys.clear();
+	mouseMoveEvents.clear();
 
 	for (uint8_t targetKey : MOUSE_CLICK_VK)
 		GetAsyncKeyState(targetKey);

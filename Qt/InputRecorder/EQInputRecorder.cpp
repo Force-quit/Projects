@@ -14,6 +14,7 @@ EQInputRecorder::EQInputRecorder(QWidget *parent)
 	worker->moveToThread(&workerThread);
 	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
 	connect(worker, &EQInputRecorderWorker::finishedRecording, this, &EQInputRecorder::bringWindowInFront);
+	connect(worker, &EQInputRecorderWorker::finishedPlayback, this, &EQInputRecorder::bringWindowInFront);
 	workerThread.start();
 
 

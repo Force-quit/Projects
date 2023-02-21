@@ -6,7 +6,7 @@
 #include <QVector>
 
 EQInputRecorderWorker::EQInputRecorderWorker()
-	: recordingTime{}, nbVectorsReceived{},
+	: recordingTime{},
 	mouseEventsWorker{ new MouseEventsWorker(recordingTime)}, mouseEventsThread(),
 	keyboardEventsHandler(this, recordingTime),
 	mouseMoveEvents(), mouseClickEvents(), keyboardEvents()
@@ -21,6 +21,7 @@ EQInputRecorderWorker::EQInputRecorderWorker()
 
 void EQInputRecorderWorker::startRecording()
 {
+
 	setupTimers(true);
 }
 
@@ -31,14 +32,15 @@ void EQInputRecorderWorker::startPlayback()
 
 void EQInputRecorderWorker::startRealRecording()
 {
-	mouseEventsThread.start();
 	clock_t start{ std::clock() };
 	recordingTime = start;
+	emit textChanged("Recording started");
 	emit startListening();
-	
+
 	while (!GetAsyncKeyState(VK_ESCAPE))
 	{
 		recordingTime = std::clock() - start;
+		QThread::msleep(1);
 	}
 
 	mouseEventsWorker->stopListening();
@@ -51,6 +53,9 @@ void EQInputRecorderWorker::startRealRecording()
 	mouseClickEvents = mouseEventsWorker->getMouseClickEvents();
 
 	keyboardEvents = keyboardEventsHandler.getKeyboardEvents();
+
+	if (keyboardEvents.back().getVkCode() == VK_ESCAPE)
+		keyboardEvents.removeLast();
 
 	emit textChanged("Finished recording");
 	emit finishedRecording();
@@ -69,6 +74,8 @@ void EQInputRecorderWorker::startRealPlayBack()
 	EQMouseClickEvent* nextMouseClickEvent{};
 	EQKeyboardEvent* nextKeyboardEvent{};
 	INPUT input{};
+
+	emit textChanged("Playback started");
 
 	do
 	{
@@ -92,8 +99,17 @@ void EQInputRecorderWorker::startRealPlayBack()
 			++keyboardEventsIt;
 		}
 
-	} while (currentPlaybackTime < recordingTime);
+		QThread::msleep(1);
+
+	} while (currentPlaybackTime < recordingTime && !userStopPlayback());
+	
 	emit textChanged("Finished playback");
+	emit finishedPlayback();
+}
+
+bool EQInputRecorderWorker::userStopPlayback() const
+{
+	return GetAsyncKeyState(VK_ESCAPE);
 }
 
 void EQInputRecorderWorker::setupTimers(const bool recording)
@@ -113,7 +129,6 @@ void EQInputRecorderWorker::setupTimers(const bool recording)
 	}
 
 	QTimer::singleShot(COUNTDOWN * 1000, [=]() {
-		emit textChanged(textToShow + " started");
 		if (recording)
 			startRealRecording();
 		else
@@ -123,6 +138,9 @@ void EQInputRecorderWorker::setupTimers(const bool recording)
 
 EQInputRecorderWorker::~EQInputRecorderWorker() 
 {
+	//mouseEventsWorker->stopListening();
+	// TODO
+	//keyboardEvents.stopListening();
 	mouseEventsThread.quit();
 	mouseEventsThread.wait();
 }
