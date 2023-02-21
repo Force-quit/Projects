@@ -14,6 +14,9 @@ public:
 	EQInputRecorder(QWidget *parent = nullptr);
 	~EQInputRecorder();
 
+private slots:
+	void bringWindowInFront();
+
 private:
 	QGroupBox* initOutputGroupBox();
 	QGroupBox* initRecordingGroupBox();

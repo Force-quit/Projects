@@ -1,18 +1,21 @@
 #include "KeyboardEventsWorker.h"
 #include <Windows.h>
-#include "KeyboardEvent.h"
+#include "EQKeyboardEvent.h"
 #include <QThread>
+#include <QVector>
 
-KeyboardEventsWorker::KeyboardEventsWorker(clock_t& currentRecTime, std::vector<uint8_t> keys)
-	: currentRecTime(currentRecTime), targetKeys(keys),	pressedKeys(), keysToRemove(), continueListening{}
+KeyboardEventsWorker::KeyboardEventsWorker(clock_t& currentRecTime, QVector<uint8_t> keys)
+	: currentRecTime(currentRecTime), targetKeys(keys), pressedKeys(), keysToRemove(), continueListening{},
+	readyToShare{}
 {}
 
 void KeyboardEventsWorker::startListening()
 {
-	continueListening = true;
+	reset();
+	
 	while (continueListening)
 	{
-		for (auto currentKey : targetKeys)
+		/*for (uint8_t currentKey : targetKeys)
 		{
 			if (GetAsyncKeyState(currentKey))
 			{
@@ -35,20 +38,35 @@ void KeyboardEventsWorker::startListening()
 			for (uint8_t keyToRemove : keysToRemove)
 				pressedKeys.erase(keyToRemove);
 			keysToRemove.clear();
-		}
+		}*/
 
 	}
+
+	readyToShare = true;
 }
 
 KeyboardEventsWorker::~KeyboardEventsWorker()
 {}
 
-std::vector<KeyboardEvent> KeyboardEventsWorker::getKeyboardEvents() const
+QVector<EQKeyboardEvent> KeyboardEventsWorker::getKeyboardEvents() const
 {
-	std::vector<KeyboardEvent> events;
+	QVector<EQKeyboardEvent> events;
 	for (auto& i : keyboardEvents)
 		events.push_back(i);
 	return events;
+}
+
+bool KeyboardEventsWorker::isReadyToShare() const
+{
+	return readyToShare;
+}
+
+void KeyboardEventsWorker::reset()
+{
+	pressedKeys.clear();
+	keyboardEvents.clear();
+	readyToShare = false;
+	continueListening = true;
 }
 
 void KeyboardEventsWorker::stopListening()

@@ -1,33 +1,41 @@
 #include "MouseEventsWorker.h"
 
 #include <Windows.h>
-#include <ctime>
-#include <vector>
+#include <QVector>
 #include <QThread>
 
-#include "MouseMoveEvent.h"
-#include "MouseClickEvent.h"
+#include "EQMouseMoveEvent.h"
+#include "EQMouseClickEvent.h"
 
 MouseEventsWorker::MouseEventsWorker(clock_t& currentRecTime)
-	: currentRecTime{ currentRecTime }, continueListening{},
-	mouseClickEvents(), mousePressedKeys(), mouseKeysToRemove(),
-	mouseMoveEvents(),
-	MOUSE_CLICK_VK{ VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_XBUTTON1, VK_XBUTTON2 }
+	: currentRecTime{ currentRecTime }, continueListening{}, readyToShare{}, lastMousePos{}, tempMousePos{},
+	mouseClickEvents(), mousePressedKeys(), mouseKeysToRemove(), mouseMoveEvents(),
+	MOUSE_CLICK_VK{ VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_XBUTTON1, VK_XBUTTON2 },
+	keyUpFlags{
+		{VK_LBUTTON, MOUSEEVENTF_LEFTUP},
+		{VK_RBUTTON, MOUSEEVENTF_RIGHTUP},
+		{VK_MBUTTON, MOUSEEVENTF_MIDDLEUP},
+		{VK_XBUTTON1, MOUSEEVENTF_XUP},
+		{VK_XBUTTON2, MOUSEEVENTF_XUP}
+	},
+	keyDownFlags{
+		{VK_LBUTTON, MOUSEEVENTF_LEFTDOWN},
+		{VK_RBUTTON, MOUSEEVENTF_RIGHTDOWN},
+		{VK_MBUTTON, MOUSEEVENTF_MIDDLEDOWN},
+		{VK_XBUTTON1, MOUSEEVENTF_XDOWN},
+		{VK_XBUTTON2, MOUSEEVENTF_XDOWN}
+	},
+	mouseData{
+		{VK_XBUTTON1, XBUTTON1},
+		{VK_XBUTTON2, XBUTTON2}
+	}
 {
 
-}
-
-void MouseEventsWorker::stopListening()
-{
-	continueListening = false;
 }
 
 void MouseEventsWorker::startListening()
 {
-	POINT initalMousePos{};
-	GetCursorPos(&initalMousePos);
-	mouseMoveEvents.push_back(MouseMoveEvent(currentRecTime, initalMousePos));
-	continueListening = true;
+	reset();
 
 	while (continueListening)
 	{
@@ -35,25 +43,41 @@ void MouseEventsWorker::startListening()
 		checkMouseMoveEvents();
 	}
 
-	if (mouseMoveEvents.size() == 1)
-		mouseMoveEvents.clear();
-	
-	emit mouseMoveEventsReady(mouseMoveEvents);
-	emit mouseClickEventsReady(mouseClickEvents);
+	readyToShare = true;
+}
+
+void MouseEventsWorker::stopListening()
+{
+	continueListening = false;
+}
+
+bool MouseEventsWorker::isReadyToShare() const
+{
+	return readyToShare;
+}
+
+QVector<EQMouseClickEvent> MouseEventsWorker::getMouseClickEvents() const
+{
+	return mouseClickEvents;
+}
+
+QVector<EQMouseMoveEvent> MouseEventsWorker::getMouseMoveEvents() const
+{
+	return mouseMoveEvents;
 }
 
 void MouseEventsWorker::checkMouseClickEvents()
 {
-	/*for (uint8_t targetKey : MOUSE_CLICK_VK)
+	for (uint8_t targetKey : MOUSE_CLICK_VK)
 	{
 		if (GetAsyncKeyState(targetKey))
 		{
 			if (!mousePressedKeys.contains(targetKey))
 			{
-				POINT position;
-				DWORD mouseData{}, dwFlags{};
-				GetCursorPos(&position);
-				mouseClickEvents.push_back(MouseClickEvent(currentRecTime, position, mouseData, dwFlags));
+				auto f = keyDownFlags[targetKey];
+
+				GetCursorPos(&tempMousePos);
+				mouseClickEvents.push_back(EQMouseClickEvent(currentRecTime, tempMousePos, mouseData[targetKey], keyDownFlags[targetKey]));
 				mousePressedKeys.insert(targetKey);
 			}
 		}
@@ -62,25 +86,36 @@ void MouseEventsWorker::checkMouseClickEvents()
 		{
 			if (!GetAsyncKeyState(pressedKey))
 			{
-				POINT position;
-				DWORD mouseData{}, dwFlags{};
-				GetCursorPos(&position);
-				mouseClickEvents.push_back(MouseClickEvent(std::clock() - start));
+				GetCursorPos(&tempMousePos);
+				mouseClickEvents.push_back(EQMouseClickEvent(currentRecTime, tempMousePos, mouseData[pressedKey], keyUpFlags[pressedKey]));
 				mouseKeysToRemove.push_back(pressedKey);
 			}
 		}
 
 		for (uint8_t keyToRemove : mouseKeysToRemove)
-			mousePressedKeys.erase(keyToRemove);
+			mousePressedKeys.remove(keyToRemove);
 		mouseKeysToRemove.clear();
-	}*/
+	}
 }
 
 void MouseEventsWorker::checkMouseMoveEvents()
 {
-	const POINT* lastMousePosition = &mouseMoveEvents.back().position;
-	POINT currentCursorPos{};
-	GetCursorPos(&currentCursorPos);
-	if (currentCursorPos.x != lastMousePosition->x || currentCursorPos.y != lastMousePosition->y)
-		mouseMoveEvents.push_back(MouseMoveEvent(currentRecTime, currentCursorPos));
+	GetCursorPos(&tempMousePos);
+	if (tempMousePos.x != lastMousePos.x || tempMousePos.y != lastMousePos.y)
+	{
+		lastMousePos = tempMousePos;
+		mouseMoveEvents.push_back(EQMouseMoveEvent(currentRecTime, lastMousePos));
+	}
+}
+
+void MouseEventsWorker::reset()
+{
+	GetCursorPos(&lastMousePos);
+	continueListening = true;
+	readyToShare = false;
+	mouseClickEvents.clear();
+	mousePressedKeys.clear();
+
+	for (uint8_t targetKey : MOUSE_CLICK_VK)
+		GetAsyncKeyState(targetKey);
 }

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <QObject>
-#include <vector>
-#include <set>
 #include <QVector>
+#include <QSet>
+#include <QHash>
 
-#include "MouseClickEvent.h"
-#include "MouseMoveEvent.h"
+#include "EQMouseClickEvent.h"
+#include "EQMouseMoveEvent.h"
 
 class MouseEventsWorker : public QObject
 {
@@ -15,25 +15,35 @@ class MouseEventsWorker : public QObject
 public:
 	MouseEventsWorker(clock_t& currentRecTime);
 	void stopListening();
+	bool isReadyToShare() const;
+	QVector<EQMouseClickEvent> getMouseClickEvents() const;
+	QVector<EQMouseMoveEvent> getMouseMoveEvents() const;
 
 public slots:
 	void startListening();
 
-signals:
-	void mouseClickEventsReady(QVector<MouseClickEvent>& mouseClickEvents);
-	void mouseMoveEventsReady(QVector<MouseMoveEvent>& mouseMoveEvents);
-
 private:
 	const clock_t& currentRecTime;
 	bool continueListening;
+	bool readyToShare;
 
-	QVector<MouseClickEvent> mouseClickEvents;
-	std::set<uint8_t> mousePressedKeys;
-	std::vector<uint8_t> mouseKeysToRemove;
+	const QHash<uint8_t, DWORD> keyUpFlags;
+	const QHash<uint8_t, DWORD> keyDownFlags;
+	const QHash<uint8_t, DWORD> mouseData;
+
+	POINT lastMousePos;
+	POINT tempMousePos; 
+
+	QVector<EQMouseClickEvent> mouseClickEvents;
+	QSet<uint8_t> mousePressedKeys;
+	QVector<uint8_t> mouseKeysToRemove;
 	void checkMouseClickEvents();
 
-	QVector<MouseMoveEvent> mouseMoveEvents;
+	QVector<EQMouseMoveEvent> mouseMoveEvents;
 	void checkMouseMoveEvents();
 
-	const std::vector<uint8_t> MOUSE_CLICK_VK;
+	void reset();
+	
+
+	const QVector<uint8_t> MOUSE_CLICK_VK;
 };

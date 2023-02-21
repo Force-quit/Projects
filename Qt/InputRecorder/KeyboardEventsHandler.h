@@ -2,10 +2,10 @@
 
 #include <Windows.h>
 #include <QObject>
-#include <vector>
 #include <QThread>
+#include <QVector>
 
-#include "KeyboardEvent.h"
+#include "EQKeyboardEvent.h"
 #include "KeyboardEventsWorker.h"
 
 class KeyboardEventsHandler : public QObject
@@ -15,20 +15,22 @@ class KeyboardEventsHandler : public QObject
 public:
 	KeyboardEventsHandler(QObject* parent, clock_t& currentRecTime);
 	~KeyboardEventsHandler();
-	std::vector<KeyboardEvent> getKeyboardEvents() const;
+	
 	void stopListening();
+	QVector<EQKeyboardEvent> getKeyboardEvents() const;
 
 public slots:
 	void startListening();
 
 private slots:
+
 signals:
 	void listen();
 
 private:
-	std::vector<QThread*> workersThreads;
-	std::vector<KeyboardEventsWorker*> workers;
+	QVector<QThread*> workersThreads;
+	QVector<KeyboardEventsWorker*> workers;
 
 	const uint8_t KEYS_PER_THREAD{ 4 };
-	static std::vector<uint8_t> KEYBOARD_VK;
+	static QVector<uint8_t> KEYBOARD_VK;
 };

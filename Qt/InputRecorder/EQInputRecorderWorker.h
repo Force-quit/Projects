@@ -1,19 +1,19 @@
 #pragma once
 
-#include <QObject>
-#include <QString>
-#include <vector>
-#include <QVector>
-#include <set>
 #include <Windows.h>
+#include <QObject>
 #include <QThread>
+
+#include <QString>
+#include <QVector>
+#include <QSet>
 
 #include "MouseEventsWorker.h"
 #include "KeyboardEventsHandler.h"
 
-#include "MouseClickEvent.h"
-#include "MouseMoveEvent.h"
-#include "KeyboardEvent.h"
+#include "EQMouseClickEvent.h"
+#include "EQMouseMoveEvent.h"
+#include "EQKeyboardEvent.h"
 
 
 class EQInputRecorderWorker  : public QObject
@@ -31,11 +31,9 @@ public slots:
 
 signals:
 	void textChanged(const QString& newText);
+	void finishedRecording();
 
 private slots:
-	void setMouseClickEvents(QVector<MouseClickEvent>& mouseClickEvents);
-	void setMouseMoveEvents(QVector<MouseMoveEvent>& mouseMoveEvents);
-	void setKeyboardEvents(QVector<KeyboardEvent>& keyboardEvents);
 
 signals:
 	void startListening();
@@ -48,12 +46,14 @@ private:
 	void startRealPlayBack();
 
 	uint8_t nbVectorsReceived;
-	QVector<MouseClickEvent> mouseClickEvents;
-	QVector<MouseMoveEvent> mouseMoveEvents;
-	QVector<KeyboardEvent> keyboardEvents;
+
+	QVector<EQMouseClickEvent> mouseClickEvents;
+	QVector<EQMouseMoveEvent> mouseMoveEvents;
+	QVector<EQKeyboardEvent> keyboardEvents;
 
 	QThread mouseEventsThread;
 	MouseEventsWorker* mouseEventsWorker;
+
 	KeyboardEventsHandler keyboardEventsHandler;
 
 	clock_t recordingTime;

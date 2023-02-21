@@ -13,7 +13,9 @@ EQInputRecorder::EQInputRecorder(QWidget *parent)
 {
 	worker->moveToThread(&workerThread);
 	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
+	connect(worker, &EQInputRecorderWorker::finishedRecording, this, &EQInputRecorder::bringWindowInFront);
 	workerThread.start();
+
 
 	QWidget* centralWidget{ new QWidget };
 	QVBoxLayout* centralLayout{ new QVBoxLayout };
@@ -74,6 +76,11 @@ QGroupBox* EQInputRecorder::initPlayingGroupBox()
 	groupBoxLayout->addWidget(startPlayback);
 	currentRecordingGroupBox->setLayout(groupBoxLayout);
 	return currentRecordingGroupBox;
+}
+
+void EQInputRecorder::bringWindowInFront()
+{
+	activateWindow();
 }
 
 EQInputRecorder::~EQInputRecorder() 
