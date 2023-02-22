@@ -28,10 +28,6 @@ private:
 	bool continueListening;
 	bool readyToShare;
 
-	const QHash<uint8_t, DWORD> keyUpFlags;
-	const QHash<uint8_t, DWORD> keyDownFlags;
-	const QHash<uint8_t, DWORD> mouseData;
-
 	POINT lastMousePos;
 	POINT tempMousePos; 
 
@@ -44,7 +40,9 @@ private:
 	void checkMouseMoveEvents();
 
 	void reset();
-	
 
 	const QVector<uint8_t> MOUSE_CLICK_VK;
+	const QHash<uint8_t, DWORD> KEY_UP_FLAGS;
+	const QHash<uint8_t, DWORD> KEY_DOWN_FLAGS;
+	const QHash<uint8_t, DWORD> mouseData;
 };

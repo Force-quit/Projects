@@ -11,14 +11,14 @@ MouseEventsWorker::MouseEventsWorker(clock_t& currentRecTime)
 	: currentRecTime{ currentRecTime }, continueListening{}, readyToShare{}, lastMousePos{}, tempMousePos{},
 	mouseClickEvents(), mousePressedKeys(), mouseKeysToRemove(), mouseMoveEvents(),
 	MOUSE_CLICK_VK{ VK_LBUTTON, VK_RBUTTON, VK_MBUTTON, VK_XBUTTON1, VK_XBUTTON2 },
-	keyUpFlags{
+	KEY_UP_FLAGS{
 		{VK_LBUTTON, MOUSEEVENTF_LEFTUP},
 		{VK_RBUTTON, MOUSEEVENTF_RIGHTUP},
 		{VK_MBUTTON, MOUSEEVENTF_MIDDLEUP},
 		{VK_XBUTTON1, MOUSEEVENTF_XUP},
 		{VK_XBUTTON2, MOUSEEVENTF_XUP}
 	},
-	keyDownFlags{
+	KEY_DOWN_FLAGS{
 		{VK_LBUTTON, MOUSEEVENTF_LEFTDOWN},
 		{VK_RBUTTON, MOUSEEVENTF_RIGHTDOWN},
 		{VK_MBUTTON, MOUSEEVENTF_MIDDLEDOWN},
@@ -84,7 +84,7 @@ void MouseEventsWorker::checkMouseClickEvents()
 		{
 			if (!mousePressedKeys.contains(targetKey))
 			{
-				mouseClickEvents.push_front(EQMouseClickEvent(currentRecTime, lastMousePos, mouseData[targetKey], keyDownFlags[targetKey]));
+				mouseClickEvents.push_front(EQMouseClickEvent(currentRecTime, lastMousePos, mouseData[targetKey], KEY_DOWN_FLAGS[targetKey]));
 				mousePressedKeys.insert(targetKey);
 			}
 		}
@@ -93,7 +93,7 @@ void MouseEventsWorker::checkMouseClickEvents()
 		{
 			if (!GetAsyncKeyState(pressedKey))
 			{
-				mouseClickEvents.push_front(EQMouseClickEvent(currentRecTime, lastMousePos, mouseData[pressedKey], keyUpFlags[pressedKey]));
+				mouseClickEvents.push_front(EQMouseClickEvent(currentRecTime, lastMousePos, mouseData[pressedKey], KEY_UP_FLAGS[pressedKey]));
 				mouseKeysToRemove.push_back(pressedKey);
 			}
 		}
