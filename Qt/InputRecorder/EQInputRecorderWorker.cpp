@@ -43,6 +43,8 @@ void EQInputRecorderWorker::startRealRecording()
 		QThread::msleep(1);
 	}
 
+	emit textChanged("Processing data..");
+
 	mouseEventsWorker->stopListening();
 	keyboardEventsHandler.stopListening();
 
@@ -101,15 +103,10 @@ void EQInputRecorderWorker::startRealPlayBack()
 
 		QThread::msleep(1);
 
-	} while (currentPlaybackTime < recordingTime && !userStopPlayback());
+	} while (currentPlaybackTime < recordingTime && !GetAsyncKeyState(VK_ESCAPE));
 	
 	emit textChanged("Finished playback");
 	emit finishedPlayback();
-}
-
-bool EQInputRecorderWorker::userStopPlayback() const
-{
-	return GetAsyncKeyState(VK_ESCAPE);
 }
 
 void EQInputRecorderWorker::setupTimers(const bool recording)

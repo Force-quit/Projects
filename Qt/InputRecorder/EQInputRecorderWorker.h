@@ -46,9 +46,6 @@ private:
 	void startRealRecording();
 	void startRealPlayBack();
 
-	bool userStopPlayback() const;
-
-
 	QVector<EQMouseClickEvent> mouseClickEvents;
 	QVector<EQMouseMoveEvent> mouseMoveEvents;
 	QVector<EQKeyboardEvent> keyboardEvents;
