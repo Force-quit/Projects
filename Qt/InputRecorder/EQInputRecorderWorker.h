@@ -40,11 +40,12 @@ signals:
 	void startListening();
 
 private:
-	const uint8_t COUNTDOWN{ 1 };
+	const uint8_t COUNTDOWN{ 3 };
 	void setupTimers(const bool recording);
 
 	void startRealRecording();
 	void startRealPlayBack();
+	bool checkPlaybackStop();
 
 	QVector<EQMouseClickEvent> mouseClickEvents;
 	QVector<EQMouseMoveEvent> mouseMoveEvents;

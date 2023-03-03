@@ -77,6 +77,11 @@ void EQInputRecorderWorker::startRealPlayBack()
 	EQKeyboardEvent* nextKeyboardEvent{};
 	INPUT input{};
 
+	bool userStopped{};
+	
+	SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_AWAYMODE_REQUIRED);
+
+
 	emit textChanged("Playback started");
 
 	do
@@ -103,10 +108,31 @@ void EQInputRecorderWorker::startRealPlayBack()
 
 		QThread::msleep(1);
 
-	} while (currentPlaybackTime < recordingTime && !GetAsyncKeyState(VK_ESCAPE));
+		userStopped = checkPlaybackStop();
+	} while (currentPlaybackTime < recordingTime && !userStopped);
 	
-	emit textChanged("Finished playback");
-	emit finishedPlayback();
+	if (userStopped)
+	{
+		emit textChanged("User stopped playback");
+		emit finishedPlayback();
+	}
+	else
+	{
+		//emit textChanged("Finished playback");
+		QTimer::singleShot(1, this, &EQInputRecorderWorker::startRealPlayBack);
+	}
+
+	SetThreadExecutionState(ES_CONTINUOUS);
+}
+
+bool EQInputRecorderWorker::checkPlaybackStop()
+{
+	if (GetAsyncKeyState(VK_ESCAPE))
+	{
+		emit textChanged("User stopped playback");
+		return true;
+	}
+	return false;
 }
 
 void EQInputRecorderWorker::setupTimers(const bool recording)
