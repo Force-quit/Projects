@@ -6,7 +6,7 @@
 #include <QVector>
 
 EQInputRecorderWorker::EQInputRecorderWorker()
-	: recordingTime{},
+	: recordingTime{}, playbackLoop{},
 	mouseEventsWorker{ new MouseEventsWorker(recordingTime)}, mouseEventsThread(),
 	keyboardEventsHandler(this, recordingTime),
 	mouseMoveEvents(), mouseClickEvents(), keyboardEvents()
@@ -109,30 +109,27 @@ void EQInputRecorderWorker::startRealPlayBack()
 		QThread::msleep(1);
 
 		userStopped = checkPlaybackStop();
+
 	} while (currentPlaybackTime < recordingTime && !userStopped);
 	
-	if (userStopped)
-	{
-		emit textChanged("User stopped playback");
-		emit finishedPlayback();
-	}
+	SetThreadExecutionState(ES_CONTINUOUS);
+
+	if (playbackLoop)
+		QTimer::singleShot(1, this, &EQInputRecorderWorker::startRealPlayBack);
 	else
 	{
-		//emit textChanged("Finished playback");
-		QTimer::singleShot(1, this, &EQInputRecorderWorker::startRealPlayBack);
-	}
+		if (userStopped)
+			emit textChanged("User stopped playback");
+		else
+			emit textChanged("Playback ended");
 
-	SetThreadExecutionState(ES_CONTINUOUS);
+		emit finishedPlayback();
+	}
 }
 
 bool EQInputRecorderWorker::checkPlaybackStop()
 {
-	if (GetAsyncKeyState(VK_ESCAPE))
-	{
-		emit textChanged("User stopped playback");
-		return true;
-	}
-	return false;
+	return GetAsyncKeyState(VK_ESCAPE);
 }
 
 void EQInputRecorderWorker::setupTimers(const bool recording)

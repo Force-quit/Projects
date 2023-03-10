@@ -4,6 +4,7 @@
 #include <QGroupBox>
 #include <QIcon>
 #include <QPushButton>
+#include <QCheckBox>
 #include "../../Utilities/EQUIRangedLineEdit.h"
 #include "EQInputRecorderWorker.h"
 #include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
@@ -75,12 +76,17 @@ QGroupBox* EQInputRecorder::initPlayingGroupBox()
 	
 	QPushButton* startPlayback{ new QPushButton("Start playback") };
 	QLabel* playbackShortcutLabel{ new QLabel("Stop playback : ESC") };
+	QCheckBox* loopCheckbox{ new QCheckBox("Looping") };
 
 	groupBoxLayout->addWidget(startPlayback);
+	groupBoxLayout->addWidget(loopCheckbox);
 	groupBoxLayout->addWidget(playbackShortcutLabel);
 	currentRecordingGroupBox->setLayout(groupBoxLayout);
 
 	connect(startPlayback, &QPushButton::clicked, worker, &EQInputRecorderWorker::startPlayback);
+	connect(loopCheckbox, &QCheckBox::stateChanged, [this](int state) {
+		worker->setPlaybackLoop(state);
+	});
 	return currentRecordingGroupBox;
 }
 

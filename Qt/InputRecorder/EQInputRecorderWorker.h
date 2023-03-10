@@ -24,6 +24,8 @@ public:
 	EQInputRecorderWorker();
 	~EQInputRecorderWorker();
 
+	void setPlaybackLoop(bool playbackLoop);
+
 public slots:
 	void startRecording();
 	void startPlayback();
@@ -51,6 +53,7 @@ private:
 	QVector<EQMouseMoveEvent> mouseMoveEvents;
 	QVector<EQKeyboardEvent> keyboardEvents;
 	clock_t recordingTime;
+	bool playbackLoop;
 
 	QThread mouseEventsThread;
 	MouseEventsWorker* mouseEventsWorker;
