@@ -114,16 +114,24 @@ void EQInputRecorderWorker::startRealPlayBack()
 	
 	SetThreadExecutionState(ES_CONTINUOUS);
 
-	if (playbackLoop)
-		QTimer::singleShot(1, this, &EQInputRecorderWorker::startRealPlayBack);
+	if (userStopped)
+	{
+		if (playbackLoop)
+		{
+			playbackLoop = false;
+			emit canceledPlaybackLoop();
+		}
+		emit finishedPlayback();
+		emit textChanged("User stopped playback");
+
+	}
 	else
 	{
-		if (userStopped)
-			emit textChanged("User stopped playback");
+		if (playbackLoop)
+			QTimer::singleShot(1, this, &EQInputRecorderWorker::startRealPlayBack);
 		else
 			emit textChanged("Playback ended");
 
-		emit finishedPlayback();
 	}
 }
 
@@ -163,4 +171,9 @@ EQInputRecorderWorker::~EQInputRecorderWorker()
 	//keyboardEvents.stopListening();
 	mouseEventsThread.quit();
 	mouseEventsThread.wait();
+}
+
+void EQInputRecorderWorker::setPlaybackLoop(bool playbackLoop)
+{
+	this->playbackLoop = playbackLoop;
 }

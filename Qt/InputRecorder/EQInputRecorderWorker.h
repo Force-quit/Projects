@@ -35,6 +35,7 @@ signals:
 	void textChanged(const QString& newText);
 	void finishedRecording();
 	void finishedPlayback();
+	void canceledPlaybackLoop();
 
 private slots:
 
@@ -58,5 +59,4 @@ private:
 	QThread mouseEventsThread;
 	MouseEventsWorker* mouseEventsWorker;
 	KeyboardEventsHandler keyboardEventsHandler;
-
 };
