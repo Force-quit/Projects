@@ -114,25 +114,23 @@ void EQInputRecorderWorker::startRealPlayBack()
 	
 	SetThreadExecutionState(ES_CONTINUOUS);
 
+	if (playbackLoop && !userStopped)
+	{
+		QTimer::singleShot(1, this, &EQInputRecorderWorker::startRealPlayBack);
+		return;
+	}
+
 	if (userStopped)
 	{
 		if (playbackLoop)
-		{
-			playbackLoop = false;
 			emit canceledPlaybackLoop();
-		}
-		emit finishedPlayback();
+		playbackLoop = false;
 		emit textChanged("User stopped playback");
-
 	}
 	else
-	{
-		if (playbackLoop)
-			QTimer::singleShot(1, this, &EQInputRecorderWorker::startRealPlayBack);
-		else
-			emit textChanged("Playback ended");
+		emit textChanged("Playback ended");
 
-	}
+	emit finishedPlayback();	
 }
 
 bool EQInputRecorderWorker::checkPlaybackStop()

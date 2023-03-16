@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QGroupBox>
+#include <QPushButton>
 #include <QLabel>
 #include <QThread>
 #include "EQInputRecorderWorker.h"
@@ -16,11 +17,16 @@ public:
 
 private slots:
 	void bringWindowInFront();
+	void disableButtons();
+	void enableButtons();
 
 private:
 	QGroupBox* initOutputGroupBox();
 	QGroupBox* initRecordingGroupBox();
 	QGroupBox* initPlayingGroupBox();
+
+	QPushButton* recordingButton;
+	QPushButton* playbackButton;
 
 	EQInputRecorderWorker* worker;
 	QThread workerThread;

@@ -10,7 +10,7 @@
 #include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
 
 EQInputRecorder::EQInputRecorder(QWidget *parent)
-	: QMainWindow(parent), workerThread(), worker{new EQInputRecorderWorker}
+	: QMainWindow(parent), workerThread(), worker{new EQInputRecorderWorker}, recordingButton{}, playbackButton{}
 {
 	worker->moveToThread(&workerThread);
 	connect(&workerThread, &QThread::finished, worker, &QObject::deleteLater);
@@ -36,6 +36,18 @@ EQInputRecorder::EQInputRecorder(QWidget *parent)
 }
 
 
+void EQInputRecorder::disableButtons()
+{
+	recordingButton->setEnabled(false);
+	playbackButton->setEnabled(false);
+}
+
+void EQInputRecorder::enableButtons()
+{
+	playbackButton->setEnabled(true);
+	recordingButton->setEnabled(true);
+}
+
 QGroupBox* EQInputRecorder::initOutputGroupBox()
 {
 	QGroupBox* outputGroupBox{ new QGroupBox("Output") };
@@ -58,14 +70,17 @@ QGroupBox* EQInputRecorder::initRecordingGroupBox()
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
 	groupBoxLayout->setAlignment(Qt::AlignCenter);
 
-	QPushButton* startRecording{ new QPushButton("Start recording") };
+	recordingButton = new QPushButton("Start recording");
 	QLabel* recordingShortcutLabel{ new QLabel("Stop recording : ESC") };
 	
-	groupBoxLayout->addWidget(startRecording);
+	groupBoxLayout->addWidget(recordingButton);
 	groupBoxLayout->addWidget(recordingShortcutLabel);
 	recordingGroupBox->setLayout(groupBoxLayout);
 
-	connect(startRecording, &QPushButton::clicked, worker, &EQInputRecorderWorker::startRecording);
+	connect(recordingButton, &QPushButton::clicked, worker, &EQInputRecorderWorker::startRecording);
+	connect(recordingButton, &QPushButton::clicked, this, &EQInputRecorder::disableButtons);
+	connect(worker, &EQInputRecorderWorker::finishedRecording, this, &EQInputRecorder::enableButtons);
+
 	return recordingGroupBox;
 }
 
@@ -73,23 +88,28 @@ QGroupBox* EQInputRecorder::initPlayingGroupBox()
 {
 	QGroupBox* currentRecordingGroupBox{ new QGroupBox("Playback") };
 	QVBoxLayout* groupBoxLayout{ new QVBoxLayout };
+	groupBoxLayout->setAlignment(Qt::AlignCenter);
 	
-	QPushButton* startPlayback{ new QPushButton("Start playback") };
+	playbackButton = new QPushButton("Start playback");
 	QLabel* playbackShortcutLabel{ new QLabel("Stop playback : ESC") };
 	QCheckBox* loopCheckbox{ new QCheckBox("Looping") };
 
-	groupBoxLayout->addWidget(startPlayback);
+	groupBoxLayout->addWidget(playbackButton);
 	groupBoxLayout->addWidget(loopCheckbox);
 	groupBoxLayout->addWidget(playbackShortcutLabel);
 	currentRecordingGroupBox->setLayout(groupBoxLayout);
 
-	connect(startPlayback, &QPushButton::clicked, worker, &EQInputRecorderWorker::startPlayback);
+	connect(playbackButton, &QPushButton::clicked, worker, &EQInputRecorderWorker::startPlayback);
 	connect(loopCheckbox, &QCheckBox::stateChanged, [this](int state) {
 		worker->setPlaybackLoop(state);
 	});
 	connect(worker, &EQInputRecorderWorker::canceledPlaybackLoop, [loopCheckbox]() {
 		loopCheckbox->setCheckState(Qt::Unchecked);
 	});
+	connect(playbackButton, &QPushButton::clicked, this, &EQInputRecorder::disableButtons);
+	connect(worker, &EQInputRecorderWorker::finishedPlayback, this, &EQInputRecorder::enableButtons);
+
+
 	return currentRecordingGroupBox;
 }
 
