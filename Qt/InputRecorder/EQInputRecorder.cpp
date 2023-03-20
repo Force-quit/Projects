@@ -5,9 +5,7 @@
 #include <QIcon>
 #include <QPushButton>
 #include <QCheckBox>
-#include "../../Utilities/EQUIRangedLineEdit.h"
 #include "EQInputRecorderWorker.h"
-#include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
 
 EQInputRecorder::EQInputRecorder(QWidget *parent)
 	: QMainWindow(parent), workerThread(), worker{new EQInputRecorderWorker}, recordingButton{}, playbackButton{}
