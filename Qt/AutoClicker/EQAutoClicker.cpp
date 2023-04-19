@@ -1,6 +1,5 @@
 #include "EQAutoClicker.h"
 #include "EQAutoClickerWorker.h"
-#include "../../Utilities/EQUIRangedLineEdit.h"
 #include <QFile>
 #include <QBoxLayout>
 #include <QGroupBox>
@@ -12,7 +11,8 @@
 #include <QButtonGroup>
 #include <QFileDialog>
 #include <QMessageBox>
-#include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
+#include "../../Utilities/Qt/EQShortcutListener/EQShortcutListener.h"
+#include "../../Utilities/Qt/EQIntLineEdit/EQIntLineEdit.h"
 #include <QTabBar>
 #include <QDir>
 #include <QFocusEvent>
@@ -42,7 +42,7 @@ EQAutoClicker::EQAutoClicker(QWidget *parent)
 	widgetsToDisable.append({ clickHoldTimeEdit, timeBetweenClicksEdit,
 		leftClickButton, rightClickButton, saveButton, loadButton });
 
-	shortcutListener->startListening();;
+	shortcutListener->startListening();
 }
 
 QGroupBox* EQAutoClicker::initParameters()
@@ -63,13 +63,13 @@ QHBoxLayout* EQAutoClicker::initClickHoldTime()
 
 	clickHoldTimeLayout->addWidget(new QLabel("Click hold time :"));
 
-	clickHoldTimeEdit = new EQUIRangedLineEdit(EQAutoClickerWorker::MIN_TIME, EQAutoClickerWorker::MAX_TIME);
-	clickHoldTimeEdit->setText(QString::number(EQAutoClickerWorker::DEFAULT_CLICK_HOLD_TIME));
+	clickHoldTimeEdit = new EQIntLineEdit(EQAutoClickerWorker::MIN_INTERVAL, EQAutoClickerWorker::MAX_INTERVAL);
+	clickHoldTimeEdit->setText(QString::number(EQAutoClickerWorker::DEFAULT_HOLD_TIME));
 	clickHoldTimeLayout->addWidget(clickHoldTimeEdit);
 
 	clickHoldTimeLayout->addWidget(new QLabel("ms"));
 
-	connect(clickHoldTimeEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQAutoClickerWorker::setClickHoldTime);
+	connect(clickHoldTimeEdit, &EQIntLineEdit::valueChanged, worker, &EQAutoClickerWorker::setClickHoldTime);
 
 	return clickHoldTimeLayout;
 }
@@ -80,13 +80,13 @@ QHBoxLayout* EQAutoClicker::initTimeBetweenClicks()
 
 	timeBetweenClickLayout->addWidget(new QLabel("Clicks interval :"));
 
-	timeBetweenClicksEdit = new EQUIRangedLineEdit(EQAutoClickerWorker::MIN_TIME, EQAutoClickerWorker::MAX_TIME);
+	timeBetweenClicksEdit = new EQIntLineEdit(EQAutoClickerWorker::MIN_INTERVAL, EQAutoClickerWorker::MAX_INTERVAL);
 	timeBetweenClicksEdit->setText(QString::number(EQAutoClickerWorker::DEFAULT_BETWEEN_TIME));
 	timeBetweenClickLayout->addWidget(timeBetweenClicksEdit);
 
 	timeBetweenClickLayout->addWidget(new QLabel("ms"));
 
-	connect(timeBetweenClicksEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQAutoClickerWorker::setTimeBetweenClicks);
+	connect(timeBetweenClicksEdit, &EQIntLineEdit::valueChanged, worker, &EQAutoClickerWorker::setTimeBetweenClicks);
 
 	return timeBetweenClickLayout;
 }

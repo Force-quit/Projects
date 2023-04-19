@@ -3,17 +3,17 @@
 #include <Windows.h>
 
 EQAutoClickerWorker::EQAutoClickerWorker()
-	: active(), clickHoldTime(DEFAULT_CLICK_HOLD_TIME), timeBetweenClicks(DEFAULT_BETWEEN_TIME), leftClick(true), input()
+	: active(), clickHoldTime(DEFAULT_HOLD_TIME), timeBetweenClicks(DEFAULT_BETWEEN_TIME), leftClick(true), input()
 {
 	input.type = INPUT_MOUSE;
 }
 
-void EQAutoClickerWorker::setClickHoldTime(unsigned int holdTime)
+void EQAutoClickerWorker::setClickHoldTime(int holdTime)
 {
 	clickHoldTime = holdTime;
 }
 
-void EQAutoClickerWorker::setTimeBetweenClicks(unsigned int timeBetween)
+void EQAutoClickerWorker::setTimeBetweenClicks(int timeBetween)
 {
 	timeBetweenClicks = timeBetween;
 }
@@ -57,12 +57,12 @@ bool EQAutoClickerWorker::isActive() const
 	return active;
 }
 
-unsigned int EQAutoClickerWorker::getClickHoldTime() const
+int EQAutoClickerWorker::getClickHoldTime() const
 {
 	return clickHoldTime;
 }
 
-unsigned int EQAutoClickerWorker::getTimeBetweenClicks() const
+int EQAutoClickerWorker::getTimeBetweenClicks() const
 {
 	return timeBetweenClicks;
 }

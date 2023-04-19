@@ -5,14 +5,15 @@
 #include <QString>
 #include "EQAutoClickerWorker.h"
 #include <QThread>
-#include "../../Utilities/EQUIRangedLineEdit.h"
-#include "../../Utilities/EQShortcutListener/EQShortcutListener.h"
 #include <QRadioButton>
 #include <QPushButton>
 #include <QVector>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include "../../Utilities/Qt/EQIntLineEdit/EQIntLineEdit.h"
+#include "../../Utilities/Qt/EQShortcutListener/EQShortcutListener.h"
+
 
 class EQAutoClicker : public QMainWindow
 {
@@ -34,10 +35,9 @@ private:
 	EQAutoClickerWorker* worker;
 	QThread workerThread;
 
-
 	EQShortcutListener* shortcutListener;
-	EQUIRangedLineEdit* clickHoldTimeEdit;
-	EQUIRangedLineEdit* timeBetweenClicksEdit;
+	EQIntLineEdit* clickHoldTimeEdit;
+	EQIntLineEdit* timeBetweenClicksEdit;
 	QRadioButton* leftClickButton;
 	QRadioButton* rightClickButton;
 	QPushButton* saveButton;
