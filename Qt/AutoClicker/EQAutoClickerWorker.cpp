@@ -52,24 +52,4 @@ void EQAutoClickerWorker::setLeftClick(bool leftClick)
 	this->leftClick = leftClick;
 }
 
-bool EQAutoClickerWorker::isActive() const
-{
-	return active;
-}
-
-int EQAutoClickerWorker::getClickHoldTime() const
-{
-	return clickHoldTime;
-}
-
-int EQAutoClickerWorker::getTimeBetweenClicks() const
-{
-	return timeBetweenClicks;
-}
-
-bool EQAutoClickerWorker::isTargetLeftClick() const
-{
-	return leftClick;
-}
-
 EQAutoClickerWorker::~EQAutoClickerWorker() {}

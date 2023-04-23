@@ -17,10 +17,25 @@ public:
 	static const int DEFAULT_HOLD_TIME{ 10 };
 	static const int DEFAULT_BETWEEN_TIME{ 30 };
 
-	int getClickHoldTime() const;
-	int getTimeBetweenClicks() const;
-	bool isTargetLeftClick() const;
-	bool isActive() const;
+	inline int getClickHoldTime() const
+	{
+		return clickHoldTime;
+	}
+
+	inline int getTimeBetweenClicks() const
+	{
+		return timeBetweenClicks;
+	}
+
+	inline bool isTargetLeftClick() const
+	{
+		return leftClick;
+	}
+
+	inline bool isActive() const
+	{
+		return active;
+	}
 
 	void setLeftClick(bool leftClick);
 
