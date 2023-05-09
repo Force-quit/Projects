@@ -163,19 +163,21 @@ void emile::winR()
 	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
-void emile::humanType(const std::string& toWrite, int keyPressInterval)
+void emile::humanType(const wchar_t* toWrite, size_t sizeToWrite, int keyPressInterval)
 {
-	const HKL currentKBL = GetKeyboardLayout(0);
-	std::vector<short> keys;
-	for (char c : toWrite)
-		keys.push_back(VkKeyScanExA(c, currentKBL));
+	INPUT ip{};
+	ip.type = INPUT_KEYBOARD;
 
-	INPUT input{};
-	input.type = INPUT_KEYBOARD;
-	for (UINT16 i = 0; i < keys.size(); ++i)
+	for (size_t i{}; i < sizeToWrite; ++i)
 	{
-		input.ki.wVk = keys[i];
-		emile::fullKeyPress(input);
+		ip.ki.dwFlags = KEYEVENTF_UNICODE;
+		ip.ki.wScan = toWrite[i];
+		SendInput(1, &ip, sizeof(INPUT));
+
+		Sleep(10);
+
+		ip.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+		SendInput(1, &ip, sizeof(INPUT));
 		Sleep(keyPressInterval);
 	}
 }
