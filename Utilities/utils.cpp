@@ -163,12 +163,13 @@ void emile::winR()
 	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
-void emile::humanType(const wchar_t* toWrite, size_t sizeToWrite, int keyPressInterval)
+void emile::humanType(const wchar_t* toWrite, int keyPressInterval)
 {
+	size_t sizeToWrite{ wcslen(toWrite) };
 	INPUT ip{};
 	ip.type = INPUT_KEYBOARD;
 
-	for (size_t i{}; i < sizeToWrite; ++i)
+	for (size_t i{}; i <= sizeToWrite; ++i)
 	{
 		ip.ki.dwFlags = KEYEVENTF_UNICODE;
 		ip.ki.wScan = toWrite[i];

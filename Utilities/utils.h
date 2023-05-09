@@ -36,7 +36,7 @@ namespace emile
 	void winR();
 
 	// Simulate the typing of a string
-	void humanType(const wchar_t* toWrite, size_t sizeToWrite, int keyPressInterval = 50);
+	void humanType(const wchar_t* toWrite, int keyPressInterval = 50);
 
 	// Copy a string into windows's clipboard
 	void copyToClipBoard(const std::string& dataToCopy);
