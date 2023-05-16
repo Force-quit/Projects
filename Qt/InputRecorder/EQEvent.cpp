@@ -6,8 +6,3 @@ EQEvent::EQEvent(clock_t positionInTime)
 
 EQEvent::~EQEvent()
 {}
-
-clock_t EQEvent::eventPlayTime() const
-{
-	return eventPositionInTime;
-}

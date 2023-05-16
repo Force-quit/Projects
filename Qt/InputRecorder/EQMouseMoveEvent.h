@@ -13,7 +13,10 @@ public:
 	EQMouseMoveEvent(const EQMouseMoveEvent& other);
 	EQMouseMoveEvent& operator=(const EQMouseMoveEvent& other);
 
-	void play() const;
+	inline void play() const
+	{
+		SetCursorPos(eventPosition.x, eventPosition.y);
+	}
 
 protected:
 	POINT eventPosition;

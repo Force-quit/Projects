@@ -18,10 +18,5 @@ EQMouseMoveEvent& EQMouseMoveEvent::operator=(const EQMouseMoveEvent& other)
 	return *this;
 }
 
-void EQMouseMoveEvent::play() const
-{
-	SetCursorPos(eventPosition.x, eventPosition.y);
-}
-
 EQMouseMoveEvent::~EQMouseMoveEvent()
 {}
