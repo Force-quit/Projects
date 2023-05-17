@@ -4,3 +4,6 @@
 [submodule "Qt/Emalice"]
 	path = Qt/Emalice
 	url = git@github.com:Force-quit/Emalice.git
+[submodule "Qt/Password-creator"]
+	path = Qt/Password-creator
+	url = git@github.com:Force-quit/Password-creator.git
