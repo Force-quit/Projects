@@ -7,3 +7,6 @@
 [submodule "Qt/Password-creator"]
 	path = Qt/Password-creator
 	url = git@github.com:Force-quit/Password-creator.git
+[submodule "Qt/Input-recorder"]
+	path = Qt/Input-recorder
+	url = git@github.com:Force-quit/Input-recorder.git
