@@ -266,16 +266,14 @@ void emile::rightClick(const int& holdTime)
 
 void emile::waitForKeyPress(short vKey)
 {
-	bool keyDown{};
-	while (true)
-	{
-		if (GetAsyncKeyState(vKey))
-			keyDown = true;
-		else if (keyDown)
-			break;
-		Sleep(1);
-	}
-}
+	GetAsyncKeyState(vKey); // Reset buffer
+
+	while (!GetAsyncKeyState(vKey))
+		Sleep(50);
+
+	while (GetAsyncKeyState(vKey))
+		Sleep(50);
+}	
 
 bool emile::ensureFolderExists(const std::string& dirName)
 {
