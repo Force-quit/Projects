@@ -24,13 +24,10 @@ int main()
 	{
 		GetCursorPos(&mousePos);
 
-		if (previousMousePos.x != mousePos.x || previousMousePos.y != mousePos.y)
+		if (mousePos.x != previousMousePos.x || mousePos.y != previousMousePos.y)
 		{
-			previousMousePos.x -= mousePos.x;
-			previousMousePos.y -= mousePos.y;
-
-			mousePos.x += 2 * previousMousePos.x;
-			mousePos.y += 2 * previousMousePos.y;
+			mousePos.x += 2 * (previousMousePos.x - mousePos.x);
+			mousePos.y += 2 * (previousMousePos.y - mousePos.y);
 
 			mousePos.x = std::clamp(static_cast<int>(mousePos.x), 2, WINDOW_SIZE.first);
 			mousePos.y = std::clamp(static_cast<int>(mousePos.y), 2, WINDOW_SIZE.second);
