@@ -57,22 +57,22 @@ int main()
 	const int MIN_INTERVAL{ 30000 };
 	const int MAX_INTERVAL{ 120000 };
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<> indexDistr(0, MAX_INDEX);
-	std::uniform_int_distribution<> intervalDistr(MIN_INTERVAL, MAX_INTERVAL);
+	std::random_device randomDevice;
+	std::mt19937 randomGenerator(randomDevice());
+	std::uniform_int_distribution<> indexDistribution(0, MAX_INDEX);
+	std::uniform_int_distribution<> intervalDistribution(MIN_INTERVAL, MAX_INTERVAL);
 
 	GetAsyncKeyState(VK_RCONTROL);
-	std::clock_t start{};
-	std::clock_t nextEvent{};
+	std::clock_t lastPrankTime{};
+	std::clock_t randomInterval{};
 	bool userQuit{};
 
 	while (!userQuit)
 	{
-		start = std::clock();
-		nextEvent = intervalDistr(gen);
+		lastPrankTime = std::clock();
+		randomInterval = intervalDistribution(randomGenerator);
 
-		while (std::clock() - start < nextEvent)
+		while (std::clock() - lastPrankTime < randomInterval)
 		{
 			Sleep(5);
 
@@ -84,7 +84,7 @@ int main()
 		}
 
 		if (!userQuit)
-			prankFunctions[indexDistr(gen)]();
+			prankFunctions[indexDistribution(randomGenerator)]();
 	}
 
 	MessageBoxA(NULL, "haha keyboard go bing bong", "Get pranked", MB_ICONINFORMATION);
