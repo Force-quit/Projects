@@ -8,11 +8,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	bool continuePranking{ true };
 	std::thread prankThread(startPranking, std::ref(continuePranking));
 
+	const int STOP_KEY{ VK_NUMLOCK };
+
+	GetAsyncKeyState(STOP_KEY);
 	while (continuePranking)
 	{
 		Sleep(5);
 
-		if (GetAsyncKeyState(VK_NUMLOCK))
+		if (GetAsyncKeyState(STOP_KEY))
 			continuePranking = false;
 	}
 
