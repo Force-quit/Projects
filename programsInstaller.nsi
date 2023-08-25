@@ -1,16 +1,16 @@
 ﻿!define /D_UNICODE
 
-Outfile "Password-creator(v6)_installer.exe" ; MODIFY IF NEEDED
+Outfile "AutoClicker(v1.2)_installer.exe" ; MODIFY IF NEEDED
 
-!define APP_ORIGINAL_FOLDER "C:\Users\Admin\Desktop\GithubRepos\Projects\Qt\Password-creator\Password-creator\x64\Password-creator(v6)" ; MODIFY IF NEEDED
+!define APP_ORIGINAL_FOLDER "C:\Users\Admin\Desktop\GithubRepos\Projects\Qt\AutoClicker\AutoClicker(v1.2)" ; MODIFY IF NEEDED
 !define INSTALL_FOLDER "$PROGRAMFILES64\Emalice"
 
 !define SHORTCUT_FOLDER "$SMPROGRAMS\Emalice"
 
-!define APP_NAME "Password-creator(v6)"
-!define APP_VERSION "6.0"
+!define APP_NAME "AutoClicker(v1.2)"
+!define APP_VERSION "1.2"
 !define APP_PUBLISHER "Émile Laforce"
-!define APP_SIZE_MB 47.6
+!define APP_SIZE_MB 51.1
 
 !macro DefineConstants
   !define APP_EXE "${APP_NAME}.exe"

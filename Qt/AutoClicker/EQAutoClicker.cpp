@@ -19,13 +19,14 @@
 #include <Windows.h>
 #include <QIcon>
 #include <QVector>
+#include <QCoreApplication>
 
-const QString EQAutoClicker::CONFIGS_PATH{ "Configs" };
 
 EQAutoClicker::EQAutoClicker(QWidget* parent)
 	: QMainWindow(parent),
 	clickHoldTimeEdit(), timeBetweenClicksEdit(), leftClickButton(), rightClickButton(),
-	saveButton(), loadButton(), widgetsToDisable(), worker(), configurationText(), shortcutListener(), activationStatusText()
+	saveButton(), loadButton(), widgetsToDisable(), worker(), configurationText(), shortcutListener(), activationStatusText(),
+	APP_PATH(QCoreApplication::applicationDirPath()), CONFIGS_PATH(QCoreApplication::applicationDirPath() + "/Configs")
 {
 	QDir().mkdir(CONFIGS_PATH);
 	worker = new EQAutoClickerWorker;
@@ -37,7 +38,7 @@ EQAutoClicker::EQAutoClicker(QWidget* parent)
 	QWidget* centralWidget{ new QWidget };
 	centralWidget->setLayout(centralLayout);
 	setCentralWidget(centralWidget);
-	setWindowIcon(QIcon("mouse.png"));
+	setWindowIcon(QIcon(APP_PATH + "/mouse.png"));
 	setWindowTitle("AutoClicker(v1.2)");
 
 	widgetsToDisable.append({ clickHoldTimeEdit, timeBetweenClicksEdit,
