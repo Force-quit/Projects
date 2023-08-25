@@ -4,6 +4,53 @@
 #include <random>
 #include <thread>
 
+void resetInputBuffer()
+{
+	for (int key{ 0x01 }; key <= 0xFE; ++key)
+		GetAsyncKeyState(key);
+}
+
+void waitForKeyRelease(const int key)
+{
+	while (GetAsyncKeyState(key))
+		Sleep(5);
+}
+
+bool passwordIsTyped(const std::vector<int>& password, const size_t nextCharIndex)
+{
+	bool keyPress{};
+	bool rightKeyPressed{};
+
+	while (!keyPress)
+	{
+		for (int key{ 0x01 }; key <= 0xFE; ++key)
+		{
+			if (GetAsyncKeyState(key))
+			{
+				keyPress = true;
+				waitForKeyRelease(key);
+				rightKeyPressed = key == password[nextCharIndex];
+				break;
+			}
+		}
+
+		Sleep(5);
+	}
+	
+	if (!rightKeyPressed)
+		return false;
+
+	if (password.size() == nextCharIndex + 1)
+		return true;
+
+	return passwordIsTyped(password, nextCharIndex + 1);
+}
+
+bool passwordIsTyped(const std::vector<int>& passwordKeys)
+{
+	return passwordIsTyped(passwordKeys, 0);
+}
+
 void prank_CAPSLOCK()
 {
 	emile::fullKeyPress(VK_CAPITAL);
@@ -44,11 +91,11 @@ void startPranking(const bool& continuePranking)
 	using prankFunctionType = void (*)();
 	std::vector<prankFunctionType> prankFunctions{ prank_WINDOWS,
 		prank_CAPSLOCK,
-		prank_BACKSPACE,
-		prank_CTRLV,
-		prank_RETURN,
-		prank_SPACE,
-		prank_ESCAPE
+		//prank_BACKSPACE,
+		//prank_CTRLV,
+		//prank_RETURN,
+		//prank_SPACE,
+		//prank_ESCAPE
 	};
 
 	const int MAX_INDEX{ static_cast<int>(prankFunctions.size() - 1) };
