@@ -1,5 +1,5 @@
 #include "EQIntLineEdit.h"
-#include "../EQIntValidator/EQIntValidator.h"
+#include "EQIntValidator.h"
 
 EQIntLineEdit::EQIntLineEdit(int minimum, int maximum, QWidget* parent)
 	: QLineEdit(parent)

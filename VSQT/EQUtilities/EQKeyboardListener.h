@@ -1,11 +1,12 @@
 #pragma once
 
+#include "equtilities_global.h"
 #include <QWidget>
 #include <unordered_map>
 #include <QString>
 #include <QVector>
 
-class EQKeyboardListener : public QWidget
+class EQUTILITIES_EXPORT EQKeyboardListener : public QWidget
 {
 	Q_OBJECT
 

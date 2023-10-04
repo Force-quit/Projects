@@ -1,8 +1,9 @@
 #pragma once
 
+#include "equtilities_global.h"
 #include <QLineEdit>
 
-class EQIntLineEdit : public QLineEdit
+class EQUTILITIES_EXPORT EQIntLineEdit : public QLineEdit
 {
 	Q_OBJECT
 

@@ -1,9 +1,10 @@
 #pragma once
 
+#include "equtilities_global.h"
 #include <QTabWidget>
 #include <QTabBar>
 
-class EQTabWidget : public QTabWidget
+class EQUTILITIES_EXPORT EQTabWidget : public QTabWidget
 {
 	Q_OBJECT
 

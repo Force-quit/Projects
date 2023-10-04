@@ -1,15 +1,16 @@
 #pragma once
 
+#include "equtilities_global.h"
 #include <QWidget>
 #include <QString>
 #include <QThread>
 #include <QVector>
 #include <QPushButton>
 #include "EQShortcutListenerWorker.h"
-#include "../EQKeyboardListener/EQKeyboardListener.h"
+#include "EQKeyboardListener.h"
 #include <QLabel>
 
-class EQShortcutListener : public QWidget
+class EQUTILITIES_EXPORT EQShortcutListener : public QWidget
 {
 	Q_OBJECT
 
