@@ -10,6 +10,3 @@
 [submodule "Qt/Input-recorder"]
 	path = Qt/Input-recorder
 	url = git@github.com:Force-quit/Input-recorder.git
-[submodule "Qt/AutoClicker"]
-	path = Qt/AutoClicker
-	url = git@github.com:Force-quit/AutoClicker.git
