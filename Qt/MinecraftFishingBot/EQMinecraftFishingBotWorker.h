@@ -4,7 +4,7 @@
 #include <QString>
 #include <QScreen>
 #include <QPixmap>
-#include "../../Utilities/EQKeyboardListener/EQKeyboardListener.h"
+#include "../../Utilities/Qt/EQKeyboardListener/EQKeyboardListener.h"
 
 class EQMinecraftFishingBotWorker  : public QObject
 {

@@ -12,8 +12,8 @@ EQMinecraftFishingBotWorker::EQMinecraftFishingBotWorker()
 	active(), captureHelp(), userActivation(), targetScreen(), shortcutListener()
 {
 	targetScreenChanged(QGuiApplication::primaryScreen()->name());
-	shortcutListener = new EQKeyboardListener(EQKeyboardListener::LCONTROL, 10);
-	connect(shortcutListener, &EQKeyboardListener::keyPressed, this, &EQMinecraftFishingBotWorker::activate);
+	shortcutListener = new EQKeyboardListener({ VK_RCONTROL }, 10);
+	connect(shortcutListener, &EQKeyboardListener::targetKeysPressed, this, &EQMinecraftFishingBotWorker::activate);
 }
 
 
@@ -60,12 +60,12 @@ void EQMinecraftFishingBotWorker::captureScreen()
 		if (!hasBlack)
 		{
 			emile::rightClick();
-			QTimer::singleShot(500, [](){emile::rightClick();});
+			QTimer::singleShot(500, []() {emile::rightClick(); });
 			QTimer::singleShot(2000, this, &EQMinecraftFishingBotWorker::captureScreen);
 			return;
 		}
 	}
-	
+
 	if (userActivation || captureHelp)
 		QTimer::singleShot(captureInterval, this, &EQMinecraftFishingBotWorker::captureScreen);
 	else
@@ -103,7 +103,7 @@ void EQMinecraftFishingBotWorker::stop()
 	captureHelp = false;
 }
 
-EQMinecraftFishingBotWorker::~EQMinecraftFishingBotWorker() 
+EQMinecraftFishingBotWorker::~EQMinecraftFishingBotWorker()
 {
 	delete shortcutListener;
 }

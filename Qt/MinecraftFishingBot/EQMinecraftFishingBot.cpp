@@ -3,7 +3,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QComboBox>
-#include "../../Utilities/EQUIRangedLineEdit.h"
+#include "../../Utilities/Qt/EQIntLineEdit/EQIntLineEdit.h"
 #include <QGuiApplication>
 #include <QScreen>
 #include <QString>
@@ -13,7 +13,7 @@
 #include <QPushButton>
 
 EQMinecraftFishingBot::EQMinecraftFishingBot(QWidget *parent)
-	: QMainWindow(parent), worker(), workerThread()
+    : QMainWindow(parent), worker(), workerThread(), APP_PATH{ QCoreApplication::applicationDirPath() }
 {
     worker = new EQMinecraftFishingBotWorker();
     worker->moveToThread(&workerThread);
@@ -35,6 +35,7 @@ EQMinecraftFishingBot::EQMinecraftFishingBot(QWidget *parent)
 
     centralWidget->setLayout(centralLayout);
     setCentralWidget(centralWidget);
+    setWindowIcon(QIcon(APP_PATH + "/fish.png"));
 }
 
 QGroupBox* EQMinecraftFishingBot::initActivationLayout()
@@ -88,7 +89,7 @@ QGroupBox* EQMinecraftFishingBot::initParameters()
     unsigned int min{ EQMinecraftFishingBotWorker::MIN_CAPTURE_SIZE };
     unsigned int max{ EQMinecraftFishingBotWorker::MAX_CAPTURE_SIZE };
     unsigned int defaultValue{ EQMinecraftFishingBotWorker::DEFAULT_CAPTURE_SIZE };
-    EQUIRangedLineEdit* captureSizeLineEdit{ new EQUIRangedLineEdit(min, max, defaultValue) };
+    EQIntLineEdit* captureSizeLineEdit{ new EQIntLineEdit(min, max) };
     captureSizeLayout->addWidget(captureSizeLabel);
     captureSizeLayout->addWidget(captureSizeLineEdit);
 
@@ -97,7 +98,7 @@ QGroupBox* EQMinecraftFishingBot::initParameters()
     min = EQMinecraftFishingBotWorker::MIN_INTERVAL;
     max = EQMinecraftFishingBotWorker::MAX_INTERVAL;
     defaultValue = EQMinecraftFishingBotWorker::DEFAULT_INTERVAL;
-    EQUIRangedLineEdit* captureIntervalLineEdit{ new EQUIRangedLineEdit(min, max, defaultValue) };
+    EQIntLineEdit* captureIntervalLineEdit{ new EQIntLineEdit(min, max) };
     captureIntervalLayout->addWidget(captureIntervalLabel);
     captureIntervalLayout->addWidget(captureIntervalLineEdit);
 
@@ -106,8 +107,8 @@ QGroupBox* EQMinecraftFishingBot::initParameters()
     parametersLayout->addLayout(captureIntervalLayout);
 
     connect(targetScreenComboBox, &QComboBox::currentTextChanged, worker, &EQMinecraftFishingBotWorker::targetScreenChanged);
-    connect(captureSizeLineEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQMinecraftFishingBotWorker::captureSizeChanged);
-    connect(captureIntervalLineEdit, &EQUIRangedLineEdit::valueValidated, worker, &EQMinecraftFishingBotWorker::setCaptureInterval);
+    connect(captureSizeLineEdit, &EQIntLineEdit::valueChanged, worker, &EQMinecraftFishingBotWorker::captureSizeChanged);
+    connect(captureIntervalLineEdit, &EQIntLineEdit::valueChanged, worker, &EQMinecraftFishingBotWorker::setCaptureInterval);
    
     parameters->setLayout(parametersLayout);
     return parameters;

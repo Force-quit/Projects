@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
+#include <QString>
 #include <QImage>
 #include <QPixmap>
 #include <QLabel>
@@ -22,10 +23,12 @@ public slots:
 	void displayCapture(const QPixmap capture);
 
 private:
+	const QString APP_PATH;
 	QThread workerThread;
 	EQMinecraftFishingBotWorker* worker;
 
 	QLabel* userCapture;
+
 
 	QGroupBox* initActivationLayout();
 	QGroupBox* initParameters();
