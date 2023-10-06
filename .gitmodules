@@ -13,3 +13,6 @@
 [submodule "VSQT/AutoClicker"]
 	path = VSQT/AutoClicker
 	url = git@github.com:Force-quit/AutoClicker.git
+[submodule "VSQT/Password-creator"]
+	path = VSQT/Password-creator
+	url = git@github.com:Force-quit/Password-creator.git
