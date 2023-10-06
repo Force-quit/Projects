@@ -1,6 +1,6 @@
 # Projects
 
-Here are my personnal projects I've been working on since 2019.
+Personnal projects I've been working on since 2019.
 
 Here are some of my favorite projects located in the VSQT solution of this repository:
 - https://github.com/Force-quit/AutoClicker
