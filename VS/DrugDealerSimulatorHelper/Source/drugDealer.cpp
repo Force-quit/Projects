@@ -1,7 +1,7 @@
-#include "drugDealer.h"
+#include "../Headers/drugDealer.h"
 #include <iomanip>
 #include <iostream>
-#include "../Utilities/utils.h"
+#include <EUtilities/EUtilities.h>
 #include <vector>
 
 void listDrugs(const std::map<short, std::string>& drugTypes)
@@ -18,7 +18,7 @@ unsigned short getDrugType(const std::map<short, std::string>& drugTypes)
 	unsigned short drugType{};
 	do
 	{
-		emile::flushTampon();
+		EUtilities::flushTampon();
 		std::cout << "Select a drug type (or 0 to stop taking orders) : ";
 		std::cin >> drugType;
 	} while (std::cin.fail() || !drugTypes.count(drugType) and drugType != 0);
@@ -100,7 +100,7 @@ void takeOrders(const std::map<short, std::string>& drugTypes, std::map<short, s
 		{
 			do
 			{
-				emile::flushTampon();
+				EUtilities::flushTampon();
 				std::cout << "Amount to add : ";
 				std::cin >> gramsToAdd;
 			} while (std::cin.fail());
@@ -163,12 +163,4 @@ void printTotalBags(const std::map<short, std::string>& drugTypes, std::map<shor
 		}
 		std::cout << std::endl;
 	}
-}
-
-void prepareConsole()
-{
-	HWND console = GetConsoleWindow();
-	RECT ConsoleRect;
-	GetWindowRect(console, &ConsoleRect);
-	MoveWindow(console, ConsoleRect.left, ConsoleRect.top, 1200, 550, FALSE);
 }

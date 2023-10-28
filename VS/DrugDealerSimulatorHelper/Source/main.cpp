@@ -1,6 +1,5 @@
-#include "../Utilities/utils.h"
-#include "../Console(v1.9)/console(v1.9).h"
-#include "../DrugDealer/drugDealer.h"
+#include "../Headers/drugDealer.h"
+#include <EUtilities/EUtilities.h>
 #include <iostream>
 #include <string>
 #include <map>
@@ -9,8 +8,6 @@
 
 int main()
 {
-	prepareConsole();
-	clreoscr();
 	auto title = R"(
  ______     ______     __    __      _____       ______      _____     ____     _____        _____   ______    
 (_  __ \   (   __ \    ) )  ( (     / ___ \     (_  __ \    / ___/    (    )   (_   _)      / ___/  (   __ \   
@@ -47,7 +44,7 @@ int main()
 		std::cout << "\n\n";
 		do
 		{
-			emile::flushTampon();
+			EUtilities::flushTampon();
 			std::cout << "Take other orders? (Y/N) : ";
 			std::cin >> continueTakingOrders;
 			continueTakingOrders = toupper(continueTakingOrders);
