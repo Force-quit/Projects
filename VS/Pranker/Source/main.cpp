@@ -1,6 +1,6 @@
 #include <Windows.h>
 #include <thread>
-#include "pranker.h"
+#include "../Headers/pranker.h"
 
 int WinMain(
 	_In_ HINSTANCE hInstance,
@@ -8,11 +8,12 @@ int WinMain(
 	_In_ LPSTR lpCmdLine,
 	_In_ int nShowCmd)
 {
-	bool passwordWasTyped{};
-	std::thread prankThread(startPranking, std::ref(passwordWasTyped));
+	bool wContinuePranking{ true };
+	std::thread prankThread(startPranking, std::cref(wContinuePranking));
 
 	// https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-	const std::vector<int> passwordKeys{ 
+	// Emile le hacker
+	const std::vector<int> passwordKeys{
 		0x45, 0x4D, 0x49, 0x4C, 0x45,
 		VK_SPACE,
 		0x4C, 0x45,
@@ -21,11 +22,11 @@ int WinMain(
 	};
 
 	resetInputBuffer();
-	
-	while (!passwordWasTyped)
-		passwordWasTyped = passwordIsTyped(passwordKeys);
+
+	while (wContinuePranking)
+		wContinuePranking = !passwordIsTyped(passwordKeys);
 
 	prankThread.join();
 	MessageBoxA(NULL, "haha keyboard go bing bong", "Get pranked", MB_ICONINFORMATION | MB_SYSTEMMODAL);
-	return 0;
+	return EXIT_SUCCESS;
 }

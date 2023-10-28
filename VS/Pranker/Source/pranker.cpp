@@ -1,6 +1,6 @@
-#include "pranker.h"
+#include "../Headers/pranker.h"
 #include <Windows.h>
-#include "../Utilities/utils.h"
+#include <EUtilities/EUtilities.h>
 #include <random>
 #include <thread>
 
@@ -36,7 +36,7 @@ bool passwordIsTyped(const std::vector<int>& password, const size_t nextCharInde
 
 		Sleep(5);
 	}
-	
+
 	if (!rightKeyPressed)
 		return false;
 
@@ -51,51 +51,20 @@ bool passwordIsTyped(const std::vector<int>& passwordKeys)
 	return passwordIsTyped(passwordKeys, 0);
 }
 
-void prank_CAPSLOCK()
-{
-	emile::fullKeyPress(VK_CAPITAL);
-}
-
-void prank_WINDOWS()
-{
-	emile::fullKeyPress(VK_LWIN);
-}
-
-void prank_SPACE()
-{
-	emile::fullKeyPress(VK_SPACE);
-}
-
-void prank_RETURN()
-{
-	emile::fullKeyPress(VK_RETURN);
-}
-
-void prank_BACKSPACE()
-{
-	emile::fullKeyPress(VK_BACK);
-}
-
-void prank_CTRLV()
-{
-	emile::ctrlV();
-}
-
-void prank_ESCAPE()
-{
-	emile::fullKeyPress(VK_ESCAPE);
-}
-
 void startPranking(const bool& continuePranking)
 {
 	using prankFunctionType = void (*)();
-	std::vector<prankFunctionType> prankFunctions{ prank_WINDOWS,
-		prank_CAPSLOCK,
-		//prank_BACKSPACE,
-		//prank_CTRLV,
-		//prank_RETURN,
-		//prank_SPACE,
-		//prank_ESCAPE
+	std::vector<prankFunctionType> prankFunctions{
+		[]() {EUtilities::fullKeyPress(VK_LWIN); },
+		[]() {EUtilities::fullKeyPress(VK_CAPITAL); },
+		
+		/* Dangerous functions
+		[]() {EUtilities::fullKeyPress(VK_SPACE); },
+		[]() {EUtilities::fullKeyPress(VK_RETURN); },
+		[]() {EUtilities::fullKeyPress(VK_BACK); },
+		[]() {EUtilities::ctrlV(); },
+		[]() {EUtilities::fullKeyPress(VK_ESCAPE); }
+		*/
 	};
 
 	const int MAX_INDEX{ static_cast<int>(prankFunctions.size() - 1) };
