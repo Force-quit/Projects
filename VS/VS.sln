@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DrugDealerSimulatorHelper",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InvertedMouseMover", "InvertedMouseMover\InvertedMouseMover.vcxproj", "{9E8A65F5-ACC3-407E-9EDF-DEC56669AC00}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -57,6 +59,14 @@ Global
 		{9E8A65F5-ACC3-407E-9EDF-DEC56669AC00}.Release|x64.Build.0 = Release|x64
 		{9E8A65F5-ACC3-407E-9EDF-DEC56669AC00}.Release|x86.ActiveCfg = Release|Win32
 		{9E8A65F5-ACC3-407E-9EDF-DEC56669AC00}.Release|x86.Build.0 = Release|Win32
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Debug|x64.ActiveCfg = Debug|x64
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Debug|x64.Build.0 = Debug|x64
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Debug|x86.ActiveCfg = Debug|Win32
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Debug|x86.Build.0 = Debug|Win32
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Release|x64.ActiveCfg = Release|x64
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Release|x64.Build.0 = Release|x64
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Release|x86.ActiveCfg = Release|Win32
+		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
