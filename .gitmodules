@@ -19,3 +19,6 @@
 [submodule "VSQT/Word-finder"]
 	path = VSQT/Word-finder
 	url = git@github.com:Force-quit/Word-finder.git
+[submodule "VSQT/MinecraftFishingBot"]
+	path = VSQT/MinecraftFishingBot
+	url = git@github.com:Force-quit/MinecraftFishingBot.git
