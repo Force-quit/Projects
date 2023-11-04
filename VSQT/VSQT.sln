@@ -29,6 +29,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EUtilities", "..\VS\EUtilit
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MinecraftFishingBot", "MinecraftFishingBot\MinecraftFishingBot.vcxproj", "{52A5DA91-1EB6-485C-9349-3E1E5C71338E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Input-recorder", "Input-recorder\Input-recorder.vcxproj", "{6E2F189E-91C6-46DC-A422-43699B3F5A09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -93,6 +95,14 @@ Global
 		{52A5DA91-1EB6-485C-9349-3E1E5C71338E}.Release|x64.Build.0 = Release|x64
 		{52A5DA91-1EB6-485C-9349-3E1E5C71338E}.Release|x86.ActiveCfg = Release|x64
 		{52A5DA91-1EB6-485C-9349-3E1E5C71338E}.Release|x86.Build.0 = Release|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Debug|x64.ActiveCfg = Debug|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Debug|x64.Build.0 = Debug|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Debug|x86.ActiveCfg = Debug|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Debug|x86.Build.0 = Debug|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Release|x64.ActiveCfg = Release|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Release|x64.Build.0 = Release|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Release|x86.ActiveCfg = Release|x64
+		{6E2F189E-91C6-46DC-A422-43699B3F5A09}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
