@@ -1,17 +1,9 @@
 #include "EQTests.h"
-#include <EQUtilities/EQIntLineEdit.h>
-#include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
-#include <EQUtilities/EQShortcutListener.h>
 
-EQTests::EQTests(QWidget* parent)
-	: QMainWindow(parent)
+EQTests::EQTests()
+	: QMainWindow()
 {
-	EQShortcutListener* s{ new EQShortcutListener("Blabla") };
-	s->startListening();
-	setCentralWidget(s);
+	QLabel* centralWidget{ new QLabel("Testing123") };
+	setCentralWidget(centralWidget);
 }
-
-EQTests::~EQTests()
-{}
