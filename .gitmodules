@@ -1,13 +1,7 @@
-[submodule "Qt/Chatlis"]
+[submodule "VSQT/Chatlis"]
 	path = VSQT/Chatlis
 	url = https://github.com/Force-quit/Chatlis.git
-[submodule "Qt/Emalice"]
-	path = Qt/Emalice
-	url = git@github.com:Force-quit/Emalice.git
-[submodule "Qt/Password-creator"]
-	path = Qt/Password-creator
-	url = git@github.com:Force-quit/Password-creator.git
-[submodule "Qt/Input-recorder"]
+[submodule "VSQT/Input-recorder"]
 	path = VSQT/Input-recorder
 	url = git@github.com:Force-quit/Input-recorder.git
 [submodule "VSQT/AutoClicker"]
