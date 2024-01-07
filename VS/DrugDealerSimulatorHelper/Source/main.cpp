@@ -1,5 +1,6 @@
+import EUtilities;
+
 #include "../Headers/drugDealer.h"
-#include <EUtilities/EUtilities.h>
 #include <iostream>
 #include <string>
 #include <map>

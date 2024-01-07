@@ -1,7 +1,8 @@
+import EUtilities;
+
 #include "../Headers/drugDealer.h"
 #include <iomanip>
 #include <iostream>
-#include <EUtilities/EUtilities.h>
 #include <vector>
 
 void listDrugs(const std::map<short, std::string>& drugTypes)
