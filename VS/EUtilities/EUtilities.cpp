@@ -1,9 +1,10 @@
-#include "pch.h" 
-#include "EUtilities.h"
-#include <string>
-#include <vector>
-#include <filesystem>
+module;
+
 #include <iostream>
+#include <Windows.h>
+#include <filesystem>
+
+module EUtilities;
 
 void EUtilities::flushTampon()
 {
@@ -183,31 +184,31 @@ void EUtilities::humanType(const wchar_t* toWrite, int keyPressInterval)
 	}
 }
 
-void EUtilities::copyToClipBoard(const std::string_view dataToCopy)
+void EUtilities::copyToClipBoard(const std::wstring_view data)
 {
-	if (OpenClipboard(GetActiveWindow()))
+	if (OpenClipboard(NULL))
 	{
 		EmptyClipboard();
 
-		HGLOBAL hGlobalAlloc = GlobalAlloc(GMEM_MOVEABLE, dataToCopy.size() + 1);
+		const size_t dataSize = (data.size() + 1) * sizeof(wchar_t); // Include null terminator
+		HGLOBAL globalAlloc = GlobalAlloc(GMEM_MOVEABLE, dataSize);
 
-		if (!hGlobalAlloc)
-			std::cout << "Failed to get a handle to the globalAlloc" << '\n';
-		else
+		if (globalAlloc)
 		{
-			memcpy(GlobalLock(hGlobalAlloc), dataToCopy.data(), dataToCopy.size() + 1);
-			GlobalUnlock(hGlobalAlloc);
+			wchar_t* dataDestination = static_cast<wchar_t*>(GlobalLock(globalAlloc));
+			if (dataDestination)
+			{
+				std::copy(data.begin(), data.end(), dataDestination);
+				dataDestination[data.size()] = L'\0'; // Null terminator
+				GlobalUnlock(globalAlloc);
+				SetClipboardData(CF_UNICODETEXT, globalAlloc);
+			}
 
-			if (!SetClipboardData(CF_TEXT, hGlobalAlloc))
-				std::cout << "Failed to copy to clipboard :(" << '\n';
-
-			GlobalFree(hGlobalAlloc);
+			GlobalFree(globalAlloc);
 		}
-
+		
 		CloseClipboard();
 	}
-	else
-		std::cout << "Failed to open clipboard" << '\n';
 }
 
 /***********************/

@@ -4,20 +4,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Pranker", "Pranker\Pranker.vcxproj", "{9A2017E5-16D5-426A-BCAB-62EC22D98730}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EDF692E7-78DD-4542-87A1-8625779C73E6} = {EDF692E7-78DD-4542-87A1-8625779C73E6}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EUtilities", "EUtilities\EUtilities.vcxproj", "{EDF692E7-78DD-4542-87A1-8625779C73E6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DrugDealerSimulatorHelper", "DrugDealerSimulatorHelper\DrugDealerSimulatorHelper.vcxproj", "{1DDAEF83-1939-47A3-A22E-47BA21D610D7}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EDF692E7-78DD-4542-87A1-8625779C73E6} = {EDF692E7-78DD-4542-87A1-8625779C73E6}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "InvertedMouseMover", "InvertedMouseMover\InvertedMouseMover.vcxproj", "{9E8A65F5-ACC3-407E-9EDF-DEC56669AC00}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxproj", "{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EUtilities", "EUtilities\EUtilities.vcxproj", "{AB1FDB31-F30A-44F2-B563-F960687E73C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,14 +29,6 @@ Global
 		{9A2017E5-16D5-426A-BCAB-62EC22D98730}.Release|x64.Build.0 = Release|x64
 		{9A2017E5-16D5-426A-BCAB-62EC22D98730}.Release|x86.ActiveCfg = Release|Win32
 		{9A2017E5-16D5-426A-BCAB-62EC22D98730}.Release|x86.Build.0 = Release|Win32
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Debug|x64.ActiveCfg = Debug|x64
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Debug|x64.Build.0 = Debug|x64
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Debug|x86.ActiveCfg = Debug|Win32
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Debug|x86.Build.0 = Debug|Win32
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Release|x64.ActiveCfg = Release|x64
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Release|x64.Build.0 = Release|x64
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Release|x86.ActiveCfg = Release|Win32
-		{EDF692E7-78DD-4542-87A1-8625779C73E6}.Release|x86.Build.0 = Release|Win32
 		{1DDAEF83-1939-47A3-A22E-47BA21D610D7}.Debug|x64.ActiveCfg = Debug|x64
 		{1DDAEF83-1939-47A3-A22E-47BA21D610D7}.Debug|x64.Build.0 = Debug|x64
 		{1DDAEF83-1939-47A3-A22E-47BA21D610D7}.Debug|x86.ActiveCfg = Debug|Win32
@@ -67,6 +53,14 @@ Global
 		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Release|x64.Build.0 = Release|x64
 		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Release|x86.ActiveCfg = Release|Win32
 		{408BEFDC-B141-4684-940E-5DE0B1AEF8BF}.Release|x86.Build.0 = Release|Win32
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Debug|x64.ActiveCfg = Debug|x64
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Debug|x64.Build.0 = Debug|x64
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Debug|x86.ActiveCfg = Debug|Win32
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Debug|x86.Build.0 = Debug|Win32
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Release|x64.ActiveCfg = Release|x64
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Release|x64.Build.0 = Release|x64
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Release|x86.ActiveCfg = Release|Win32
+		{AB1FDB31-F30A-44F2-B563-F960687E73C8}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

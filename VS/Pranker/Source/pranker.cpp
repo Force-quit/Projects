@@ -1,6 +1,7 @@
+import EUtilities;
+
 #include "../Headers/pranker.h"
 #include <Windows.h>
-#include <EUtilities/EUtilities.h>
 #include <random>
 #include <thread>
 
