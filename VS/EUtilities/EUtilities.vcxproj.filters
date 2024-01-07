@@ -18,9 +18,6 @@
     <ClCompile Include="EUtilities.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EUtilities.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>

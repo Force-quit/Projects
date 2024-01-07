@@ -1,6 +1,0 @@
-import EUtilities;
-
-int main()
-{
-
-}
