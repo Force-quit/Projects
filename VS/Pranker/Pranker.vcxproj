@@ -144,10 +144,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\pranker.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Headers\pranker.h" />
     <ClInclude Include="Resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
