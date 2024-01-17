@@ -61,7 +61,10 @@ export namespace EUtilities
 	void rightClick(const int& holdTime = 30);
 
 	// Wait until user presses and release the specified virutal key
+	void waitForFullKeyPress(short vKey);
 	void waitForKeyPress(short vKey);
+	void waitForKeyRelease(short vKey);
+
 
 	// Create folder if it doesn't exist. Returns false if folder did not exist
 	bool ensureFolderExists(const std::string_view dirName);
