@@ -144,8 +144,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\PrankWorker.cpp" />
+    <ClCompile Include="Source\RangedRandomGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\PrankWorker.h" />
+    <ClInclude Include="Headers\RangedRandomGenerator.h" />
     <ClInclude Include="Resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
