@@ -18,10 +18,10 @@
     <ClCompile Include="Source\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\RangedRandomGenerator.cpp">
+    <ClCompile Include="Source\PrankWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\PrankWorker.cpp">
+    <ClCompile Include="Source\PasswordWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Headers\PrankWorker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\PasswordWorker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

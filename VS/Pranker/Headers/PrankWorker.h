@@ -4,7 +4,6 @@ import EUtilities;
 
 #include <Windows.h>
 #include <array>
-#include <chrono>
 #include <thread>
 
 class PrankWorker
@@ -15,9 +14,10 @@ public:
 	void stop();
 
 private:
-	static constexpr auto MIN_PRANK_INTERVAL{ std::chrono::seconds(30).count() };
-	static constexpr auto MAX_PRANK_INTERVAL{ std::chrono::minutes(2).count() };
-	static constexpr std::array<void (*)(), 2> prankFunctions{
+	static constexpr int MIN_PRANK_INTERVAL{ 30000 };
+	static constexpr int MAX_PRANK_INTERVAL{ 120000 };
+	static constexpr std::array<void (*)(), 2> mPrankFunctions
+	{
 		[]() {EUtilities::fullKeyPress(VK_LWIN); },
 		[]() {EUtilities::fullKeyPress(VK_CAPITAL); },
 
@@ -30,7 +30,7 @@ private:
 		*/
 	};
 
-	std::jthread loopThread;
-	void mainLoop(std::stop_token stoken);
+	std::jthread mLoopThread;
+	void mainLoop(std::stop_token iStopToken);
 };
 

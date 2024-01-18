@@ -1,16 +1,24 @@
 #pragma once
 #include <random>
 
+template <typename T>
 class RangedRandomGenerator
 {
 private:
-    static std::random_device rd;
-    static std::mt19937 gen;
+    inline static std::random_device rd;
+    inline static std::mt19937 gen;
 
-    std::uniform_int_distribution<size_t> distribution;
+    std::uniform_int_distribution<T> distribution;
 
 public:
-    RangedRandomGenerator(size_t min, size_t inclusiveMax);
-    size_t random();
+    RangedRandomGenerator(T min, T inclusiveMax)
+        : distribution(min, inclusiveMax)
+    {
+    }
+
+    T random()
+    {
+        return distribution(gen);
+    }
 };
 
