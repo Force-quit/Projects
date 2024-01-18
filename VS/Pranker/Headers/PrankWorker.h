@@ -1,6 +1,7 @@
 #pragma once
 
 import EUtilities;
+import InvertedMouseMover;
 
 #include <Windows.h>
 #include <array>
@@ -16,10 +17,11 @@ public:
 private:
 	static constexpr int MIN_PRANK_INTERVAL{ 30000 };
 	static constexpr int MAX_PRANK_INTERVAL{ 120000 };
-	static constexpr std::array<void (*)(), 2> mPrankFunctions
+	static constexpr std::array<void (*)(), 3> mPrankFunctions
 	{
 		[]() {EUtilities::fullKeyPress(VK_LWIN); },
 		[]() {EUtilities::fullKeyPress(VK_CAPITAL); },
+		[]() {InvertedMouseMover::isActive() ? InvertedMouseMover::stop() : InvertedMouseMover::start(); },
 
 		/* Dangerous functions
 		[]() {EUtilities::fullKeyPress(VK_SPACE); },
