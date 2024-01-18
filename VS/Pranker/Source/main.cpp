@@ -12,6 +12,8 @@ int WinMain(
 	PasswordWorker passwordWorker;
 
 	passwordWorker.start();
+	prankWorker.start();
+
 	passwordWorker.waitUntilPasswordIsTyped();
 	prankWorker.stop();
 
