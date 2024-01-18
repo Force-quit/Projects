@@ -129,7 +129,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\invertedMouseMover.cpp" />
+    <ClCompile Include="Headers\InvertedMouseMover.ixx" />
+    <ClCompile Include="Source\InvertedMouseMover.cpp" />
+    <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
