@@ -31,6 +31,11 @@ void InvertedMouseMover::startFor(clock_t iActivationTime)
 	});
 }
 
+bool InvertedMouseMover::isActive()
+{
+	return mActive;
+}
+
 void InvertedMouseMover::stop()
 {
 	if (mLoopThread.joinable())
@@ -49,6 +54,7 @@ std::pair<int, int> InvertedMouseMover::getScreenSize()
 
 void InvertedMouseMover::mainLoop(std::stop_token iStopToken)
 {
+	mActive = true;
 	POINT previousMousePos, mousePos;
 	
 	GetCursorPos(&mousePos);
@@ -70,4 +76,5 @@ void InvertedMouseMover::mainLoop(std::stop_token iStopToken)
 			previousMousePos = mousePos;
 		}
 	}
+	mActive = false;
 }

@@ -3,7 +3,8 @@ import InvertedMouseMover;
 
 int main()
 {
-	InvertedMouseMover::start();
+	InvertedMouseMover::startFor(1000);
 	std::cin.get();
+	auto b = InvertedMouseMover::isActive();
 	InvertedMouseMover::stop();
 }

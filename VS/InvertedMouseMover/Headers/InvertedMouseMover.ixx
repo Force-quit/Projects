@@ -13,6 +13,7 @@ public:
 	InvertedMouseMover() = delete;
 	static void start();
 	static void startFor(clock_t iActivationTime);
+	static bool isActive();
 	static void stop();
 
 private:
@@ -21,4 +22,5 @@ private:
 	
 	static const std::pair<int, int> mScreenSize;
 	inline static std::jthread mLoopThread;
+	inline static bool mActive{};
 };
