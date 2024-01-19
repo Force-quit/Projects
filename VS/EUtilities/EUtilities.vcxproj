@@ -19,8 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EUtilities-Windows.cpp" />
     <ClCompile Include="EUtilities.cpp" />
     <ClCompile Include="EUtilities.ixx" />
+    <ClCompile Include="EUtilities-Windows.ixx" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

@@ -21,5 +21,11 @@
     <ClCompile Include="EUtilities.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="EUtilities-Windows.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EUtilities-Windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

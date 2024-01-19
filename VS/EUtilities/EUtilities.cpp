@@ -60,13 +60,13 @@ void EUtilities::Console::hideScrollingBar()
 /*     KEYBOARD UTILS     */
 /**************************/
 
-void EUtilities::pressKey(const char key)
+void EUtilities::pressKey(char key)
 {
-	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
+	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
 	EUtilities::pressKey(keyCode);
 }
 
-void EUtilities::pressKey(const int keyCode)
+void EUtilities::pressKey(int keyCode)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
@@ -81,13 +81,13 @@ void EUtilities::pressKey(INPUT& input)
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void EUtilities::releaseKey(const char key)
+void EUtilities::releaseKey(char key)
 {
-	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
+	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
 	EUtilities::releaseKey(keyCode);
 }
 
-void EUtilities::releaseKey(const int keyCode)
+void EUtilities::releaseKey(int keyCode)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
@@ -101,13 +101,13 @@ void EUtilities::releaseKey(INPUT& input)
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void EUtilities::fullKeyPress(const char key, unsigned int pressDuration)
+void EUtilities::fullKeyPress(char key, unsigned int pressDuration)
 {
-	const short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
+	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
 	EUtilities::fullKeyPress(keyCode, pressDuration);
 }
 
-void EUtilities::fullKeyPress(const int keyCode, unsigned int pressDuration)
+void EUtilities::fullKeyPress(int keyCode, unsigned int pressDuration)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
@@ -206,7 +206,7 @@ void EUtilities::copyToClipBoard(const std::wstring_view data)
 
 			GlobalFree(globalAlloc);
 		}
-		
+
 		CloseClipboard();
 	}
 }
@@ -263,27 +263,6 @@ void EUtilities::rightClick(const int& holdTime)
 	EUtilities::rightClickDown();
 	Sleep(holdTime);
 	EUtilities::rightClickUp();
-}
-
-void EUtilities::waitForFullKeyPress(short vKey)
-{
-	GetAsyncKeyState(vKey); // Reset buffer
-
-	EUtilities::waitForKeyPress(vKey);
-
-	EUtilities::waitForKeyRelease(vKey);
-}
-
-void EUtilities::waitForKeyPress(short vKey)
-{
-	while (!GetAsyncKeyState(vKey))
-		Sleep(50);
-}
-
-void EUtilities::waitForKeyRelease(short vKey)
-{
-	while (GetAsyncKeyState(vKey))
-		Sleep(50);
 }
 
 bool EUtilities::ensureFolderExists(const std::string_view dirName)
