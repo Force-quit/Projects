@@ -3,11 +3,11 @@ module;
 #include <Windows.h>
 #include <string_view>
 
-export module EUtilities;
+export module eutilities;
 
 export import :Windows;
 
-export namespace EUtilities
+export namespace eutilities
 {
 	void flushTampon();
 

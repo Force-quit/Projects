@@ -2,24 +2,24 @@ module;
 
 #include <Windows.h>
 
-module EUtilities:Windows;
+module eutilities:Windows;
 
-void EUtilities::waitForFullKeyPress(short vKey)
+void eutilities::windows::waitForFullKeyPress(short vKey)
 {
 	GetAsyncKeyState(vKey); // Reset buffer
 
-	EUtilities::waitForKeyPress(vKey);
+	eutilities::windows::waitForKeyPress(vKey);
 
-	EUtilities::waitForKeyRelease(vKey);
+	eutilities::windows::waitForKeyRelease(vKey);
 }
 
-void EUtilities::waitForKeyPress(short vKey)
+void eutilities::windows::waitForKeyPress(short vKey)
 {
 	while (!GetAsyncKeyState(vKey))
 		Sleep(50);
 }
 
-void EUtilities::waitForKeyRelease(short vKey)
+void eutilities::windows::waitForKeyRelease(short vKey)
 {
 	while (GetAsyncKeyState(vKey))
 		Sleep(50);

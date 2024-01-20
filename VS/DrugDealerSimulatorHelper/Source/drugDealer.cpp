@@ -1,4 +1,4 @@
-import EUtilities;
+import eutilities;
 
 #include "../Headers/drugDealer.h"
 #include <iomanip>
@@ -19,7 +19,7 @@ unsigned short getDrugType(const std::map<short, std::string>& drugTypes)
 	unsigned short drugType{};
 	do
 	{
-		EUtilities::flushTampon();
+		eutilities::flushTampon();
 		std::cout << "Select a drug type (or 0 to stop taking orders) : ";
 		std::cin >> drugType;
 	} while (std::cin.fail() || !drugTypes.count(drugType) and drugType != 0);
@@ -101,7 +101,7 @@ void takeOrders(const std::map<short, std::string>& drugTypes, std::map<short, s
 		{
 			do
 			{
-				EUtilities::flushTampon();
+				eutilities::flushTampon();
 				std::cout << "Amount to add : ";
 				std::cin >> gramsToAdd;
 			} while (std::cin.fail());

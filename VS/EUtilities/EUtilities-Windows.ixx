@@ -1,9 +1,12 @@
-export module EUtilities:Windows;
+export module eutilities:Windows;
 
-export namespace EUtilities
+export namespace eutilities
 {
-	// Wait until user presses and release the specified virutal key
-	void waitForFullKeyPress(short vKey);
-	void waitForKeyPress(short vKey);
-	void waitForKeyRelease(short vKey);
+	namespace windows
+	{
+		// Wait until user presses and release the specified virutal key
+		void waitForFullKeyPress(short vKey);
+		void waitForKeyPress(short vKey);
+		void waitForKeyRelease(short vKey);
+	}
 }
