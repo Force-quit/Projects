@@ -1,6 +1,6 @@
 #include "../Headers/PasswordWorker.h"
 
-import eutilities;
+import eUtilities;
 #include <Windows.h>
 #include <thread>
 #include <functional>
@@ -33,7 +33,7 @@ bool PasswordWorker::passwordIsTyped(size_t iNextCharIndex)
 			if (GetAsyncKeyState(wVirtualKey))
 			{
 				wAnyKeyWasPressed = true;
-				eutilities::waitForKeyRelease(wVirtualKey);
+				eUtilities::waitForKeyRelease(wVirtualKey);
 				wRightKeyPressed = wVirtualKey == mPasswordKeys[iNextCharIndex];
 				break;
 			}

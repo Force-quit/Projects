@@ -21,10 +21,10 @@
     <ClCompile Include="EUtilities.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="EUtilities-Windows.ixx">
+    <ClCompile Include="EUtilities-windows.ixx">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="EUtilities-Windows.cpp">
+    <ClCompile Include="EUtilities-windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

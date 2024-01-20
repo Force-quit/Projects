@@ -1,6 +1,6 @@
-export module eutilities:Windows;
+export module eUtilities:Windows;
 
-export namespace eutilities
+export namespace eUtilities
 {
 	namespace windows
 	{

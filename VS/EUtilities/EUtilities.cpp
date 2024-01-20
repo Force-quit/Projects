@@ -4,29 +4,29 @@ module;
 #include <Windows.h>
 #include <filesystem>
 
-module eutilities;
+module eUtilities;
 
-void eutilities::flushTampon()
+void eUtilities::flushTampon()
 {
 	std::cin.clear();
 	std::cin.ignore(std::cin.rdbuf()->in_avail());
 }
 
-void eutilities::Console::consoleBundle()
+void eUtilities::Console::consoleBundle()
 {
-	eutilities::Console::preventConsoleResize();
-	eutilities::Console::hideCursor();
-	eutilities::Console::disableQuickEdit();
-	eutilities::Console::hideScrollingBar();
+	eUtilities::Console::preventConsoleResize();
+	eUtilities::Console::hideCursor();
+	eUtilities::Console::disableQuickEdit();
+	eUtilities::Console::hideScrollingBar();
 }
 
-void eutilities::Console::preventConsoleResize()
+void eUtilities::Console::preventConsoleResize()
 {
 	HWND consoleWindow = GetConsoleWindow();
 	SetWindowLong(consoleWindow, GWL_STYLE, GetWindowLong(consoleWindow, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
 }
 
-void eutilities::Console::hideCursor()
+void eUtilities::Console::hideCursor()
 {
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_CURSOR_INFO lpCursor{};
@@ -35,7 +35,7 @@ void eutilities::Console::hideCursor()
 	SetConsoleCursorInfo(console, &lpCursor);
 }
 
-void eutilities::Console::disableQuickEdit()
+void eUtilities::Console::disableQuickEdit()
 {
 	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
 	DWORD prev_mode;
@@ -43,7 +43,7 @@ void eutilities::Console::disableQuickEdit()
 	SetConsoleMode(hInput, prev_mode & ~ENABLE_QUICK_EDIT_MODE);
 }
 
-void eutilities::Console::hideScrollingBar()
+void eUtilities::Console::hideScrollingBar()
 {
 	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
 	CONSOLE_SCREEN_BUFFER_INFO info;
@@ -60,69 +60,69 @@ void eutilities::Console::hideScrollingBar()
 /*     KEYBOARD UTILS     */
 /**************************/
 
-void eutilities::pressKey(char key)
+void eUtilities::pressKey(char key)
 {
 	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
-	eutilities::pressKey(keyCode);
+	eUtilities::pressKey(keyCode);
 }
 
-void eutilities::pressKey(int keyCode)
+void eUtilities::pressKey(int keyCode)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
 	i.ki.wVk = keyCode;
 
-	eutilities::pressKey(i);
+	eUtilities::pressKey(i);
 }
 
-void eutilities::pressKey(INPUT& input)
+void eUtilities::pressKey(INPUT& input)
 {
 	input.ki.dwFlags = 0;
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void eutilities::releaseKey(char key)
+void eUtilities::releaseKey(char key)
 {
 	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
-	eutilities::releaseKey(keyCode);
+	eUtilities::releaseKey(keyCode);
 }
 
-void eutilities::releaseKey(int keyCode)
+void eUtilities::releaseKey(int keyCode)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
 	i.ki.wVk = keyCode;
-	eutilities::releaseKey(i);
+	eUtilities::releaseKey(i);
 }
 
-void eutilities::releaseKey(INPUT& input)
+void eUtilities::releaseKey(INPUT& input)
 {
 	input.ki.dwFlags = KEYEVENTF_KEYUP;
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void eutilities::fullKeyPress(char key, unsigned int pressDuration)
+void eUtilities::fullKeyPress(char key, unsigned int pressDuration)
 {
 	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
-	eutilities::fullKeyPress(keyCode, pressDuration);
+	eUtilities::fullKeyPress(keyCode, pressDuration);
 }
 
-void eutilities::fullKeyPress(int keyCode, unsigned int pressDuration)
+void eUtilities::fullKeyPress(int keyCode, unsigned int pressDuration)
 {
 	INPUT i{};
 	i.type = INPUT_KEYBOARD;
 	i.ki.wVk = keyCode;
-	eutilities::fullKeyPress(i, pressDuration);
+	eUtilities::fullKeyPress(i, pressDuration);
 }
 
-void eutilities::fullKeyPress(INPUT& input, unsigned int pressDuration)
+void eUtilities::fullKeyPress(INPUT& input, unsigned int pressDuration)
 {
-	eutilities::pressKey(input);
+	eUtilities::pressKey(input);
 	Sleep(pressDuration);
-	eutilities::releaseKey(input);
+	eUtilities::releaseKey(input);
 }
 
-void eutilities::ctrlV()
+void eUtilities::ctrlV()
 {
 	const short NB_INPUTS = 4;
 
@@ -143,7 +143,7 @@ void eutilities::ctrlV()
 	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
-void eutilities::winR()
+void eUtilities::winR()
 {
 	const short NB_INPUTS = 4;
 
@@ -164,7 +164,7 @@ void eutilities::winR()
 	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
-void eutilities::humanType(const wchar_t* toWrite, int keyPressInterval)
+void eUtilities::humanType(const wchar_t* toWrite, int keyPressInterval)
 {
 	size_t sizeToWrite{ wcslen(toWrite) };
 	INPUT ip{};
@@ -184,7 +184,7 @@ void eutilities::humanType(const wchar_t* toWrite, int keyPressInterval)
 	}
 }
 
-void eutilities::copyToClipBoard(const std::wstring_view data)
+void eUtilities::copyToClipBoard(const std::wstring_view data)
 {
 	if (OpenClipboard(NULL))
 	{
@@ -217,7 +217,7 @@ void eutilities::copyToClipBoard(const std::wstring_view data)
 
 // LEFT CLICK
 
-void eutilities::leftClickDown()
+void eUtilities::leftClickDown()
 {
 	INPUT mouseDown{};
 	mouseDown.type = INPUT_MOUSE;
@@ -225,7 +225,7 @@ void eutilities::leftClickDown()
 	SendInput(1, &mouseDown, sizeof(INPUT));
 }
 
-void eutilities::leftClickUp()
+void eUtilities::leftClickUp()
 {
 	INPUT mouseUp{};
 	mouseUp.type = INPUT_MOUSE;
@@ -233,16 +233,16 @@ void eutilities::leftClickUp()
 	SendInput(1, &mouseUp, sizeof(INPUT));
 }
 
-void eutilities::leftClick(const int& holdTime)
+void eUtilities::leftClick(const int& holdTime)
 {
-	eutilities::leftClickDown();
+	eUtilities::leftClickDown();
 	Sleep(holdTime);
-	eutilities::leftClickUp();
+	eUtilities::leftClickUp();
 }
 
 // RIGHT CLICK
 
-void eutilities::rightClickDown()
+void eUtilities::rightClickDown()
 {
 	INPUT mouseDown{};
 	mouseDown.type = INPUT_MOUSE;
@@ -250,7 +250,7 @@ void eutilities::rightClickDown()
 	SendInput(1, &mouseDown, sizeof(INPUT));
 }
 
-void eutilities::rightClickUp()
+void eUtilities::rightClickUp()
 {
 	INPUT mouseDown{};
 	mouseDown.type = INPUT_MOUSE;
@@ -258,22 +258,22 @@ void eutilities::rightClickUp()
 	SendInput(1, &mouseDown, sizeof(INPUT));
 }
 
-void eutilities::rightClick(const int& holdTime)
+void eUtilities::rightClick(const int& holdTime)
 {
-	eutilities::rightClickDown();
+	eUtilities::rightClickDown();
 	Sleep(holdTime);
-	eutilities::rightClickUp();
+	eUtilities::rightClickUp();
 }
 
-bool eutilities::ensureFolderExists(const std::string_view dirName)
+bool eUtilities::ensureFolderExists(const std::string_view dirName)
 {
-	bool folderExists = eutilities::folderExists(dirName);
+	bool folderExists = eUtilities::folderExists(dirName);
 	if (!folderExists)
 		std::filesystem::create_directory(dirName);
 	return folderExists;
 }
 
-bool eutilities::folderExists(const std::string_view dirName)
+bool eUtilities::folderExists(const std::string_view dirName)
 {
 	return std::filesystem::is_directory(dirName);
 }
