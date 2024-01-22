@@ -5,20 +5,11 @@ module;
 
 export module eUtilities;
 
-export import :Windows;
+export import :windows;
 
 export namespace eUtilities
 {
 	void flushTampon();
-
-	namespace Console
-	{
-		void consoleBundle();
-		void preventConsoleResize();
-		void hideCursor();
-		void disableQuickEdit();
-		void hideScrollingBar();
-	};
 
 	//////////////////////////////
 	// KEYBOARD AND MOUSE INPUT //

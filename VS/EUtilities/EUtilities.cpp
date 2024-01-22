@@ -12,50 +12,6 @@ void eUtilities::flushTampon()
 	std::cin.ignore(std::cin.rdbuf()->in_avail());
 }
 
-void eUtilities::Console::consoleBundle()
-{
-	eUtilities::Console::preventConsoleResize();
-	eUtilities::Console::hideCursor();
-	eUtilities::Console::disableQuickEdit();
-	eUtilities::Console::hideScrollingBar();
-}
-
-void eUtilities::Console::preventConsoleResize()
-{
-	HWND consoleWindow = GetConsoleWindow();
-	SetWindowLong(consoleWindow, GWL_STYLE, GetWindowLong(consoleWindow, GWL_STYLE) & ~WS_MAXIMIZEBOX & ~WS_SIZEBOX);
-}
-
-void eUtilities::Console::hideCursor()
-{
-	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_CURSOR_INFO lpCursor{};
-	lpCursor.bVisible = false;
-	lpCursor.dwSize = 20;
-	SetConsoleCursorInfo(console, &lpCursor);
-}
-
-void eUtilities::Console::disableQuickEdit()
-{
-	HANDLE hInput = GetStdHandle(STD_INPUT_HANDLE);
-	DWORD prev_mode;
-	GetConsoleMode(hInput, &prev_mode);
-	SetConsoleMode(hInput, prev_mode & ~ENABLE_QUICK_EDIT_MODE);
-}
-
-void eUtilities::Console::hideScrollingBar()
-{
-	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_SCREEN_BUFFER_INFO info;
-	GetConsoleScreenBufferInfo(handle, &info);
-	COORD new_size =
-	{
-		info.srWindow.Right - info.srWindow.Left + 1,
-		info.srWindow.Bottom - info.srWindow.Top + 1
-	};
-	SetConsoleScreenBufferSize(handle, new_size);
-}
-
 /**************************/
 /*     KEYBOARD UTILS     */
 /**************************/
