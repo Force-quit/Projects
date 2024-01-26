@@ -1,4 +1,4 @@
-import EUtilities;
+import eutilities;
 
 #include "../Headers/drugDealer.h"
 #include <iostream>
@@ -45,7 +45,7 @@ int main()
 		std::cout << "\n\n";
 		do
 		{
-			EUtilities::flushTampon();
+			eutilities::flushTampon();
 			std::cout << "Take other orders? (Y/N) : ";
 			std::cin >> continueTakingOrders;
 			continueTakingOrders = toupper(continueTakingOrders);

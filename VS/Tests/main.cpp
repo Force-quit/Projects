@@ -1,4 +1,4 @@
-import EUtilities;
+import eutilities;
 #include <iostream>
 
 int main()
