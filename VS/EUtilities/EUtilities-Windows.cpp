@@ -6,21 +6,73 @@ module;
 #include <thread>
 
 module eutilities:windows;
-//
-//static constexpr bool isMouseKey(eutilities::Key key)
-//{
-//	switch (key)
-//	{
-//	case eutilities::Key::MOUSE_LEFT:
-//	case eutilities::Key::MOUSE_RIGHT:
-//	case eutilities::Key::MOUSE_MIDDLE:
-//	case eutilities::Key::MOUSE_BUTTON1:
-//	case eutilities::Key::MOUSE_BUTTON2:
-//		return true;
-//	default:
-//		return false;
-//	}
-//}
+
+constexpr bool eutilities::isMouseKey(Key key)
+{
+	switch (key)
+	{
+	case eutilities::Key::LEFT_CLICK:
+	case eutilities::Key::RIGHT_CLICK:
+	case eutilities::Key::MIDDLE_MOUSE:
+	case eutilities::Key::MOUSE_BUTTON1:
+	case eutilities::Key::MOUSE_BUTTON2:
+		return true;
+	default:
+		return false;
+	}
+}
+
+void eutilities::setMousePressInput(Key mouseKey, INPUT& mouseInput)
+{
+	mouseInput.type = INPUT_MOUSE;
+
+	switch (mouseKey)
+	{
+	case eutilities::Key::LEFT_CLICK:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+		break;
+	case eutilities::Key::RIGHT_CLICK:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+		break;
+	case eutilities::Key::MIDDLE_MOUSE:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_MIDDLEDOWN;
+		break;
+	case eutilities::Key::MOUSE_BUTTON1:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_XDOWN;
+		mouseInput.mi.mouseData = XBUTTON1;
+		break;
+	case eutilities::Key::MOUSE_BUTTON2:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_XDOWN;
+		mouseInput.mi.mouseData = XBUTTON2;
+		break;
+	}
+}
+
+void eutilities::setMouseReleaseInput(Key mouseKey, INPUT& mouseInput)
+{
+	mouseInput.type = INPUT_MOUSE;
+
+	switch (mouseKey)
+	{
+	case eutilities::Key::LEFT_CLICK:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+		break;
+	case eutilities::Key::RIGHT_CLICK:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_RIGHTUP;
+		break;
+	case eutilities::Key::MIDDLE_MOUSE:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_MIDDLEUP;
+		break;
+	case eutilities::Key::MOUSE_BUTTON1:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_XUP;
+		mouseInput.mi.mouseData = XBUTTON1;
+		break;
+	case eutilities::Key::MOUSE_BUTTON2:
+		mouseInput.mi.dwFlags = MOUSEEVENTF_XUP;
+		mouseInput.mi.mouseData = XBUTTON2;
+		break;
+	}
+}
 
 void eutilities::waitForFullKeyPress(Key key)
 {
@@ -53,40 +105,54 @@ void eutilities::Console::hideCursor()
 	SetConsoleCursorInfo(console, &lpCursor);
 }
 
-void eutilities::pressKeyboardKey(Key key)
+void eutilities::pressKey(Key key)
 {
 	INPUT input{};
-	input.type = INPUT_KEYBOARD;
-	input.ki.wVk = key;
-	SendInput(1, &input, sizeof(INPUT));
+	if (isMouseKey(key))
+	{
+		setMousePressInput(key, input);
+	}
+	else
+	{
+		input.type = INPUT_KEYBOARD;
+		input.ki.wVk = key;
+	}
 
-}
-
-void eutilities::releaseKeyboardKey(Key key)
-{
-	INPUT input{};
-	input.type = INPUT_KEYBOARD;
-	input.ki.wVk = key;
-	input.ki.dwFlags = KEYEVENTF_KEYUP;
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void eutilities::fullKeyboardKeyPress(Key key)
+void eutilities::releaseKey(Key key)
 {
-	pressKeyboardKey(key);
+	INPUT input{};
+	if (isMouseKey(key))
+	{
+		setMouseReleaseInput(key, input);
+	}
+	else
+	{
+		input.type = INPUT_KEYBOARD;
+		input.ki.wVk = key;
+		input.ki.dwFlags = KEYEVENTF_KEYUP;
+	}
+	SendInput(1, &input, sizeof(INPUT));
+}
+
+void eutilities::fullKeyPress(Key key)
+{
+	pressKey(key);
 	sleepFor(30);
-	releaseKeyboardKey(key);
+	releaseKey(key);
 }
 
 void eutilities::ctrlV()
 {
-	pressKeyboardKey(Key::CONTROL);
+	pressKey(Key::CONTROL);
 	sleepFor(10);
-	pressKeyboardKey(Key::V);
+	pressKey(Key::V);
 	sleepFor(10);
 
-	releaseKeyboardKey(Key::CONTROL);
-	releaseKeyboardKey(Key::V);
+	releaseKey(Key::CONTROL);
+	releaseKey(Key::V);
 }
 
 void eutilities::winR()
@@ -157,52 +223,6 @@ void eutilities::copyToClipBoard(const std::wstring_view data)
 	}
 }
 
-void eutilities::leftClickDown()
-{
-	INPUT mouseDown{};
-	mouseDown.type = INPUT_MOUSE;
-	mouseDown.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
-	SendInput(1, &mouseDown, sizeof(INPUT));
-}
-
-void eutilities::leftClickUp()
-{
-	INPUT mouseUp{};
-	mouseUp.type = INPUT_MOUSE;
-	mouseUp.mi.dwFlags = MOUSEEVENTF_LEFTUP;
-	SendInput(1, &mouseUp, sizeof(INPUT));
-}
-
-void eutilities::leftClick(const int& holdTime)
-{
-	eutilities::leftClickDown();
-	Sleep(holdTime);
-	eutilities::leftClickUp();
-}
-
-void eutilities::rightClickDown()
-{
-	INPUT mouseDown{};
-	mouseDown.type = INPUT_MOUSE;
-	mouseDown.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
-	SendInput(1, &mouseDown, sizeof(INPUT));
-}
-
-void eutilities::rightClickUp()
-{
-	INPUT mouseDown{};
-	mouseDown.type = INPUT_MOUSE;
-	mouseDown.mi.dwFlags = MOUSEEVENTF_RIGHTUP;
-	SendInput(1, &mouseDown, sizeof(INPUT));
-}
-
-void eutilities::rightClick(const int& holdTime)
-{
-	eutilities::rightClickDown();
-	Sleep(holdTime);
-	eutilities::rightClickUp();
-}
-
 void eutilities::sleepFor(int msDuration)
 {
 	std::this_thread::sleep_for(std::chrono::milliseconds(msDuration));
@@ -212,11 +232,11 @@ constexpr std::optional<std::string> eutilities::nameOf(Key keyCode)
 {
 	switch (keyCode)
 	{
-	case MOUSE_LEFT:
+	case LEFT_CLICK:
 		return "Left click";
-	case MOUSE_RIGHT:
+	case RIGHT_CLICK:
 		return "Right click";
-	case MOUSE_MIDDLE:
+	case MIDDLE_MOUSE:
 		return "Middle mouse";
 	case MOUSE_BUTTON1:
 		return "Mouse 1";
