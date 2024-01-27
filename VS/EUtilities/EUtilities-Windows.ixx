@@ -2,25 +2,131 @@ module;
 
 #include <Windows.h>
 #include <string_view>
+#include <string>
+#include <optional>
 
 export module eutilities:windows;
 
 export namespace eutilities
 {
+	enum VirtualKey
+	{
+		MOUSE_LEFT = VK_LBUTTON,
+		MOUSE_RIGHT = VK_RBUTTON,
+		MOUSE_MIDDLE = VK_MBUTTON,
+		MOUSE_BUTTON1 = VK_XBUTTON1,
+		MOUSE_BUTTON2 = VK_XBUTTON2,
+
+		ESCAPE = VK_ESCAPE,
+		F1 = VK_F1,
+		F2 = VK_F2,
+		F3 = VK_F3,
+		F4 = VK_F4,
+		F5 = VK_F5,
+		F6 = VK_F6,
+		F7 = VK_F7,
+		F8 = VK_F8,
+		F9 = VK_F9,
+		F10 = VK_F10,
+		F11 = VK_F11,
+		F12 = VK_F12,
+		PRINT = VK_SNAPSHOT,
+		SCROLL_LOCK = VK_SCROLL,
+		PAUSE = VK_PAUSE,
+
+		KEY_0 = 0x30,
+		KEY_1 = 0x31,
+		KEY_2 = 0x32,
+		KEY_3 = 0x33,
+		KEY_4 = 0x34,
+		KEY_5 = 0x35,
+		KEY_6 = 0x36,
+		KEY_7 = 0x37,
+		KEY_8 = 0x38,
+		KEY_9 = 0x39,
+
+
+		TAB = VK_TAB,
+		CAPSLOCK = VK_CAPITAL,
+		SHIFT = VK_SHIFT,
+		LEFT_SHIFT = VK_LSHIFT,
+		CTRL = VK_CONTROL,
+		LEFT_CONTROL = VK_LCONTROL,
+		LEFT_WINDOWS = VK_LWIN,
+		ALT = VK_MENU,
+		LEFT_ALT = VK_LMENU,
+		SPACEBAR = VK_SPACE,
+		RIGHT_ALT = VK_RMENU,
+		RIGHT_WINDOWS = VK_RWIN,
+		APPS = VK_APPS,
+		RIGHT_CONTROL = VK_RCONTROL,
+		RIGHT_SHIFT = VK_RSHIFT,
+		ENTER = VK_RETURN,
+		BACKSPACE = VK_BACK,
+
+		A = 0x41,
+		B = 0x42,
+		C = 0x43,
+		D = 0x44,
+		E = 0x45,
+		F = 0x46,
+		G = 0x47,
+		H = 0x48,
+		I = 0x49,
+		J = 0x4A,
+		K = 0x4B,
+		L = 0x4C,
+		M = 0x4D,
+		N = 0x4E,
+		O = 0x4F,
+		P = 0x50,
+		Q = 0x51,
+		R = 0x52,
+		S = 0x53,
+		T = 0x54,
+		U = 0x55,
+		V = 0x56,
+		W = 0x57,
+		X = 0x58,
+		Y = 0x59,
+		Z = 0x5A,
+
+		OEM1 = 0xBA,
+		OEM2 = 0xBF,
+		OEM3 = 0xC0,
+		OEM4 = 0xDB,
+		OEM5 = 0xDC,
+		OEM6 = 0xDD,
+		OEM7 = 0xDE,
+		OEM8 = 0xDF,
+
+		OEM_PLUS = VK_OEM_PLUS,
+		OEM_MINUS = VK_OEM_MINUS,
+		OEM_PERIOD = VK_OEM_PERIOD,
+		OEM_COMMA = VK_OEM_COMMA,
+		OEM102 = VK_OEM_102,
+	};
+	
+	[[nodiscard]] constexpr std::optional<std::string> nameOf(VirtualKey keyCode);
+
+
 	namespace Console
 	{
-		void consoleBundle();
-		void preventConsoleResize();
 		void hideCursor();
-		void disableQuickEdit();
-		void hideScrollingBar();
 	};
 
+	/**
+	* Returns execution only when the specified
+	* key was pressed and then released.
+	*
+	* @param vKey The Windows virtual key code of the target key.
+	* @see [Windows virtual key codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
+	*/
+	void waitForFullKeyPress(int vKey);
 
-	// Wait until user presses and release the specified virutal key
-	void waitForFullKeyPress(short vKey);
-	void waitForKeyPress(short vKey);
-	void waitForKeyRelease(short vKey);
+	void waitForKeyPress(int vKey);
+
+	void waitForKeyRelease(int vKey);
 
 	//////////////////////////////
 	// KEYBOARD AND MOUSE INPUT //
