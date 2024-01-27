@@ -1,7 +1,3 @@
-module;
-
-#include <string_view>
-
 export module eutilities;
 
 #ifdef _WIN32
