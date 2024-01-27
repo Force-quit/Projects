@@ -19,16 +19,16 @@ private:
 	static constexpr int MAX_PRANK_INTERVAL{ 120000 };
 	static constexpr std::array<void (*)(), 3> mPrankFunctions
 	{
-		[]() {eutilities::fullKeyPress(VK_LWIN); },
-		[]() {eutilities::fullKeyPress(VK_CAPITAL); },
+		[]() {eutilities::fullKeyboardKeyPress(VK_LWIN); },
+		[]() {eutilities::fullKeyboardKeyPress(VK_CAPITAL); },
 		[]() {InvertedMouseMover::isActive() ? InvertedMouseMover::stop() : InvertedMouseMover::start(); },
 
 		/* Dangerous functions
-		[]() {eutilities::fullKeyPress(VK_SPACE); },
-		[]() {eutilities::fullKeyPress(VK_RETURN); },
-		[]() {eutilities::fullKeyPress(VK_BACK); },
+		[]() {eutilities::fullKeyboardKeyPress(VK_SPACE); },
+		[]() {eutilities::fullKeyboardKeyPress(VK_RETURN); },
+		[]() {eutilities::fullKeyboardKeyPress(VK_BACK); },
 		[]() {eutilities::ctrlV(); },
-		[]() {eutilities::fullKeyPress(VK_ESCAPE); }
+		[]() {eutilities::fullKeyboardKeyPress(VK_ESCAPE); }
 		*/
 	};
 

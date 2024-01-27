@@ -9,7 +9,19 @@ export module eutilities:windows;
 
 export namespace eutilities
 {
-	enum VirtualKey
+	// Usefull Windows console utilities
+	namespace Console
+	{
+		// Make the console's cursor invisible.
+		void hideCursor();
+	};
+
+	/**
+	* Represents physical buttons you can press.
+	*
+	* @see [Windows virtual key codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
+	*/
+	enum Key
 	{
 		MOUSE_LEFT = VK_LBUTTON,
 		MOUSE_RIGHT = VK_RBUTTON,
@@ -46,23 +58,20 @@ export namespace eutilities
 		KEY_9 = 0x39,
 
 
+		SHIFT = VK_LSHIFT,
+		RIGHT_SHIFT = VK_RSHIFT,
+		CONTROL = VK_LCONTROL,
+		RIGHT_CONTROL = VK_RCONTROL,
+		ALT = VK_LMENU,
+		RIGHT_ALT = VK_RMENU,
+		WINDOWS = VK_LWIN,
+		RIGHT_WINDOWS = VK_RWIN,
 		TAB = VK_TAB,
 		CAPSLOCK = VK_CAPITAL,
-		SHIFT = VK_SHIFT,
-		LEFT_SHIFT = VK_LSHIFT,
-		CTRL = VK_CONTROL,
-		LEFT_CONTROL = VK_LCONTROL,
-		LEFT_WINDOWS = VK_LWIN,
-		ALT = VK_MENU,
-		LEFT_ALT = VK_LMENU,
-		SPACEBAR = VK_SPACE,
-		RIGHT_ALT = VK_RMENU,
-		RIGHT_WINDOWS = VK_RWIN,
 		APPS = VK_APPS,
-		RIGHT_CONTROL = VK_RCONTROL,
-		RIGHT_SHIFT = VK_RSHIFT,
 		ENTER = VK_RETURN,
 		BACKSPACE = VK_BACK,
+		SPACEBAR = VK_SPACE,
 
 		A = 0x41,
 		B = 0x42,
@@ -106,46 +115,64 @@ export namespace eutilities
 		OEM_COMMA = VK_OEM_COMMA,
 		OEM102 = VK_OEM_102,
 	};
-	
-	[[nodiscard]] constexpr std::optional<std::string> nameOf(VirtualKey keyCode);
 
+	/**
+	* Get the display name of the specified key.
+	*
+	* @param key An enum value of eutilities::Key.
+	* @return The name of the key if it's known. If not, an empty std::optional.
+	*/
+	[[nodiscard]] constexpr std::optional<std::string> nameOf(Key key);
 
-	namespace Console
-	{
-		void hideCursor();
-	};
+	/**
+	* Check if the specified key is being pressed.
+	*
+	* @param key The key you want to check.
+	* @return True if the key is being pressed.
+	*/
+	[[nodiscard]] bool keyIsPressed(Key key);
 
 	/**
 	* Returns execution only when the specified
 	* key was pressed and then released.
 	*
-	* @param vKey The Windows virtual key code of the target key.
-	* @see [Windows virtual key codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
+	* @param key The key you want to wait for.
 	*/
-	void waitForFullKeyPress(int vKey);
+	void waitForFullKeyPress(Key key);
 
-	void waitForKeyPress(int vKey);
+	/**
+	* Returns execution only when the specified
+	* key was pressed.
+	*
+	* @param key The key you want to wait for.
+	*/
+	void waitForKeyPress(Key key);
 
-	void waitForKeyRelease(int vKey);
+	/**
+	* Returns execution only when the specified
+	* key was released.
+	*
+	* @param key The key you want to wait for.
+	*/
+	void waitForKeyRelease(Key key);
 
-	//////////////////////////////
-	// KEYBOARD AND MOUSE INPUT //
-	//////////////////////////////
+	/**
+	* Simulates a key press with the specified key.
+	* @param key The key to press.
+	*/
+	void pressKeyboardKey(Key key);
 
-	void pressKey(char key);
-	void pressKey(int keyCode);
-	void pressKey(INPUT& input);
-	void releaseKey(char key);
-	void releaseKey(int keyCode);
-	void releaseKey(INPUT& input);
-	void fullKeyPress(char key, unsigned int pressDuration = 20);
-	void fullKeyPress(int keyCode, unsigned int pressDuration = 20);
-	void fullKeyPress(INPUT& input, unsigned int pressDuration = 20);
+	/**
+	* Simulates a key release with the specified key.
+	* @param key The key to release.
+	*/
+	void releaseKeyboardKey(Key key);
+
+	void fullKeyboardKeyPress(Key key);
 
 	void ctrlV();
-
 	void winR();
-
+	
 	// Simulate the typing of a string
 	void humanType(const wchar_t* toWrite, int keyPressInterval = 50);
 
@@ -169,4 +196,6 @@ export namespace eutilities
 
 	// Simulate a right click
 	void rightClick(const int& holdTime = 30);
+
+	void sleepFor(int msDuration);
 }

@@ -3,28 +3,45 @@ module;
 #include <Windows.h>
 #include <string_view>
 #include <optional>
+#include <thread>
 
 module eutilities:windows;
+//
+//static constexpr bool isMouseKey(eutilities::Key key)
+//{
+//	switch (key)
+//	{
+//	case eutilities::Key::MOUSE_LEFT:
+//	case eutilities::Key::MOUSE_RIGHT:
+//	case eutilities::Key::MOUSE_MIDDLE:
+//	case eutilities::Key::MOUSE_BUTTON1:
+//	case eutilities::Key::MOUSE_BUTTON2:
+//		return true;
+//	default:
+//		return false;
+//	}
+//}
 
-void eutilities::waitForFullKeyPress(int vKey)
+void eutilities::waitForFullKeyPress(Key key)
 {
-	GetAsyncKeyState(vKey); // Reset buffer
-
-	eutilities::waitForKeyPress(vKey);
-
-	eutilities::waitForKeyRelease(vKey);
+	waitForKeyPress(key);
+	waitForKeyRelease(key);
 }
 
-void eutilities::waitForKeyPress(int vKey)
+void eutilities::waitForKeyPress(Key key)
 {
-	while (!GetAsyncKeyState(vKey))
-		Sleep(50);
+	while (!keyIsPressed(key))
+	{
+		sleepFor(1);
+	}
 }
 
-void eutilities::waitForKeyRelease(int vKey)
+void eutilities::waitForKeyRelease(Key key)
 {
-	while (GetAsyncKeyState(vKey))
-		Sleep(50);
+	while (keyIsPressed(key))
+	{
+		sleepFor(1);
+	}
 }
 
 void eutilities::Console::hideCursor()
@@ -36,91 +53,40 @@ void eutilities::Console::hideCursor()
 	SetConsoleCursorInfo(console, &lpCursor);
 }
 
-/**************************/
-/*     KEYBOARD UTILS     */
-/**************************/
-
-void eutilities::pressKey(char key)
+void eutilities::pressKeyboardKey(Key key)
 {
-	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
-	eutilities::pressKey(keyCode);
-}
-
-void eutilities::pressKey(int keyCode)
-{
-	INPUT i{};
-	i.type = INPUT_KEYBOARD;
-	i.ki.wVk = keyCode;
-
-	eutilities::pressKey(i);
-}
-
-void eutilities::pressKey(INPUT& input)
-{
-	input.ki.dwFlags = 0;
+	INPUT input{};
+	input.type = INPUT_KEYBOARD;
+	input.ki.wVk = key;
 	SendInput(1, &input, sizeof(INPUT));
+
 }
 
-void eutilities::releaseKey(char key)
+void eutilities::releaseKeyboardKey(Key key)
 {
-	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
-	eutilities::releaseKey(keyCode);
-}
-
-void eutilities::releaseKey(int keyCode)
-{
-	INPUT i{};
-	i.type = INPUT_KEYBOARD;
-	i.ki.wVk = keyCode;
-	eutilities::releaseKey(i);
-}
-
-void eutilities::releaseKey(INPUT& input)
-{
+	INPUT input{};
+	input.type = INPUT_KEYBOARD;
+	input.ki.wVk = key;
 	input.ki.dwFlags = KEYEVENTF_KEYUP;
 	SendInput(1, &input, sizeof(INPUT));
 }
 
-void eutilities::fullKeyPress(char key, unsigned int pressDuration)
+void eutilities::fullKeyboardKeyPress(Key key)
 {
-	short keyCode = VkKeyScanExA(key, GetKeyboardLayout(0));
-	eutilities::fullKeyPress(keyCode, pressDuration);
-}
-
-void eutilities::fullKeyPress(int keyCode, unsigned int pressDuration)
-{
-	INPUT i{};
-	i.type = INPUT_KEYBOARD;
-	i.ki.wVk = keyCode;
-	eutilities::fullKeyPress(i, pressDuration);
-}
-
-void eutilities::fullKeyPress(INPUT& input, unsigned int pressDuration)
-{
-	eutilities::pressKey(input);
-	Sleep(pressDuration);
-	eutilities::releaseKey(input);
+	pressKeyboardKey(key);
+	sleepFor(30);
+	releaseKeyboardKey(key);
 }
 
 void eutilities::ctrlV()
 {
-	const short NB_INPUTS = 4;
+	pressKeyboardKey(Key::CONTROL);
+	sleepFor(10);
+	pressKeyboardKey(Key::V);
+	sleepFor(10);
 
-	INPUT inputs[NB_INPUTS]{};
-
-	for (INPUT& i : inputs)
-		i.type = INPUT_KEYBOARD;
-
-	inputs[0].ki.wVk = VK_CONTROL;
-	inputs[1].ki.wVk = 0x56;
-
-	inputs[2].ki.wVk = 0x56;
-	inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
-
-	inputs[3].ki.wVk = VK_CONTROL;
-	inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
-
-	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
+	releaseKeyboardKey(Key::CONTROL);
+	releaseKeyboardKey(Key::V);
 }
 
 void eutilities::winR()
@@ -191,12 +157,6 @@ void eutilities::copyToClipBoard(const std::wstring_view data)
 	}
 }
 
-/***********************/
-/*     MOUSE UTILS     */
-/***********************/
-
-// LEFT CLICK
-
 void eutilities::leftClickDown()
 {
 	INPUT mouseDown{};
@@ -219,8 +179,6 @@ void eutilities::leftClick(const int& holdTime)
 	Sleep(holdTime);
 	eutilities::leftClickUp();
 }
-
-// RIGHT CLICK
 
 void eutilities::rightClickDown()
 {
@@ -245,7 +203,12 @@ void eutilities::rightClick(const int& holdTime)
 	eutilities::rightClickUp();
 }
 
-constexpr std::optional<std::string> eutilities::nameOf(VirtualKey keyCode)
+void eutilities::sleepFor(int msDuration)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(msDuration));
+}
+
+constexpr std::optional<std::string> eutilities::nameOf(Key keyCode)
 {
 	switch (keyCode)
 	{
@@ -317,18 +280,12 @@ constexpr std::optional<std::string> eutilities::nameOf(VirtualKey keyCode)
 		return "Capslock";
 	case SHIFT:
 		return "Shift";
-	case LEFT_SHIFT:
-		return "Left shift";
-	case CTRL:
+	case CONTROL:
 		return "CTRL";
-	case LEFT_CONTROL:
-		return "Left control";
-	case LEFT_WINDOWS:
-		return "Left Windows";
+	case WINDOWS:
+		return "Windows";
 	case ALT:
 		return "Alt";
-	case LEFT_ALT:
-		return "Left alt";
 	case SPACEBAR:
 		return "Spacebar";
 	case RIGHT_ALT:
@@ -338,7 +295,7 @@ constexpr std::optional<std::string> eutilities::nameOf(VirtualKey keyCode)
 	case APPS:
 		return "Apps";
 	case RIGHT_CONTROL:
-		return "Right control";
+		return "Right CTRL";
 	case RIGHT_SHIFT:
 		return "Right shift";
 	case ENTER:
@@ -427,3 +384,9 @@ constexpr std::optional<std::string> eutilities::nameOf(VirtualKey keyCode)
 		return std::nullopt;
 	}
 }
+
+bool eutilities::keyIsPressed(Key key)
+{
+	return GetKeyState(key) & 0x8000;
+}
+
