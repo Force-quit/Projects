@@ -7,10 +7,9 @@ module;
 
 export module eutilities:windows;
 
-namespace eutilities
+export namespace eutilities
 {
-	export
-	{
+	
 		// Usefull Windows console utilities
 		namespace Console
 		{
@@ -183,8 +182,11 @@ namespace eutilities
 		void copyToClipBoard(const std::wstring_view dataToCopy);
 
 		void sleepFor(int msDuration);
-	}
+	
+}
 
+namespace eutilities
+{
 	void setMouseReleaseInput(Key mouseKey, INPUT& mouseInput);
 	void setMousePressInput(Key mouseKey, INPUT& mouseInput);
 	constexpr bool isMouseKey(Key key);
