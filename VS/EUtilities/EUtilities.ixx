@@ -10,10 +10,6 @@ export import :windows;
 
 export namespace eutilities
 {
-	void flushTampon();
-
-	// Create folder if it doesn't exist. Returns false if folder did not exist
-	bool ensureFolderExists(const std::string_view dirName);
-
-	bool folderExists(const std::string_view dirName);
+	//Reset the std::cin buffer.
+	void resetConsoleInput();
 }
