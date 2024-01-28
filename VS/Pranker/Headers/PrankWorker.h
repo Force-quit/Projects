@@ -19,8 +19,8 @@ private:
 	static constexpr int MAX_PRANK_INTERVAL{ 120000 };
 	static constexpr std::array<void (*)(), 3> mPrankFunctions
 	{
-		[]() {eutilities::fullKeyPress(VK_LWIN); },
-		[]() {eutilities::fullKeyPress(VK_CAPITAL); },
+		[]() {eutilities::fullKeyPress(eutilities::Key::WINDOWS); },
+		[]() {eutilities::fullKeyPress(eutilities::Key::CAPSLOCK); },
 		[]() {InvertedMouseMover::isActive() ? InvertedMouseMover::stop() : InvertedMouseMover::start(); },
 
 		/* Dangerous functions

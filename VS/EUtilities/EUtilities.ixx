@@ -1,7 +1,3 @@
-module;
-
-#include <string_view>
-
 export module eutilities;
 
 #ifdef _WIN32
@@ -10,10 +6,13 @@ export import :windows;
 
 export namespace eutilities
 {
-	void flushTampon();
+	//Reset the std::cin buffer.
+	void resetConsoleInput();
 
-	// Create folder if it doesn't exist. Returns false if folder did not exist
-	bool ensureFolderExists(const std::string_view dirName);
-
-	bool folderExists(const std::string_view dirName);
+	/**
+	* Sleep for a certain time.
+	*
+	* @param msDuration The duration in milliseconds.
+	*/
+	void sleepFor(int msDuration);
 }

@@ -34,7 +34,7 @@ bool PasswordWorker::passwordIsTyped(size_t iNextCharIndex)
 			if (GetAsyncKeyState(wVirtualKey))
 			{
 				wAnyKeyWasPressed = true;
-				eutilities::waitForKeyRelease(wVirtualKey);
+				eutilities::waitForKeyRelease(static_cast<eutilities::Key>(wVirtualKey));
 				wRightKeyPressed = wVirtualKey == mPasswordKeys[iNextCharIndex];
 				break;
 			}

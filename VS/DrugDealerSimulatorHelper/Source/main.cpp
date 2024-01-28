@@ -45,7 +45,7 @@ int main()
 		std::cout << "\n\n";
 		do
 		{
-			eutilities::flushTampon();
+			eutilities::resetConsoleInput();
 			std::cout << "Take other orders? (Y/N) : ";
 			std::cin >> continueTakingOrders;
 			continueTakingOrders = toupper(continueTakingOrders);

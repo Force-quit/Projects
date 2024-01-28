@@ -1,26 +1,17 @@
 module;
 
 #include <iostream>
-#include <Windows.h>
-#include <filesystem>
+#include <thread>
 
 module eutilities;
 
-void eutilities::flushTampon()
+void eutilities::resetConsoleInput()
 {
 	std::cin.clear();
 	std::cin.ignore(std::cin.rdbuf()->in_avail());
 }
 
-bool eutilities::ensureFolderExists(const std::string_view dirName)
+void eutilities::sleepFor(int msDuration)
 {
-	bool folderExists = eutilities::folderExists(dirName);
-	if (!folderExists)
-		std::filesystem::create_directory(dirName);
-	return folderExists;
-}
-
-bool eutilities::folderExists(const std::string_view dirName)
-{
-	return std::filesystem::is_directory(dirName);
+	std::this_thread::sleep_for(std::chrono::milliseconds(msDuration));
 }
