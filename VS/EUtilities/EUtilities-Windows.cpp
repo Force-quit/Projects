@@ -176,23 +176,23 @@ void eutilities::winR()
 	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
 }
 
-void eutilities::humanType(const wchar_t* toWrite, int keyPressInterval)
+void eutilities::humanType(std::span<const char> string, int keyPressInterval)
 {
-	size_t sizeToWrite{ wcslen(toWrite) };
-	INPUT ip{};
-	ip.type = INPUT_KEYBOARD;
+	INPUT input{};
+	input.type = INPUT_KEYBOARD;
 
-	for (size_t i{}; i <= sizeToWrite; ++i)
+	for (char i : string)
 	{
-		ip.ki.dwFlags = KEYEVENTF_UNICODE;
-		ip.ki.wScan = toWrite[i];
-		SendInput(1, &ip, sizeof(INPUT));
+		input.ki.dwFlags = KEYEVENTF_UNICODE;
+		input.ki.wScan = i;
+		SendInput(1, &input, sizeof(INPUT));
 
-		Sleep(10);
+		sleepFor(20);
 
-		ip.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
-		SendInput(1, &ip, sizeof(INPUT));
-		Sleep(keyPressInterval);
+		input.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+		SendInput(1, &input, sizeof(INPUT));
+		
+		sleepFor(keyPressInterval);
 	}
 }
 
@@ -409,4 +409,3 @@ bool eutilities::keyIsPressed(Key key)
 {
 	return GetKeyState(key) & 0x8000;
 }
-
