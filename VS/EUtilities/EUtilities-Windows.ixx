@@ -10,6 +10,8 @@ export module eutilities:windows;
 
 export namespace eutilities
 {
+	constexpr int MIN_VIRTUAL_KEY{ 0x01 };
+	constexpr int MAX_VIRTUAL_KEY{ 0xFE };
 
 	// Usefull Windows console utilities
 	namespace Console
@@ -116,6 +118,35 @@ export namespace eutilities
 		OEM_PERIOD = VK_OEM_PERIOD,
 		OEM_COMMA = VK_OEM_COMMA,
 		OEM102 = VK_OEM_102,
+
+		UP = VK_UP,
+		DOWN = VK_DOWN,
+		LEFT = VK_LEFT,
+		RIGHT = VK_RIGHT,
+		DEL = VK_DELETE,
+		INSERT = VK_INSERT,
+		HOME = VK_HOME,
+		END = VK_END,
+		PAGE_UP = VK_PRIOR,
+		PAGE_DOWN = VK_NEXT,
+
+		NUMPAD_0 = VK_NUMPAD0,
+		NUMPAD_1 = VK_NUMPAD1,
+		NUMPAD_2 = VK_NUMPAD2,
+		NUMPAD_3 = VK_NUMPAD3,
+		NUMPAD_4 = VK_NUMPAD4,
+		NUMPAD_5 = VK_NUMPAD5,
+		NUMPAD_6 = VK_NUMPAD6,
+		NUMPAD_7 = VK_NUMPAD7,
+		NUMPAD_8 = VK_NUMPAD8,
+		NUMPAD_9 = VK_NUMPAD9,
+		NUMPAD_ADD = VK_ADD,
+		NUMPAD_SUBTRACT = VK_SUBTRACT,
+		NUMPAD_MULTIPLY = VK_MULTIPLY,
+		NUMPAD_DIVIDE = VK_DIVIDE,
+		NUMPAD_CLEAR = VK_CLEAR,
+		NUMPAD_LOCK = VK_NUMLOCK,
+		NUMPAD_DECIMAL = VK_DECIMAL,
 	};
 
 	/**
@@ -127,12 +158,31 @@ export namespace eutilities
 	[[nodiscard]] constexpr std::optional<std::string> nameOf(Key key);
 
 	/**
+	* Get the display name of the specified key.
+	*
+	* @param key An enum value of eutilities::Key.
+	* @return The name of the key if it's known. If not, an empty std::optional.
+	* @overload
+	*/
+	[[nodiscard]] constexpr std::optional<std::string> nameOf(int key);
+
+
+	/**
 	* Check if the specified key is being pressed.
 	*
 	* @param key The key you want to check.
 	* @return True if the key is being pressed.
 	*/
-	[[nodiscard]] bool keyIsPressed(Key key);
+	[[nodiscard]] bool isPressed(Key key);
+
+	/**
+	* Check if the specified key is being pressed.
+	*
+	* @param key The key you want to check.
+	* @return True if the key is being pressed.
+	* @overload
+	*/
+	[[nodiscard]] bool isPressed(int key);
 
 	/**
 	* Returns execution only when the specified
@@ -170,20 +220,30 @@ export namespace eutilities
 	*/
 	void releaseKey(Key key);
 
+	/**
+	* Simulates a full key press (press and release)
+	* with the specified key.
+	* @param key The key to press and release.
+	*/
 	void fullKeyPress(Key key);
 
+	// Simulates the CTRL + V keyboard shortcut
 	void ctrlV();
 
-	void winR();
+	/**
+	* Simulates the typing of a string.
+	*
+	* @param string A sequence of unicode characters.
+	* @param keyPressInterval The interval between key presses.
+	*/
+	void humanType(std::span<const wchar_t> string, int keyPressInterval = 120);
 
-	// Simulate the typing of a string
-	void humanType(std::span<const char> string, int keyPressInterval = 120);
-
-	// Copy a string into windows's clipboard
-	void copyToClipBoard(const std::wstring_view dataToCopy);
-
-	void sleepFor(int msDuration);
-
+	/**
+	* Copy a sequence of characters into the Windows clipboard.
+	*
+	* @param dataToCopy A sequence of unicode characters.
+	*/
+	void copyToClipBoard(std::span<const char> dataToCopy);
 }
 
 namespace eutilities

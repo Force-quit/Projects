@@ -7,6 +7,8 @@ module;
 
 module eutilities:windows;
 
+import eutilities;
+
 constexpr bool eutilities::isMouseKey(Key key)
 {
 	switch (key)
@@ -82,7 +84,7 @@ void eutilities::waitForFullKeyPress(Key key)
 
 void eutilities::waitForKeyPress(Key key)
 {
-	while (!keyIsPressed(key))
+	while (!isPressed(key))
 	{
 		sleepFor(1);
 	}
@@ -90,7 +92,7 @@ void eutilities::waitForKeyPress(Key key)
 
 void eutilities::waitForKeyRelease(Key key)
 {
-	while (keyIsPressed(key))
+	while (isPressed(key))
 	{
 		sleepFor(1);
 	}
@@ -155,33 +157,12 @@ void eutilities::ctrlV()
 	releaseKey(Key::V);
 }
 
-void eutilities::winR()
-{
-	const short NB_INPUTS = 4;
-
-	INPUT inputs[NB_INPUTS]{};
-
-	for (INPUT& i : inputs)
-		i.type = INPUT_KEYBOARD;
-
-	inputs[0].ki.wVk = VK_LWIN;
-	inputs[1].ki.wVk = 0x52;
-
-	inputs[2].ki.wVk = 0x52;
-	inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
-
-	inputs[3].ki.wVk = VK_LWIN;
-	inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
-
-	SendInput(NB_INPUTS, inputs, sizeof(INPUT));
-}
-
-void eutilities::humanType(std::span<const char> string, int keyPressInterval)
+void eutilities::humanType(std::span<const wchar_t> string, int keyPressInterval)
 {
 	INPUT input{};
 	input.type = INPUT_KEYBOARD;
 
-	for (char i : string)
+	for (auto i : string)
 	{
 		input.ki.dwFlags = KEYEVENTF_UNICODE;
 		input.ki.wScan = i;
@@ -191,12 +172,12 @@ void eutilities::humanType(std::span<const char> string, int keyPressInterval)
 
 		input.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
 		SendInput(1, &input, sizeof(INPUT));
-		
+
 		sleepFor(keyPressInterval);
 	}
 }
 
-void eutilities::copyToClipBoard(const std::wstring_view data)
+void eutilities::copyToClipBoard(std::span<const char> data)
 {
 	if (OpenClipboard(NULL))
 	{
@@ -223,10 +204,6 @@ void eutilities::copyToClipBoard(const std::wstring_view data)
 	}
 }
 
-void eutilities::sleepFor(int msDuration)
-{
-	std::this_thread::sleep_for(std::chrono::milliseconds(msDuration));
-}
 
 constexpr std::optional<std::string> eutilities::nameOf(Key keyCode)
 {
@@ -400,12 +377,76 @@ constexpr std::optional<std::string> eutilities::nameOf(Key keyCode)
 		return "OEM comma";
 	case OEM102:
 		return "OEM102";
+	case UP:
+		return "Up";
+	case DOWN:
+		return "Down";
+	case LEFT:
+		return "Left";
+	case RIGHT:
+		return "Right";
+	case DEL:
+		return "Delete";
+	case INSERT:
+		return "Insert";
+	case HOME:
+		return "Home";
+	case END:
+		return "End";
+	case PAGE_UP:
+		return "Page up";
+	case PAGE_DOWN:
+		return "Page down";
+		case NUMPAD_0:
+			return "Numpad 0";
+		case NUMPAD_1:
+			return "Numpad 1";
+		case NUMPAD_2:
+			return "Numpad 2";
+		case NUMPAD_3:
+			return "Numpad 3";
+		case NUMPAD_4:
+			return "Numpad 4";
+		case NUMPAD_5:
+			return "Numpad 5";
+		case NUMPAD_6:
+			return "Numpad 6";
+		case NUMPAD_7:
+			return "Numpad 7";
+		case NUMPAD_8:
+			return "Numpad 8";
+		case NUMPAD_9:
+			return "Numpad 9";
+		case NUMPAD_ADD:
+			return "Numpad add";
+		case NUMPAD_SUBTRACT:
+			return "Numpad subtract";
+		case NUMPAD_MULTIPLY:
+			return "Numpad multiply";
+		case NUMPAD_DIVIDE:
+			return "Numpad divide";
+		case NUMPAD_CLEAR:
+			return "Numpad clear";
+		case NUMPAD_LOCK:
+			return "Numpad lock";
+		case NUMPAD_DECIMAL:
+			return "Numpad decimal";
 	default:
 		return std::nullopt;
 	}
 }
 
-bool eutilities::keyIsPressed(Key key)
+constexpr std::optional<std::string> eutilities::nameOf(int key)
+{
+	return nameOf(static_cast<Key>(key));
+}
+
+bool eutilities::isPressed(Key key)
 {
 	return GetKeyState(key) & 0x8000;
+}
+
+bool eutilities::isPressed(int key)
+{
+	return isPressed(static_cast<Key>(key));
 }
