@@ -157,7 +157,7 @@ void eutilities::ctrlV()
 	releaseKey(Key::V);
 }
 
-void eutilities::humanType(std::span<const wchar_t> string, int keyPressInterval)
+void eutilities::humanType(std::wstring_view string, int keyPressInterval)
 {
 	INPUT input{};
 	input.type = INPUT_KEYBOARD;

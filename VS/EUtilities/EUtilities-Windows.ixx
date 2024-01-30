@@ -236,7 +236,7 @@ export namespace eutilities
 	* @param string A sequence of unicode characters.
 	* @param keyPressInterval The interval between key presses.
 	*/
-	void humanType(std::span<const wchar_t> string, int keyPressInterval = 120);
+	void humanType(std::wstring_view string, int keyPressInterval = 120);
 
 	/**
 	* Copy a sequence of characters into the Windows clipboard.

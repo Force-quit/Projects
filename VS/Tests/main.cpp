@@ -1,7 +1,7 @@
-import eutilities;
+﻿import eutilities;
 
 int main()
 {
 	eutilities::sleepFor(2000);
-	eutilities::humanType(L"Test123");
+	eutilities::humanType(L"😂😂😂");
 }
