@@ -14,6 +14,7 @@ public:
 	EShortcutListener() = delete;
 
 	[[nodiscard]] static std::vector<eutilities::Key> targetKeys();
+	[[nodiscard]] static bool isListening();
 	static void setTargetKeys(std::span<eutilities::Key> keys);
 	static void startListening(std::function<void()> callbackFunc);
 	static void stopListening();

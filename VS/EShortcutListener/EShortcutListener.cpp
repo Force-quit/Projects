@@ -65,6 +65,11 @@ std::vector<eutilities::Key> EShortcutListener::targetKeys()
 	return shortcutKeys;
 }
 
+bool EShortcutListener::isListening()
+{
+	return listenLoop.joinable();
+}
+
 void EShortcutListener::setTargetKeys(std::span<eutilities::Key> keys)
 {
 	shortcutKeys.assign(keys.begin(), keys.end());
