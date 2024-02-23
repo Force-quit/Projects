@@ -1,9 +1,14 @@
 #include "EQTests.h"
-#include <QLabel>
+#include <EQUtilities/EQShortcutPicker.h>
 
 EQTests::EQTests()
 	: QMainWindow()
 {
-	QLabel* centralWidget{ new QLabel("Testing123") };
+	EQShortcutPicker* centralWidget{ new EQShortcutPicker("Activate bot")};
+	
+	centralWidget->startListening();
+	connect(centralWidget, &EQShortcutPicker::shortcutPressed, [] {
+		qDebug() << "Shortcut activated";
+	});
 	setCentralWidget(centralWidget);
 }

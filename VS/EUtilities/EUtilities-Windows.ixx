@@ -5,14 +5,12 @@ module;
 #include <string>
 #include <optional>
 #include <span>
+#include <array>
 
 export module eutilities:windows;
 
 export namespace eutilities
 {
-	constexpr int MIN_VIRTUAL_KEY{ 0x01 };
-	constexpr int MAX_VIRTUAL_KEY{ 0xFE };
-
 	// Usefull Windows console utilities
 	namespace Console
 	{
@@ -25,7 +23,7 @@ export namespace eutilities
 	*
 	* @see [Windows virtual key codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
 	*/
-	enum Key
+	constexpr enum Key
 	{
 		LEFT_CLICK = VK_LBUTTON,
 		RIGHT_CLICK = VK_RBUTTON,
@@ -147,6 +145,121 @@ export namespace eutilities
 		NUMPAD_CLEAR = VK_CLEAR,
 		NUMPAD_LOCK = VK_NUMLOCK,
 		NUMPAD_DECIMAL = VK_DECIMAL,
+	};
+
+	// Array to iterate over all the values of the Key enum.
+	constexpr std::array<Key, 111> keys	{
+		LEFT_CLICK,
+		RIGHT_CLICK,
+		MIDDLE_MOUSE,
+		MOUSE_BUTTON1,
+		MOUSE_BUTTON2,
+		ESCAPE,
+		F1,
+		F2,
+		F3,
+		F4,
+		F5,
+		F6,
+		F7,
+		F8,
+		F9,
+		F10,
+		F11,
+		F12,
+		PRINT,
+		SCROLL_LOCK,
+		PAUSE,
+		KEY_0,
+		KEY_1,
+		KEY_2,
+		KEY_3,
+		KEY_4,
+		KEY_5,
+		KEY_6,
+		KEY_7,
+		KEY_8,
+		KEY_9,
+		SHIFT,
+		RIGHT_SHIFT,
+		CONTROL,
+		RIGHT_CONTROL,
+		ALT,
+		RIGHT_ALT,
+		WINDOWS,
+		RIGHT_WINDOWS,
+		TAB,
+		CAPSLOCK,
+		APPS,
+		ENTER,
+		BACKSPACE,
+		SPACEBAR,
+		A,
+		B,
+		C,
+		D,
+		E,
+		F,
+		G,
+		H,
+		I,
+		J,
+		K,
+		L,
+		M,
+		N,
+		O,
+		P,
+		Q,
+		R,
+		S,
+		T,
+		U,
+		V,
+		W,
+		X,
+		Y,
+		Z,
+		OEM1,
+		OEM2,
+		OEM3,
+		OEM4,
+		OEM5,
+		OEM6,
+		OEM7,
+		OEM8,
+		OEM_PLUS,
+		OEM_MINUS,
+		OEM_PERIOD,
+		OEM_COMMA,
+		OEM102,
+		UP,
+		DOWN,
+		LEFT,
+		RIGHT,
+		DEL,
+		INSERT,
+		HOME,
+		END,
+		PAGE_UP,
+		PAGE_DOWN,
+		NUMPAD_0,
+		NUMPAD_1,
+		NUMPAD_2,
+		NUMPAD_3,
+		NUMPAD_4,
+		NUMPAD_5,
+		NUMPAD_6,
+		NUMPAD_7,
+		NUMPAD_8,
+		NUMPAD_9,
+		NUMPAD_ADD,
+		NUMPAD_SUBTRACT,
+		NUMPAD_MULTIPLY,
+		NUMPAD_DIVIDE,
+		NUMPAD_CLEAR,
+		NUMPAD_LOCK,
+		NUMPAD_DECIMAL,
 	};
 
 	/**

@@ -12,10 +12,6 @@ class EQShortcutListenerWorker : public QObject
 
 public:
 	EQShortcutListenerWorker();
-	~EQShortcutListenerWorker();
-
-	const static QVector<int> DEFAULT_CODE;
-	const static QString DEFAULT_SHORTCUT;
 
 public slots:
 	void startListening();
@@ -31,7 +27,6 @@ private slots:
 	void waitForShortcutRelease();
 
 private:
-	static const QMap<int, QString> VIRTUAL_KEYS;
 	static const unsigned short HOLD_TIME_TO_CONFIRM{ 2000 };
 
 	bool inputChanged;
