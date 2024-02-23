@@ -127,21 +127,16 @@ void EQShortcutPicker::waitForShortcutRelease(const std::vector<eutilities::Key>
 
 void EQShortcutPicker::shortcutTextChanged(const std::set<std::string>& strings)
 {
-	if (strings.size() == 0)
+	std::string newText;
+
+	for (auto& i : strings)
 	{
-		mShortcutLabel->setText("");
-		return;
+		newText += i + " + ";
 	}
 
-	auto iterator(strings.cbegin());
-
-	std::string newText(*iterator);
-	++iterator;
-
-	while (iterator != strings.cend())
+	if (newText.size() > 0)
 	{
-		newText += " + " + *iterator;
-		++iterator;
+		newText.erase(newText.rfind(" + "));
 	}
 	
 	mShortcutLabel->setText(QString::fromStdString(newText));
