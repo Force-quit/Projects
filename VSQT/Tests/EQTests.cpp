@@ -1,4 +1,6 @@
 #include "EQTests.h"
+
+import eutilities;
 #include <EQUtilities/EQShortcutPicker.h>
 
 EQTests::EQTests()

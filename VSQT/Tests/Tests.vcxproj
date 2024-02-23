@@ -122,6 +122,9 @@
     <ProjectReference Include="..\..\VS\EUtilities\EUtilities.vcxproj">
       <Project>{ab1fdb31-f30a-44f2-b563-f960687e73c8}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\EQUtilities\EQUtilities.vcxproj">
+      <Project>{ecb3d703-478f-4757-883b-d08ef40126b9}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
