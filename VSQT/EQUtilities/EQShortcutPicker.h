@@ -1,6 +1,5 @@
 #pragma once
 
-#include "equtilities_global.h"
 import eutilities;
 import EShortcutListener;
 
@@ -15,15 +14,15 @@ import EShortcutListener;
 #include <string>
 #include <set>
 
-class EQUTILITIES_EXPORT EQShortcutPicker : public QWidget
+class EQShortcutPicker : public QWidget
 {
 	Q_OBJECT
 
 public:
-	EQShortcutPicker(QString labelText, QWidget *parent = nullptr);
+	EQShortcutPicker(QString labelText);
 
-	QVector<eutilities::Key> getTargetKeys() const;
-	void setTargetKeys(QVector<int>& targetKeys);
+	[[nodiscard]] QVector<eutilities::Key> getTargetKeys() const;
+	void setTargetKeys(const QVector<eutilities::Key>& targetKeys);
 
 public slots:
 	void startListening();
@@ -47,7 +46,7 @@ private:
 	static constexpr eutilities::Key DEFAULT_KEY{ eutilities::RIGHT_CONTROL };
 	static constexpr clock_t SHORTCUT_HOLD_TIME{ 3000 };
 
-	void shortcutTextChanged(const std::set<std::string>& strings);
+	void shortcutTextChanged(const std::set<eutilities::Key>& strings);
 	void changingShortcutLoop(std::stop_token stopToken);
 	void waitForShortcutRelease(const std::vector<eutilities::Key>& keys);
 

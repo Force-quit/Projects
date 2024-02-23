@@ -1,8 +1,7 @@
 #pragma once
-#include "equtilities_global.h"
 #include <QRegularExpressionValidator>
 
-class EQUTILITIES_EXPORT EQTextValidator : public QRegularExpressionValidator
+class EQTextValidator : public QRegularExpressionValidator
 {
 	Q_OBJECT
 

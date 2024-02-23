@@ -66,3 +66,9 @@ void EShortcutListener::setTargetKeys(std::initializer_list<eutilities::Key> key
 {
 	shortcutKeys.assign(keys.begin(), keys.end());
 }
+
+void EShortcutListener::setTargetKeys(eutilities::Key key)
+{
+	shortcutKeys.clear();
+	shortcutKeys.emplace_back(key);
+}

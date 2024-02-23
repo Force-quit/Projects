@@ -20,6 +20,7 @@ public:
 	[[nodiscard]] static std::vector<eutilities::Key> targetKeys();
 	[[nodiscard]] static bool isListening();
 	static void setTargetKeys(std::initializer_list<eutilities::Key> keys);
+	static void setTargetKeys(eutilities::Key key);
 
 	template <std::ranges::input_range Range>
 	requires IsKey<std::ranges::range_value_t<Range>>
