@@ -12,8 +12,8 @@ EQTests::EQTests()
 	centralWidget->startListening();
 
 	connect(centralWidget, &EQShortcutPicker::shortcutPressed, [centralWidget] {
-		auto i = centralWidget->getTargetKeys();
-		i.size();
+		static int counter{};
+		qDebug() << "Shortcut " << ++counter;
 	});
 	setCentralWidget(centralWidget);
 }

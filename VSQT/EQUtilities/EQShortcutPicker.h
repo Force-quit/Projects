@@ -1,18 +1,15 @@
 #pragma once
 
 import eutilities;
-import EShortcutListener;
 
 #include <QWidget>
 #include <QString>
-#include <thread>
 #include <QVector>
+#include <vector>
+#include <thread>
 #include <QPushButton>
 #include <QLabel>
-#include <string_view>
-#include <span>
-#include <string>
-#include <set>
+#include <array>
 
 class EQShortcutPicker : public QWidget
 {
@@ -27,8 +24,6 @@ public:
 public slots:
 	void startListening();
 	void stopListening();
-	void disableButton();
-	void enableButton();
 
 signals:
 	void startedChangingShortcut();
@@ -37,16 +32,13 @@ signals:
 	
 private slots:
 	void startChangingShortcut();
-	void changeShortcut();
-
-signals:
-	void finishedChangingShortcut();
 
 private:
 	static constexpr eutilities::Key DEFAULT_KEY{ eutilities::RIGHT_CONTROL };
 	static constexpr clock_t SHORTCUT_HOLD_TIME{ 3000 };
 
-	void shortcutTextChanged(const std::set<eutilities::Key>& strings);
+	void updateShortcutText(const std::vector<eutilities::Key>& strings);
+	void processKey(std::clock_t& timer, std::size_t keyIndex);
 	void changingShortcutLoop(std::stop_token stopToken);
 	void waitForShortcutRelease(const std::vector<eutilities::Key>& keys);
 
@@ -54,4 +46,6 @@ private:
 	std::jthread mShortcutSetterThread;
 	QPushButton* changeShortcutButton;
 	QLabel* mShortcutLabel;
+	std::array<bool, eutilities::keys.size()> mPressedKeysIndicator;
+	std::vector<eutilities::Key> mPressedKeys;
 };
