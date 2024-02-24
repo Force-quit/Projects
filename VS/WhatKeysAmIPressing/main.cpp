@@ -8,7 +8,7 @@ import eutilities;
 
 static void addPressedKeys(std::vector<int>& pressedKeys)
 {
-	for (int i{ eutilities::MIN_VIRTUAL_KEY }; i <= eutilities::MAX_VIRTUAL_KEY; i++)
+	for (auto& i : eutilities::keys)
 	{
 		if (eutilities::isPressed(i))
 		{

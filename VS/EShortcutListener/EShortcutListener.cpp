@@ -2,7 +2,7 @@ module;
 
 #include <functional>
 #include <vector>
-#include <span>
+#include <initializer_list>
 
 module EShortcutListener;
 import eutilities;
@@ -52,14 +52,6 @@ void EShortcutListener::mainLoop(std::stop_token iStopToken)
 	}
 }
 
-void EShortcutListener::waitForKeysToBeReleased()
-{
-	for (auto& i : shortcutKeys)
-	{
-		eutilities::waitForKeyRelease(i);
-	}
-}
-
 std::vector<eutilities::Key> EShortcutListener::targetKeys()
 {
 	return shortcutKeys;
@@ -70,7 +62,13 @@ bool EShortcutListener::isListening()
 	return listenLoop.joinable();
 }
 
-void EShortcutListener::setTargetKeys(std::span<eutilities::Key> keys)
+void EShortcutListener::setTargetKeys(std::initializer_list<eutilities::Key> keys)
 {
 	shortcutKeys.assign(keys.begin(), keys.end());
+}
+
+void EShortcutListener::setTargetKeys(eutilities::Key key)
+{
+	shortcutKeys.clear();
+	shortcutKeys.emplace_back(key);
 }

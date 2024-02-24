@@ -3,7 +3,7 @@
 #include <QIntValidator>
 #include <QString>
 
-class EQIntValidator  : public QIntValidator
+class EQIntValidator : public QIntValidator
 {
 	Q_OBJECT
 
