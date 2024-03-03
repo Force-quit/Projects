@@ -1,5 +1,6 @@
 #include "EQShortcutPicker.h"
 
+#pragma warning(disable:5050)
 import eutilities;
 import EShortcutListener;
 

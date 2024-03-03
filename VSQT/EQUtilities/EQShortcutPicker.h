@@ -1,5 +1,6 @@
 #pragma once
 
+#pragma warning(disable:5050)
 import eutilities;
 
 #include <QWidget>
