@@ -21,26 +21,26 @@ import EShortcutListener;
 #include <ranges>
 
 EQShortcutPicker::EQShortcutPicker(QString labelText)
-	: QWidget(), mShortcutSetterThread(), changeShortcutButton(), mShortcutLabel{}, wasListening{}, mPressedKeys(), mPressedKeysIndicator{}
+	: QWidget(), mShortcutSetterThread(), mChangeShortcutButton(), mShortcutLabel{}, wasListening{}, mPressedKeys(), mPressedKeysIndicator{}
 {
 	QHBoxLayout* centralLayout{ new QHBoxLayout };
 
 	QLabel* widgetName{ new QLabel(labelText) };
 
 	mShortcutLabel = new QLabel(eutilities::nameOf(DEFAULT_KEY).value().c_str());
-	changeShortcutButton = new QPushButton("Change");
-	changeShortcutButton->setFocusPolicy(Qt::NoFocus);
+	mChangeShortcutButton = new QPushButton("Change");
+	mChangeShortcutButton->setFocusPolicy(Qt::NoFocus);
 
 	centralLayout->addWidget(widgetName);
 	centralLayout->addWidget(mShortcutLabel);
-	centralLayout->addWidget(changeShortcutButton);
+	centralLayout->addWidget(mChangeShortcutButton);
 
 	setLayout(centralLayout);
 
 	EShortcutListener::setTargetKeys(DEFAULT_KEY);
-	connect(changeShortcutButton, &QPushButton::clicked, this, &EQShortcutPicker::startChangingShortcut);
-	connect(changeShortcutButton, &QPushButton::clicked, changeShortcutButton, &QWidget::setEnabled);
-	connect(this, &EQShortcutPicker::stoppedChangingShortcut, [&]() {changeShortcutButton->setEnabled(true); });
+	connect(mChangeShortcutButton, &QPushButton::clicked, this, &EQShortcutPicker::startChangingShortcut);
+	connect(mChangeShortcutButton, &QPushButton::clicked, mChangeShortcutButton, &QWidget::setEnabled);
+	connect(this, &EQShortcutPicker::shortcutSelected, this, &EQShortcutPicker::enableButton);
 }
 
 void EQShortcutPicker::startChangingShortcut()
@@ -76,6 +76,11 @@ void EQShortcutPicker::processKey(std::clock_t& timer, std::size_t keyIndex)
 	}
 }
 
+void EQShortcutPicker::enableButton()
+{
+	mChangeShortcutButton->setEnabled(true);
+}
+
 void EQShortcutPicker::changingShortcutLoop(std::stop_token stopToken)
 {
 	std::ranges::fill(mPressedKeysIndicator, false);
@@ -96,6 +101,7 @@ void EQShortcutPicker::changingShortcutLoop(std::stop_token stopToken)
 
 	if (mPressedKeys.size() > 0)
 	{
+		emit shortcutSelected();
 		waitForShortcutRelease(mPressedKeys);
 		EShortcutListener::setTargetKeys(mPressedKeys);
 		if (wasListening)
