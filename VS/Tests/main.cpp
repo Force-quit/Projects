@@ -1,12 +1,12 @@
-﻿import eutilities;
-import EShortcutListener;
+﻿import std;
 
-#include <iostream>
-
+void helloWorld()
+{
+	std::println("Hello, World!");
+}
 
 int main()
 {
-	
-	
+	helloWorld();
 	std::cin.get();
 }
