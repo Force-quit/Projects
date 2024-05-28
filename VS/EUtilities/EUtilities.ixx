@@ -12,7 +12,7 @@ export namespace eutilities
 	/**
 	* Sleep for a certain time.
 	*
-	* @param msDuration The duration in milliseconds.
+	* @param iMsDuration The duration in milliseconds.
 	*/
-	void sleepFor(int msDuration);
+	void sleepFor(int iMsDuration);
 }

@@ -23,7 +23,7 @@ export namespace eutilities
 	*
 	* @see [Windows virtual key codes](https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes)
 	*/
-	constexpr enum Key
+	enum Key : std::uint16_t
 	{
 		LEFT_CLICK = VK_LBUTTON,
 		RIGHT_CLICK = VK_RBUTTON,
@@ -148,7 +148,7 @@ export namespace eutilities
 	};
 
 	// Array to iterate over all the values of the Key enum.
-	constexpr std::array<Key, 111> keys	{
+	constexpr auto keys	= std::array{
 		LEFT_CLICK,
 		RIGHT_CLICK,
 		MIDDLE_MOUSE,
@@ -263,7 +263,7 @@ export namespace eutilities
 	};
 
 	// Array to iterate over the keyboard keys of the Key enum.
-	constexpr std::array<Key, 106> keyboardKeys{
+	constexpr auto keyboardKeys = std::array{
 		ESCAPE,
 		F1,
 		F2,
@@ -373,7 +373,7 @@ export namespace eutilities
 	};
 
 	// Array to iterate over the mouse keys of the Key enum.
-	constexpr std::array<Key, 5> mouseKeys{
+	constexpr auto mouseKeys = std::array{
 		LEFT_CLICK,
 		RIGHT_CLICK,
 		MIDDLE_MOUSE,

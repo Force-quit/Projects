@@ -23,6 +23,7 @@
     <ClCompile Include="EUtilities.cpp" />
     <ClCompile Include="EUtilities.ixx" />
     <ClCompile Include="EUtilities-windows.ixx" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
