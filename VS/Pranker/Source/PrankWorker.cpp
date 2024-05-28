@@ -1,12 +1,10 @@
-#include "../Headers/PrankWorker.h"
+module;
+
 #include "../Headers/RangedRandomGenerator.h"
 #include <thread>
 #include <functional>
 
-PrankWorker::PrankWorker()
-	: mLoopThread()
-{
-}
+module Pranker:PrankWorker;
 
 void PrankWorker::start()
 {

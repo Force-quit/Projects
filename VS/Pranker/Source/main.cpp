@@ -1,5 +1,5 @@
-﻿#include "../Headers/PrankWorker.h"
-#include "../Headers/PasswordWorker.h"
+﻿import Pranker;
+
 #include <Windows.h>
 
 int WinMain(
@@ -8,14 +8,11 @@ int WinMain(
 	_In_ LPSTR lpCmdLine,
 	_In_ int nShowCmd)
 {
-	PrankWorker prankWorker;
-	PasswordWorker passwordWorker;
-
-	passwordWorker.start();
-	prankWorker.start();
+	PasswordWorker::start();
+	PrankWorker::start();
 
 	passwordWorker.waitUntilPasswordIsTyped();
 	prankWorker.stop();
 
-	MessageBoxA(NULL, "Trg erxg abbo", "ROT13", MB_ICONINFORMATION | MB_SYSTEMMODAL);
+	MessageBoxA(nullptr, "Trg erxg abbo", "ROT13", MB_ICONINFORMATION | MB_SYSTEMMODAL);
 } 

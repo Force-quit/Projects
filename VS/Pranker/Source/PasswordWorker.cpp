@@ -1,20 +1,22 @@
-import eutilities;
-
-#include "../Headers/PasswordWorker.h"
+module;
 
 #include <Windows.h>
 #include <thread>
 #include <functional>
 
-PasswordWorker::PasswordWorker()
-	: mLoopThread()
-{
-}
+module Pranker:PasswordWorker;
+
+import eutilities;
 
 void PasswordWorker::start()
 {
-	resetInputBuffer();
-	mLoopThread = std::jthread([=]() {while (!passwordIsTyped()) {}});
+	mLoopThread = std::jthread([]() 
+	{
+		while (!passwordIsTyped()) 
+		{
+			// Nothing to do here
+		}
+	});
 }
 
 void PasswordWorker::waitUntilPasswordIsTyped()
@@ -50,10 +52,4 @@ bool PasswordWorker::passwordIsTyped(size_t iNextCharIndex)
 		return true;
 
 	return passwordIsTyped(iNextCharIndex + 1);
-}
-
-void PasswordWorker::resetInputBuffer()
-{
-	for (int wVirtualKey{ 0x01 }; wVirtualKey <= 0xFE; ++wVirtualKey)
-		GetAsyncKeyState(wVirtualKey);
 }

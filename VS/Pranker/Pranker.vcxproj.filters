@@ -24,6 +24,9 @@
     <ClCompile Include="Source\PasswordWorker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Pranker.ixx">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resources\resource.h">
@@ -32,10 +35,10 @@
     <ClInclude Include="Headers\RangedRandomGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\PrankWorker.h">
+    <ClInclude Include="Headers\PrankWorker.ixx">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\PasswordWorker.h">
+    <ClInclude Include="Headers\PasswordWorker.ixx">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
