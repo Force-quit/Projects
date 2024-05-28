@@ -149,9 +149,13 @@
     <ClCompile Include="Source\PrankWorker.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Headers\PasswordWorker.ixx" />
-    <ClInclude Include="Headers\PrankWorker.ixx" />
-    <ClInclude Include="Headers\RangedRandomGenerator.h" />
+    <ClCompile Include="Headers\PasswordWorker.ixx">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="Headers\PrankWorker.ixx">
+      <FileType>Document</FileType>
+    </ClCompile>
+    <ClCompile Include="Headers\RangedRandomGenerator.ixx" />
     <ClInclude Include="Resources\resource.h" />
   </ItemGroup>
   <ItemGroup>

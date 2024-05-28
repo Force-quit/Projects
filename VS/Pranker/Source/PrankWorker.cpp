@@ -1,14 +1,15 @@
 module;
 
-#include "../Headers/RangedRandomGenerator.h"
 #include <thread>
 #include <functional>
 
 module Pranker:PrankWorker;
 
+import :RangedRandomGenerator;
+
 void PrankWorker::start()
 {
-	mLoopThread = std::jthread(std::bind_front(&PrankWorker::mainLoop, this));
+	mLoopThread = std::jthread(PrankWorker::mainLoop);
 }
 
 void PrankWorker::stop()
@@ -18,7 +19,7 @@ void PrankWorker::stop()
 
 void PrankWorker::mainLoop(std::stop_token iStopToken)
 {
-	RangedRandomGenerator<size_t> wRandomPrankGenerator(0, mPrankFunctions.size() - 1);
+	RangedRandomGenerator<std::size_t> wRandomPrankGenerator(0, mPrankFunctions.size() - 1);
 	RangedRandomGenerator<std::clock_t> wRandomIntervalGenerator(MIN_PRANK_INTERVAL, MAX_PRANK_INTERVAL);
 
 	std::clock_t wCurrentTime{ std::clock() };

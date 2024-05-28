@@ -11,8 +11,8 @@ int WinMain(
 	PasswordWorker::start();
 	PrankWorker::start();
 
-	passwordWorker.waitUntilPasswordIsTyped();
-	prankWorker.stop();
+	PasswordWorker::waitUntilPasswordIsTyped();
+	PrankWorker::stop();
 
 	MessageBoxA(nullptr, "Trg erxg abbo", "ROT13", MB_ICONINFORMATION | MB_SYSTEMMODAL);
 } 
