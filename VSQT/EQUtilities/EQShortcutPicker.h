@@ -1,5 +1,6 @@
 #pragma once
 
+#pragma warning(disable:5050)
 import eutilities;
 
 #include <QWidget>
@@ -32,6 +33,10 @@ signals:
 	
 private slots:
 	void startChangingShortcut();
+	void enableButton();
+
+signals:
+	void shortcutSelected();
 
 private:
 	static constexpr eutilities::Key DEFAULT_KEY{ eutilities::RIGHT_CONTROL };
@@ -44,7 +49,7 @@ private:
 
 	bool wasListening;
 	std::jthread mShortcutSetterThread;
-	QPushButton* changeShortcutButton;
+	QPushButton* mChangeShortcutButton;
 	QLabel* mShortcutLabel;
 	std::array<bool, eutilities::keys.size()> mPressedKeysIndicator;
 	std::vector<eutilities::Key> mPressedKeys;
