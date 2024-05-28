@@ -3,23 +3,26 @@ module;
 #include <functional>
 #include <vector>
 #include <initializer_list>
+#include <span>
+#include <thread>
 
 module EShortcutListener;
+
 import eutilities;
 
-void EShortcutListener::startListening(std::function<void()> callbackFunc)
+void EShortcutListener::startListening(std::function<void()> iCallbackFunction)
 {
-	callbackFunction = callbackFunc;
+	sCallbackFunction = iCallbackFunction;
 	stopListening();
-	listenLoop = std::jthread(&EShortcutListener::mainLoop);
+	sListenLoop = std::jthread(&EShortcutListener::mainLoop);
 }
 
 void EShortcutListener::stopListening()
 {
-	if (listenLoop.joinable())
+	if (sListenLoop.joinable())
 	{
-		listenLoop.request_stop();
-		listenLoop.join();
+		sListenLoop.request_stop();
+		sListenLoop.join();
 	}
 }
 
@@ -30,14 +33,14 @@ void EShortcutListener::mainLoop(std::stop_token iStopToken)
 
 	while (!iStopToken.stop_requested())
 	{
-		for (auto& i : shortcutKeys)
+		for (auto i : sShortcutKeys)
 		{
 			if (eutilities::isPressed(i))
 			{
 				++pressedKeys;
-				if (pressedKeys == shortcutKeys.size() && canTrigger)
+				if (pressedKeys == sShortcutKeys.size() && canTrigger)
 				{
-					callbackFunction();
+					sCallbackFunction();
 					canTrigger = false;
 				}
 			}
@@ -54,21 +57,26 @@ void EShortcutListener::mainLoop(std::stop_token iStopToken)
 
 std::vector<eutilities::Key> EShortcutListener::targetKeys()
 {
-	return shortcutKeys;
+	return sShortcutKeys;
 }
 
 bool EShortcutListener::isListening()
 {
-	return listenLoop.joinable();
+	return sListenLoop.joinable();
 }
 
-void EShortcutListener::setTargetKeys(std::initializer_list<eutilities::Key> keys)
+void EShortcutListener::setTargetKeys(std::initializer_list<eutilities::Key> iKeys)
 {
-	shortcutKeys.assign(keys.begin(), keys.end());
+	sShortcutKeys.assign_range(iKeys);
 }
 
-void EShortcutListener::setTargetKeys(eutilities::Key key)
+void EShortcutListener::setTargetKeys(std::span<const eutilities::Key> iKeys)
 {
-	shortcutKeys.clear();
-	shortcutKeys.emplace_back(key);
+	sShortcutKeys.assign_range(iKeys);
+}
+
+void EShortcutListener::setTargetKeys(eutilities::Key iKey)
+{
+	sShortcutKeys.clear();
+	sShortcutKeys.emplace_back(iKey);
 }

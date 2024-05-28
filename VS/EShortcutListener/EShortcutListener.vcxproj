@@ -131,6 +131,7 @@
   <ItemGroup>
     <ClCompile Include="EShortcutListener.cpp" />
     <ClCompile Include="EShortcutListener.ixx" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EUtilities\EUtilities.vcxproj">
