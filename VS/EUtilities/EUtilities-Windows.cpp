@@ -397,40 +397,40 @@ constexpr std::optional<std::string> eutilities::nameOf(Key keyCode)
 		return "Page up";
 	case PAGE_DOWN:
 		return "Page down";
-		case NUMPAD_0:
-			return "Numpad 0";
-		case NUMPAD_1:
-			return "Numpad 1";
-		case NUMPAD_2:
-			return "Numpad 2";
-		case NUMPAD_3:
-			return "Numpad 3";
-		case NUMPAD_4:
-			return "Numpad 4";
-		case NUMPAD_5:
-			return "Numpad 5";
-		case NUMPAD_6:
-			return "Numpad 6";
-		case NUMPAD_7:
-			return "Numpad 7";
-		case NUMPAD_8:
-			return "Numpad 8";
-		case NUMPAD_9:
-			return "Numpad 9";
-		case NUMPAD_ADD:
-			return "Numpad add";
-		case NUMPAD_SUBTRACT:
-			return "Numpad subtract";
-		case NUMPAD_MULTIPLY:
-			return "Numpad multiply";
-		case NUMPAD_DIVIDE:
-			return "Numpad divide";
-		case NUMPAD_CLEAR:
-			return "Numpad clear";
-		case NUMPAD_LOCK:
-			return "Numpad lock";
-		case NUMPAD_DECIMAL:
-			return "Numpad decimal";
+	case NUMPAD_0:
+		return "Numpad 0";
+	case NUMPAD_1:
+		return "Numpad 1";
+	case NUMPAD_2:
+		return "Numpad 2";
+	case NUMPAD_3:
+		return "Numpad 3";
+	case NUMPAD_4:
+		return "Numpad 4";
+	case NUMPAD_5:
+		return "Numpad 5";
+	case NUMPAD_6:
+		return "Numpad 6";
+	case NUMPAD_7:
+		return "Numpad 7";
+	case NUMPAD_8:
+		return "Numpad 8";
+	case NUMPAD_9:
+		return "Numpad 9";
+	case NUMPAD_ADD:
+		return "Numpad add";
+	case NUMPAD_SUBTRACT:
+		return "Numpad subtract";
+	case NUMPAD_MULTIPLY:
+		return "Numpad multiply";
+	case NUMPAD_DIVIDE:
+		return "Numpad divide";
+	case NUMPAD_CLEAR:
+		return "Numpad clear";
+	case NUMPAD_LOCK:
+		return "Numpad lock";
+	case NUMPAD_DECIMAL:
+		return "Numpad decimal";
 	default:
 		return std::nullopt;
 	}
