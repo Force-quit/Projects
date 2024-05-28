@@ -2,8 +2,6 @@ module;
 
 #include <utility>
 #include <thread>
-#include <string>
-#include <functional>
 
 export module InvertedMouseMover;
 
@@ -11,10 +9,12 @@ export class InvertedMouseMover
 {
 public:
 	InvertedMouseMover() = delete;
+	
 	static void start();
-	static void startFor(clock_t iActivationTime);
-	static bool isActive();
+	static void startFor(std::clock_t iActivationTime);
 	static void stop();
+
+	[[nodiscard]] static bool isActive();
 
 private:
 	static std::pair<int, int> getScreenSize();

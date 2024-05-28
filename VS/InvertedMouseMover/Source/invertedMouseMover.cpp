@@ -27,7 +27,6 @@ void InvertedMouseMover::startFor(clock_t iActivationTime)
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		}
-
 	});
 }
 
