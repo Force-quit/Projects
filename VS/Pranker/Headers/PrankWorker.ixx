@@ -1,6 +1,5 @@
 module;
 
-#include <Windows.h>
 #include <array>
 #include <thread>
 

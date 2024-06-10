@@ -39,4 +39,6 @@ void PrankWorker::mainLoop(std::stop_token iStopToken)
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(5));
 	}
+
+	InvertedMouseMover::stop(); // Just in case
 }
