@@ -1,20 +1,21 @@
-import eutilities;
+module;
 
-#include "../Headers/PasswordWorker.h"
-
-#include <Windows.h>
 #include <thread>
 #include <functional>
 
-PasswordWorker::PasswordWorker()
-	: mLoopThread()
-{
-}
+module Pranker:PasswordWorker;
+
+import eutilities;
 
 void PasswordWorker::start()
 {
-	resetInputBuffer();
-	mLoopThread = std::jthread([=]() {while (!passwordIsTyped()) {}});
+	mLoopThread = std::jthread([]() 
+	{
+		while (!passwordIsTyped()) 
+		{
+			// Nothing to do here
+		}
+	});
 }
 
 void PasswordWorker::waitUntilPasswordIsTyped()
@@ -29,31 +30,29 @@ bool PasswordWorker::passwordIsTyped(size_t iNextCharIndex)
 
 	while (!wAnyKeyWasPressed)
 	{
-		for (int wVirtualKey{ 0x01 }; wVirtualKey <= 0xFE; ++wVirtualKey)
+		for (auto wKey : eutilities::keyboardKeys)
 		{
-			if (GetAsyncKeyState(wVirtualKey))
+			if (eutilities::isPressed(wKey))
 			{
 				wAnyKeyWasPressed = true;
-				eutilities::waitForKeyRelease(static_cast<eutilities::Key>(wVirtualKey));
-				wRightKeyPressed = wVirtualKey == mPasswordKeys[iNextCharIndex];
+				eutilities::waitForKeyRelease(wKey);
+				wRightKeyPressed = wKey == mPasswordKeys[iNextCharIndex];
 				break;
 			}
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		eutilities::sleepFor(5);
 	}
 
 	if (!wRightKeyPressed)
+	{
 		return false;
+	}
 
 	if (mPasswordKeys.size() == iNextCharIndex + 1)
+	{
 		return true;
+	}
 
 	return passwordIsTyped(iNextCharIndex + 1);
-}
-
-void PasswordWorker::resetInputBuffer()
-{
-	for (int wVirtualKey{ 0x01 }; wVirtualKey <= 0xFE; ++wVirtualKey)
-		GetAsyncKeyState(wVirtualKey);
 }

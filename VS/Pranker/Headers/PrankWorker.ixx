@@ -1,20 +1,23 @@
-#pragma once
+module;
+
+#include <array>
+#include <thread>
+
+export module Pranker:PrankWorker;
 
 import eutilities;
 import InvertedMouseMover;
 
-#include <Windows.h>
-#include <array>
-#include <thread>
-
-class PrankWorker
+export class PrankWorker
 {
 public:
-	PrankWorker();
-	void start();
-	void stop();
+	PrankWorker() = delete;
+	static void start();
+	static void stop();
 
 private:
+	static void mainLoop(std::stop_token iStopToken);
+
 	static constexpr int MIN_PRANK_INTERVAL{ 30000 };
 	static constexpr int MAX_PRANK_INTERVAL{ 120000 };
 	static constexpr std::array<void (*)(), 3> mPrankFunctions
@@ -32,7 +35,6 @@ private:
 		*/
 	};
 
-	std::jthread mLoopThread;
-	void mainLoop(std::stop_token iStopToken);
+	inline static std::jthread mLoopThread;
 };
 

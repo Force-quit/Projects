@@ -1,16 +1,16 @@
-#include "../Headers/PrankWorker.h"
-#include "../Headers/RangedRandomGenerator.h"
+module;
+
 #include <thread>
 #include <functional>
 
-PrankWorker::PrankWorker()
-	: mLoopThread()
-{
-}
+module Pranker:PrankWorker;
+
+import eutilities;
+import :RangedRandomGenerator;
 
 void PrankWorker::start()
 {
-	mLoopThread = std::jthread(std::bind_front(&PrankWorker::mainLoop, this));
+	mLoopThread = std::jthread(PrankWorker::mainLoop);
 }
 
 void PrankWorker::stop()
@@ -20,7 +20,7 @@ void PrankWorker::stop()
 
 void PrankWorker::mainLoop(std::stop_token iStopToken)
 {
-	RangedRandomGenerator<size_t> wRandomPrankGenerator(0, mPrankFunctions.size() - 1);
+	RangedRandomGenerator<std::size_t> wRandomPrankGenerator(0, mPrankFunctions.size() - 1);
 	RangedRandomGenerator<std::clock_t> wRandomIntervalGenerator(MIN_PRANK_INTERVAL, MAX_PRANK_INTERVAL);
 
 	std::clock_t wCurrentTime{ std::clock() };
@@ -38,6 +38,8 @@ void PrankWorker::mainLoop(std::stop_token iStopToken)
 			wRandomInterval = wRandomIntervalGenerator.random();
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		eutilities::sleepFor(5);
 	}
+
+	InvertedMouseMover::stop(); // Just in case
 }
