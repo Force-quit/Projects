@@ -107,8 +107,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>true</BuildStlModules>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
-      <EnableModules>true</EnableModules>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,8 +129,8 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>true</BuildStlModules>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <ScanSourceForModuleDependencies>true</ScanSourceForModuleDependencies>
-      <EnableModules>true</EnableModules>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <EnableModules>false</EnableModules>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
