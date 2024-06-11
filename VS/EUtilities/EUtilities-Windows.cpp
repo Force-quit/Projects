@@ -2,7 +2,6 @@ module;
 
 #include <Windows.h>
 #include <string_view>
-#include <optional>
 #include <thread>
 
 module eutilities:windows;
@@ -19,9 +18,9 @@ constexpr bool eutilities::isMouseKey(Key key)
 	case eutilities::Key::MOUSE_BUTTON1:
 	case eutilities::Key::MOUSE_BUTTON2:
 		return true;
-	default:
-		return false;
 	}
+
+	return false;
 }
 
 void eutilities::setMousePressInput(Key mouseKey, INPUT& mouseInput)
@@ -204,8 +203,7 @@ void eutilities::copyToClipBoard(std::span<const char> data)
 	}
 }
 
-
-constexpr std::optional<std::string> eutilities::nameOf(Key keyCode)
+constexpr std::string eutilities::nameOf(Key keyCode)
 {
 	switch (keyCode)
 	{
@@ -431,12 +429,14 @@ constexpr std::optional<std::string> eutilities::nameOf(Key keyCode)
 		return "Numpad lock";
 	case NUMPAD_DECIMAL:
 		return "Numpad decimal";
+	case UNKNOWN:
+		[[fallthrough]];
 	default:
-		return std::nullopt;
+		return "Unnamed";
 	}
 }
 
-constexpr std::optional<std::string> eutilities::nameOf(int key)
+constexpr std::string eutilities::nameOf(int key)
 {
 	return nameOf(static_cast<Key>(key));
 }

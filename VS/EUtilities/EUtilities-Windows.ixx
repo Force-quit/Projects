@@ -3,7 +3,6 @@ module;
 #include <Windows.h>
 #include <string_view>
 #include <string>
-#include <optional>
 #include <span>
 #include <array>
 
@@ -145,6 +144,8 @@ export namespace eutilities
 		NUMPAD_CLEAR = VK_CLEAR,
 		NUMPAD_LOCK = VK_NUMLOCK,
 		NUMPAD_DECIMAL = VK_DECIMAL,
+
+		UNKNOWN = 0xFFFF
 	};
 
 	// Array to iterate over all the values of the Key enum.
@@ -387,7 +388,7 @@ export namespace eutilities
 	* @param key An enum value of eutilities::Key.
 	* @return The name of the key if it's known. If not, an empty std::optional.
 	*/
-	[[nodiscard]] constexpr std::optional<std::string> nameOf(Key key);
+	[[nodiscard]] constexpr std::string nameOf(Key key);
 
 	/**
 	* Get the display name of the specified key.
@@ -396,7 +397,7 @@ export namespace eutilities
 	* @return The name of the key if it's known. If not, an empty std::optional.
 	* @overload
 	*/
-	[[nodiscard]] constexpr std::optional<std::string> nameOf(int key);
+	[[nodiscard]] constexpr std::string nameOf(int key);
 
 
 	/**

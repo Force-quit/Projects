@@ -1,45 +1,36 @@
 import eutilities;
 
-#include <Windows.h>
 #include <vector>
-#include <iostream>
 #include <string>
-#include <optional>
+#include <print>
+#include <span>
 
-static void addPressedKeys(std::vector<int>& pressedKeys)
+void addPressedKeys(std::vector<eutilities::Key>& pressedKeys)
 {
-	for (auto& i : eutilities::keys)
+	for (auto key : eutilities::keys)
 	{
-		if (eutilities::isPressed(i))
+		if (eutilities::isPressed(key))
 		{
-			pressedKeys.emplace_back(i);
+			pressedKeys.push_back(key);
 		}
 	}
 }
 
-static void printPressedKeys(const std::vector<int>& pressedKeys)
+void printPressedKeys(std::span<eutilities::Key> pressedKeys)
 {
-	std::cout << "Pressing : " << std::hex;
+	std::print("Pressing : ");
+
 	for (auto i : pressedKeys)
 	{
-		std::optional<std::string> virtualKeyName(eutilities::nameOf(i));
-		if (virtualKeyName)
-		{
-			std::cout << virtualKeyName.value() << " ";
-		}
-		// For testing
-		else
-		{
-			std::cout << i << " (Unnamed) ";
-		}
+		std::print("{} ", eutilities::nameOf(i));
 	}
 
-	std::cout << '\n';
+	std::println("");
 }
 
 int main()
 {
-	std::vector<int> pressedKeys;
+	std::vector<eutilities::Key> pressedKeys;
 	while (!eutilities::isPressed(eutilities::ESCAPE))
 	{
 		addPressedKeys(pressedKeys);
