@@ -5,6 +5,7 @@ module;
 
 module Pranker:PrankWorker;
 
+import eutilities;
 import :RangedRandomGenerator;
 
 void PrankWorker::start()
@@ -37,7 +38,7 @@ void PrankWorker::mainLoop(std::stop_token iStopToken)
 			wRandomInterval = wRandomIntervalGenerator.random();
 		}
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		eutilities::sleepFor(5);
 	}
 
 	InvertedMouseMover::stop(); // Just in case
