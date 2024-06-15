@@ -27,7 +27,7 @@ EQShortcutPicker::EQShortcutPicker(QString labelText)
 
 	QLabel* widgetName{ new QLabel(labelText) };
 
-	mShortcutLabel = new QLabel(eutilities::nameOf(DEFAULT_KEY).value().c_str());
+	mShortcutLabel = new QLabel(eutilities::nameOf(DEFAULT_KEY).c_str());
 	mChangeShortcutButton = new QPushButton("Change");
 	mChangeShortcutButton->setFocusPolicy(Qt::NoFocus);
 
@@ -83,7 +83,7 @@ void EQShortcutPicker::enableButton()
 
 void EQShortcutPicker::changingShortcutLoop(std::stop_token stopToken)
 {
-	std::ranges::fill(mPressedKeysIndicator, false);
+	mPressedKeysIndicator.fill(false);
 	mPressedKeys.clear();
 	std::clock_t timerStart{ std::clock() };
 	bool shortcutWasChosen{};
@@ -138,7 +138,7 @@ void EQShortcutPicker::updateShortcutText(const std::vector<eutilities::Key>& st
 			newText += " + ";
 		}
 
-		newText += eutilities::nameOf(i).value();
+		newText += eutilities::nameOf(i);
 	}
 
 	mShortcutLabel->setText(QString::fromStdString(newText));
