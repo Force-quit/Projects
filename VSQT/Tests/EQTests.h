@@ -11,4 +11,5 @@ public:
 private:
 	QWidget* intLineEditTest();
 	QWidget* textValidatorTest();
+	QWidget* shortcutPickerTest();
 };

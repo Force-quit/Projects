@@ -1,9 +1,7 @@
 #include "EQShortcutPicker.h"
 
-#pragma warning(disable:5050)
 import eutilities;
 import EShortcutListener;
-
 
 #include <QString>
 #include <QWidget>
@@ -20,16 +18,11 @@ import EShortcutListener;
 #include <vector>
 #include <ranges>
 
-EQShortcutPicker::EQShortcutPicker(QString labelText)
-	: QWidget(), mShortcutSetterThread(), mChangeShortcutButton(), mShortcutLabel{}, wasListening{}, mPressedKeys(), mPressedKeysIndicator{}
+EQShortcutPicker::EQShortcutPicker(QString iShortcutTriggerText)
+	: mShortcutLabel{ new QLabel(eutilities::nameOf(DEFAULT_KEY).c_str()) }
 {
 	QHBoxLayout* centralLayout{ new QHBoxLayout };
-
-	QLabel* widgetName{ new QLabel(labelText) };
-
-	mShortcutLabel = new QLabel(eutilities::nameOf(DEFAULT_KEY).c_str());
-	mChangeShortcutButton = new QPushButton("Change");
-	mChangeShortcutButton->setFocusPolicy(Qt::NoFocus);
+	QLabel* widgetName{ new QLabel(iShortcutTriggerText) };
 
 	centralLayout->addWidget(widgetName);
 	centralLayout->addWidget(mShortcutLabel);
@@ -38,6 +31,7 @@ EQShortcutPicker::EQShortcutPicker(QString labelText)
 	setLayout(centralLayout);
 
 	EShortcutListener::setTargetKeys(DEFAULT_KEY);
+
 	connect(mChangeShortcutButton, &QPushButton::clicked, this, &EQShortcutPicker::startChangingShortcut);
 	connect(mChangeShortcutButton, &QPushButton::clicked, mChangeShortcutButton, &QWidget::setEnabled);
 	connect(this, &EQShortcutPicker::shortcutSelected, this, &EQShortcutPicker::enableButton);
@@ -46,7 +40,7 @@ EQShortcutPicker::EQShortcutPicker(QString labelText)
 void EQShortcutPicker::startChangingShortcut()
 {
 	emit startedChangingShortcut();
-	wasListening = EShortcutListener::isListening();
+	mWasListening = EShortcutListener::isListening();
 	EShortcutListener::stopListening();
 	mShortcutSetterThread = std::jthread(std::bind_front(&EQShortcutPicker::changingShortcutLoop, this));
 }
@@ -59,7 +53,7 @@ void EQShortcutPicker::processKey(std::clock_t& timer, std::size_t keyIndex)
 		{
 			timer = std::clock();
 			mPressedKeysIndicator[keyIndex] = true;
-			mPressedKeys.emplace_back(eutilities::keys[keyIndex]);
+			mPressedKeys.push_back(eutilities::keys[keyIndex]);
 			updateShortcutText(mPressedKeys);
 		}
 	}
@@ -86,25 +80,28 @@ void EQShortcutPicker::changingShortcutLoop(std::stop_token stopToken)
 	mPressedKeysIndicator.fill(false);
 	mPressedKeys.clear();
 	std::clock_t timerStart{ std::clock() };
-	bool shortcutWasChosen{};
 
-	while (!shortcutWasChosen && !stopToken.stop_requested())
+	while (!stopToken.stop_requested())
 	{
 		for (std::size_t i{}; i < eutilities::keys.size(); ++i)
 		{
 			processKey(timerStart, i);
 		}
+		
+		if (mPressedKeys.size() > 0 && std::clock() - timerStart >= SHORTCUT_HOLD_TIME)
+		{
+			break;
+		}
 
-		shortcutWasChosen = mPressedKeys.size() > 0 && std::clock() - timerStart >= SHORTCUT_HOLD_TIME;
 		eutilities::sleepFor(5);
 	}
 
-	if (mPressedKeys.size() > 0)
+	if (!stopToken.stop_requested())
 	{
 		emit shortcutSelected();
 		waitForShortcutRelease(mPressedKeys);
 		EShortcutListener::setTargetKeys(mPressedKeys);
-		if (wasListening)
+		if (mWasListening)
 		{
 			startListening();
 		}
@@ -112,26 +109,27 @@ void EQShortcutPicker::changingShortcutLoop(std::stop_token stopToken)
 	}
 }
 
-void EQShortcutPicker::waitForShortcutRelease(const std::vector<eutilities::Key>& keys)
+void EQShortcutPicker::waitForShortcutRelease(std::span<const eutilities::Key> keys)
 {
 	auto it(keys.cbegin());
 	while (eutilities::isPressed(*it))
 	{
 		++it;
+		
 		if (it == keys.cend())
 		{
 			it = keys.cbegin();
 		}
 
-		eutilities::sleepFor(1);
+		eutilities::sleepFor(5);
 	}
 }
 
-void EQShortcutPicker::updateShortcutText(const std::vector<eutilities::Key>& strings)
+void EQShortcutPicker::updateShortcutText(std::span<const eutilities::Key> strings)
 {
 	std::string newText;
 
-	for (auto& i : strings)
+	for (auto i : strings)
 	{
 		if (!newText.empty())
 		{
@@ -146,7 +144,7 @@ void EQShortcutPicker::updateShortcutText(const std::vector<eutilities::Key>& st
 
 void EQShortcutPicker::startListening()
 {
-	EShortcutListener::startListening([=] {emit shortcutPressed(); });
+	EShortcutListener::startListening([this] {emit shortcutPressed(); });
 }
 
 void EQShortcutPicker::stopListening()
@@ -154,20 +152,13 @@ void EQShortcutPicker::stopListening()
 	EShortcutListener::stopListening();
 }
 
-QVector<eutilities::Key> EQShortcutPicker::getTargetKeys() const
+std::vector<eutilities::Key> EQShortcutPicker::targetKeys() const
 {
-	auto keys{ EShortcutListener::targetKeys() };
-	return QVector<eutilities::Key>(keys.begin(), keys.end());
+	return EShortcutListener::targetKeys();
 }
 
-void EQShortcutPicker::setTargetKeys(const QVector<eutilities::Key>& targetKeys)
+void EQShortcutPicker::setTargetKeys(std::span<const eutilities::Key> targetKeys)
 {
-	std::vector<eutilities::Key> keys;
-	for (auto i : targetKeys)
-	{
-		keys.emplace_back(static_cast<eutilities::Key>(i));
-	}
-
-	EShortcutListener::setTargetKeys(keys);
-	updateShortcutText(keys);
+	EShortcutListener::setTargetKeys(targetKeys);
+	updateShortcutText(targetKeys);
 }

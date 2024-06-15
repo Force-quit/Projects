@@ -2,12 +2,13 @@
 
 #include "../EQUtilities/EQIntLineEdit.h"
 #include "../EQUtilities/EQTextValidator.h"
+#include "../EQUtilities/EQShortcutPicker.h"
 #include <QVBoxLayout>
 #include <QLineEdit>
 
 EQTests::EQTests()
 {
-	setCentralWidget(textValidatorTest());
+	setCentralWidget(shortcutPickerTest());
 }
 
 QWidget* EQTests::intLineEditTest()
@@ -26,7 +27,18 @@ QWidget* EQTests::intLineEditTest()
 
 QWidget* EQTests::textValidatorTest()
 {
-	QLineEdit* lineEdit{ new QLineEdit };
-	lineEdit->setValidator(new EQTextValidator);
-	return lineEdit;
+	QLineEdit* centralWidget{ new QLineEdit };
+	centralWidget->setValidator(new EQTextValidator);
+	return centralWidget;
+}
+
+QWidget* EQTests::shortcutPickerTest()
+{
+	EQShortcutPicker* centralWidget{ new EQShortcutPicker("Activate testing mode :") };
+	centralWidget->startListening();
+	connect(centralWidget, &EQShortcutPicker::shortcutPressed, [] {
+		static std::uint8_t counter{};
+		qDebug() << "Shortcut pressed " << ++counter;
+	});
+	return centralWidget;
 }

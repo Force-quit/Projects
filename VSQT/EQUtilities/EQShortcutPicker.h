@@ -3,24 +3,24 @@
 #pragma warning(disable:5050)
 import eutilities;
 
-#include <QWidget>
-#include <QString>
-#include <QVector>
-#include <vector>
-#include <thread>
-#include <QPushButton>
-#include <QLabel>
 #include <array>
+#include <QLabel>
+#include <QPushButton>
+#include <QWidget>
+#include <span>
+#include <thread>
+#include <vector>
 
 class EQShortcutPicker : public QWidget
 {
 	Q_OBJECT
 
 public:
-	EQShortcutPicker(QString labelText);
+	EQShortcutPicker(QString iShortcutTriggerText);
 
-	[[nodiscard]] QVector<eutilities::Key> getTargetKeys() const;
-	void setTargetKeys(const QVector<eutilities::Key>& targetKeys);
+	[[nodiscard]] std::vector<eutilities::Key> targetKeys() const;
+
+	void setTargetKeys(std::span<const eutilities::Key> targetKeys);
 
 public slots:
 	void startListening();
@@ -30,7 +30,7 @@ signals:
 	void startedChangingShortcut();
 	void stoppedChangingShortcut();
 	void shortcutPressed();
-	
+
 private slots:
 	void startChangingShortcut();
 	void enableButton();
@@ -40,17 +40,17 @@ signals:
 
 private:
 	static constexpr eutilities::Key DEFAULT_KEY{ eutilities::RIGHT_CONTROL };
-	static constexpr clock_t SHORTCUT_HOLD_TIME{ 3000 };
+	static constexpr std::clock_t SHORTCUT_HOLD_TIME{ 3000 };
 
-	void updateShortcutText(const std::vector<eutilities::Key>& strings);
+	void updateShortcutText(std::span<const eutilities::Key> keys);
 	void processKey(std::clock_t& timer, std::size_t keyIndex);
 	void changingShortcutLoop(std::stop_token stopToken);
-	void waitForShortcutRelease(const std::vector<eutilities::Key>& keys);
+	void waitForShortcutRelease(std::span<const eutilities::Key> keys);
 
-	bool wasListening;
 	std::jthread mShortcutSetterThread;
-	QPushButton* mChangeShortcutButton;
+	std::array<bool, eutilities::keys.size()> mPressedKeysIndicator{};
+	std::vector<eutilities::Key> mPressedKeys{};
+	QPushButton* mChangeShortcutButton{ new QPushButton("Change") };
 	QLabel* mShortcutLabel;
-	std::array<bool, eutilities::keys.size()> mPressedKeysIndicator;
-	std::vector<eutilities::Key> mPressedKeys;
+	bool mWasListening{};
 };
