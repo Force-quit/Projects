@@ -104,14 +104,12 @@
     <QtMoc Include="EQIntLineEdit.h" />
     <QtMoc Include="EQIntValidator.h" />
     <QtMoc Include="EQShortcutPicker.h" />
-    <QtMoc Include="EQTabWidget.h" />
     <QtMoc Include="EQTextValidator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EQIntLineEdit.cpp" />
     <ClCompile Include="EQIntValidator.cpp" />
     <ClCompile Include="EQShortcutPicker.cpp" />
-    <ClCompile Include="EQTabWidget.cpp" />
     <ClCompile Include="EQTextValidator.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,10 +1,8 @@
 #include "EQTextValidator.h"
 
-EQTextValidator::EQTextValidator(QObject* parent)
-	: QRegularExpressionValidator(parent)
+EQTextValidator::EQTextValidator()
 {
-	QRegularExpression wRe("\\p{L}*");
-	setRegularExpression(wRe);
+	setRegularExpression(QRegularExpression("\\p{L}*"));
 }
 
 void EQTextValidator::fixup(QString& input) const

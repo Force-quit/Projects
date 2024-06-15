@@ -1,9 +1,16 @@
 #include "EQTests.h"
-#include <QVBoxLayout>
+
 #include "../EQUtilities/EQIntLineEdit.h"
+#include "../EQUtilities/EQTextValidator.h"
+#include <QVBoxLayout>
+#include <QLineEdit>
 
 EQTests::EQTests()
-	: QMainWindow()
+{
+	setCentralWidget(textValidatorTest());
+}
+
+QWidget* EQTests::intLineEditTest()
 {
 	QWidget* centralWidget{ new QWidget() };
 	QVBoxLayout* layout{ new QVBoxLayout() };
@@ -14,5 +21,12 @@ EQTests::EQTests()
 	layout->addWidget(intLineEdit2);
 
 	centralWidget->setLayout(layout);
-	setCentralWidget(centralWidget);
+	return centralWidget;
+}
+
+QWidget* EQTests::textValidatorTest()
+{
+	QLineEdit* lineEdit{ new QLineEdit };
+	lineEdit->setValidator(new EQTextValidator);
+	return lineEdit;
 }

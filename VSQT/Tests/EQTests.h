@@ -8,4 +8,7 @@ class EQTests : public QMainWindow
 
 public:
 	EQTests();
+private:
+	QWidget* intLineEditTest();
+	QWidget* textValidatorTest();
 };

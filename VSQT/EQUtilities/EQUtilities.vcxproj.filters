@@ -17,9 +17,6 @@
     <ClCompile Include="EQShortcutPicker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EQTabWidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EQTextValidator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -32,9 +29,6 @@
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="EQShortcutPicker.h">
-      <Filter>Header Files</Filter>
-    </QtMoc>
-    <QtMoc Include="EQTabWidget.h">
       <Filter>Header Files</Filter>
     </QtMoc>
     <QtMoc Include="EQTextValidator.h">
