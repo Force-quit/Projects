@@ -1,8 +1,10 @@
 #include "EQIntValidator.h"
 
-EQIntValidator::EQIntValidator(int minimum, int maximum, QObject* parent)
-	: QIntValidator(minimum, maximum, parent)
-{}
+EQIntValidator::EQIntValidator(int iMinimum, int iMaximum)
+	: QIntValidator(iMinimum, iMaximum)
+{
+
+}
 
 QValidator::State EQIntValidator::validate(QString& input, int& pos) const
 {
@@ -11,15 +13,17 @@ QValidator::State EQIntValidator::validate(QString& input, int& pos) const
 		bool inputIsNumber{};
 		input.toInt(&inputIsNumber);
 		if (!inputIsNumber)
+		{
 			return QValidator::State::Invalid;
+		}
 	}
 	
 	if (input.toInt() > top())
+	{
 		input = QString::number(top());
+	}
 
 	// If input < bottom() or input is empty, 
 	// EQIntLineEdit::verifyValue will catch it
 	return QValidator::State::Acceptable;
 }
-
-EQIntValidator::~EQIntValidator() {}

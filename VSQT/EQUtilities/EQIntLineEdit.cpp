@@ -1,27 +1,21 @@
 #include "EQIntLineEdit.h"
 #include "EQIntValidator.h"
 
-EQIntLineEdit::EQIntLineEdit(int minimum, int maximum, QWidget* parent)
-	: QLineEdit(parent), mLastValue{}
+EQIntLineEdit::EQIntLineEdit(int iMinimum, int iMaximum)
+	: mValidator{ new EQIntValidator(iMinimum, iMaximum) }
 {
-	setValidator(new EQIntValidator(minimum, maximum));
+	setValidator(mValidator);
 	connect(this, &QLineEdit::editingFinished, this, &EQIntLineEdit::verifyValue);
 }
 
 void EQIntLineEdit::verifyValue()
 {
-	QString wText(text());
-	const QIntValidator* wValidator{ dynamic_cast<const QIntValidator*>(validator()) };
-
-	if (wText.isEmpty() || wText.toInt() < wValidator->bottom())
-		setText(QString::number(wValidator->bottom()));
-
-	wText = text();
-	int wCurrentValue{ wText.toInt() };
-	if (wCurrentValue != mLastValue)
+	QString currentText{ text() };
+	if (currentText.isEmpty() || currentText.toInt() < mValidator->bottom())
 	{
-		mLastValue = wCurrentValue;
-		emit valueChanged(mLastValue);
+		int newValue{ mValidator->bottom() };
+		setText(QString::number(newValue));
+		emit valueChanged(newValue);
 	}
 }
 
@@ -30,5 +24,3 @@ void EQIntLineEdit::focusOutEvent(QFocusEvent* e)
 	QLineEdit::focusOutEvent(e);
 	verifyValue();
 }
-
-EQIntLineEdit::~EQIntLineEdit() {}

@@ -1,24 +1,24 @@
 #pragma once
 
 #include <QLineEdit>
+#include "EQIntValidator.h"
 
 class EQIntLineEdit : public QLineEdit
 {
 	Q_OBJECT
 
 public:
-	EQIntLineEdit(int minimum, int maximum, QWidget *parent = nullptr);
-	~EQIntLineEdit();
+	EQIntLineEdit(int iMinimum, int iMaximum);
 
 signals:
-	void valueChanged(int newValue);
+	void valueChanged(int iNewValue);
 
-private:
-	int mLastValue;
+protected:
+	void focusOutEvent(QFocusEvent* iFocusEvent) override;
 
 private slots:
 	void verifyValue();
 
-protected:
-	void focusOutEvent(QFocusEvent* e) override;
+private:
+	EQIntValidator* mValidator;
 };

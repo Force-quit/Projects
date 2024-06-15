@@ -8,8 +8,6 @@ class EQIntValidator : public QIntValidator
 	Q_OBJECT
 
 public:
-	EQIntValidator(int minimum, int maximum, QObject* parent = nullptr);
-	~EQIntValidator();
-
+	EQIntValidator(int iMinimum, int iMaximum);
 	QValidator::State validate(QString& input, int& pos) const override;
 };
