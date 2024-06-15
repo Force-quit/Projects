@@ -8,5 +8,4 @@ void helloWorld()
 int main()
 {
 	helloWorld();
-	std::cin.get();
 }
