@@ -1,21 +1,30 @@
 #include "EQIntLineEdit.h"
 #include "EQIntValidator.h"
 
-EQIntLineEdit::EQIntLineEdit(int iMinimum, int iMaximum)
-	: mValidator{ new EQIntValidator(iMinimum, iMaximum) }
+EQIntLineEdit::EQIntLineEdit(int iMinimum, int iMaximum, int iDefaultValue)
+	: mValidator{ new EQIntValidator(iMinimum, iMaximum) },
+	mPreviousValue{ iDefaultValue }
 {
 	setValidator(mValidator);
+	setText(QString::number(mPreviousValue));
 	connect(this, &QLineEdit::editingFinished, this, &EQIntLineEdit::verifyValue);
 }
 
 void EQIntLineEdit::verifyValue()
 {
-	QString currentText{ text() };
-	if (currentText.isEmpty() || currentText.toInt() < mValidator->bottom())
+	QString wText(text());
+
+	if (wText.isEmpty() || wText.toInt() < mValidator->bottom())
 	{
-		int newValue{ mValidator->bottom() };
-		setText(QString::number(newValue));
-		emit valueChanged(newValue);
+		setText(QString::number(mValidator->bottom()));
+	}
+	
+	wText = text();
+	int wCurrentValue{ wText.toInt() };
+	if (wCurrentValue != mPreviousValue)
+	{
+		mPreviousValue = wCurrentValue;
+		emit valueChanged(mPreviousValue);
 	}
 }
 

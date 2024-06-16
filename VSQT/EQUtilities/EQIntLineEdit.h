@@ -8,7 +8,7 @@ class EQIntLineEdit : public QLineEdit
 	Q_OBJECT
 
 public:
-	EQIntLineEdit(int iMinimum, int iMaximum);
+	EQIntLineEdit(int iMinimum, int iMaximum, int iDefaultValue);
 
 signals:
 	void valueChanged(int iNewValue);
@@ -21,4 +21,5 @@ private slots:
 
 private:
 	EQIntValidator* mValidator;
+	int mPreviousValue;
 };

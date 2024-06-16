@@ -8,7 +8,7 @@
 
 EQTests::EQTests()
 {
-	setCentralWidget(shortcutPickerTest());
+	setCentralWidget(intLineEditTest());
 }
 
 QWidget* EQTests::intLineEditTest()
@@ -16,10 +16,18 @@ QWidget* EQTests::intLineEditTest()
 	QWidget* centralWidget{ new QWidget() };
 	QVBoxLayout* layout{ new QVBoxLayout() };
 
-	EQIntLineEdit* intLineEdit{ new EQIntLineEdit(10, 100) };
+	EQIntLineEdit* intLineEdit{ new EQIntLineEdit(10, 5000, 10) };
 	layout->addWidget(intLineEdit);
-	EQIntLineEdit* intLineEdit2{ new EQIntLineEdit(-10, 100) };
+
+	EQIntLineEdit* intLineEdit2{ new EQIntLineEdit(-10, 5000, -10) };
 	layout->addWidget(intLineEdit2);
+
+	connect(intLineEdit, &EQIntLineEdit::valueChanged, [](int value) {
+		qDebug() << "Value changed to " << value;
+	});
+	connect(intLineEdit2, &EQIntLineEdit::valueChanged, [](int value) {
+		qDebug() << "Value changed to " << value;
+	});
 
 	centralWidget->setLayout(layout);
 	return centralWidget;
