@@ -2,6 +2,7 @@
 
 #pragma warning(disable:5050)
 import eutilities;
+import EShortcutListener;
 
 #include <array>
 #include <QLabel>
@@ -25,6 +26,8 @@ public:
 public slots:
 	void startListening();
 	void stopListening();
+	void disableButton();
+	void enableButton();
 
 signals:
 	void startedChangingShortcut();
@@ -33,7 +36,6 @@ signals:
 
 private slots:
 	void startChangingShortcut();
-	void enableButton();
 
 signals:
 	void shortcutSelected();
@@ -53,4 +55,5 @@ private:
 	QPushButton* mChangeShortcutButton{ new QPushButton("Change") };
 	QLabel* mShortcutLabel;
 	bool mWasListening{};
+	EShortcutListener mShortcutListener;
 };

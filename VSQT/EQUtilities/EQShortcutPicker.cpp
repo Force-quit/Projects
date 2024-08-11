@@ -26,11 +26,13 @@ EQShortcutPicker::EQShortcutPicker(QString iShortcutTriggerText)
 
 	centralLayout->addWidget(widgetName);
 	centralLayout->addWidget(mShortcutLabel);
+
+	mChangeShortcutButton->setFocusPolicy(Qt::NoFocus);
 	centralLayout->addWidget(mChangeShortcutButton);
 
 	setLayout(centralLayout);
 
-	EShortcutListener::setTargetKeys(DEFAULT_KEY);
+	mShortcutListener.setTargetKeys(DEFAULT_KEY);
 
 	connect(mChangeShortcutButton, &QPushButton::clicked, this, &EQShortcutPicker::startChangingShortcut);
 	connect(mChangeShortcutButton, &QPushButton::clicked, mChangeShortcutButton, &QWidget::setEnabled);
@@ -40,8 +42,8 @@ EQShortcutPicker::EQShortcutPicker(QString iShortcutTriggerText)
 void EQShortcutPicker::startChangingShortcut()
 {
 	emit startedChangingShortcut();
-	mWasListening = EShortcutListener::isListening();
-	EShortcutListener::stopListening();
+	mWasListening = mShortcutListener.isListening();
+	mShortcutListener.stopListening();
 	mShortcutSetterThread = std::jthread(std::bind_front(&EQShortcutPicker::changingShortcutLoop, this));
 }
 
@@ -100,7 +102,7 @@ void EQShortcutPicker::changingShortcutLoop(std::stop_token stopToken)
 	{
 		emit shortcutSelected();
 		waitForShortcutRelease(mPressedKeys);
-		EShortcutListener::setTargetKeys(mPressedKeys);
+		mShortcutListener.setTargetKeys(mPressedKeys);
 		if (mWasListening)
 		{
 			startListening();
@@ -144,21 +146,26 @@ void EQShortcutPicker::updateShortcutText(std::span<const eutilities::Key> strin
 
 void EQShortcutPicker::startListening()
 {
-	EShortcutListener::startListening([this] {emit shortcutPressed(); });
+	mShortcutListener.startListening([this] {emit shortcutPressed(); });
 }
 
 void EQShortcutPicker::stopListening()
 {
-	EShortcutListener::stopListening();
+	mShortcutListener.stopListening();
+}
+
+void EQShortcutPicker::disableButton()
+{
+	mChangeShortcutButton->setEnabled(false);
 }
 
 std::vector<eutilities::Key> EQShortcutPicker::targetKeys() const
 {
-	return EShortcutListener::targetKeys();
+	return mShortcutListener.targetKeys();
 }
 
 void EQShortcutPicker::setTargetKeys(std::span<const eutilities::Key> targetKeys)
 {
-	EShortcutListener::setTargetKeys(targetKeys);
+	mShortcutListener.setTargetKeys(targetKeys);
 	updateShortcutText(targetKeys);
 }
