@@ -42,7 +42,7 @@ signals:
 
 private:
 	static constexpr eutilities::Key DEFAULT_KEY{ eutilities::RIGHT_CONTROL };
-	static constexpr std::clock_t SHORTCUT_HOLD_TIME{ 3000 };
+	static constexpr std::clock_t SHORTCUT_HOLD_TIME{ 1500 };
 
 	void updateShortcutText(std::span<const eutilities::Key> keys);
 	void processKey(std::clock_t& timer, std::size_t keyIndex);
