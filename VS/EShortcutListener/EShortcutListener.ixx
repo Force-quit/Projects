@@ -13,8 +13,8 @@ import eutilities;
 export class EShortcutListener
 {
 public:
-	[[nodiscard]] std::vector<eutilities::Key> targetKeys();
-	[[nodiscard]] bool isListening();
+	[[nodiscard]] std::vector<eutilities::Key> targetKeys() const;
+	[[nodiscard]] bool isListening() const;
 
 	void setTargetKeys(std::initializer_list<eutilities::Key> iKeys);
 	void setTargetKeys(const eutilities::Key iKey);

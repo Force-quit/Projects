@@ -55,12 +55,12 @@ void EShortcutListener::mainLoop(std::stop_token iStopToken)
 	}
 }
 
-std::vector<eutilities::Key> EShortcutListener::targetKeys()
+std::vector<eutilities::Key> EShortcutListener::targetKeys() const
 {
 	return mShortcutKeys;
 }
 
-bool EShortcutListener::isListening()
+bool EShortcutListener::isListening() const
 {
 	return mListenLoop.joinable();
 }
