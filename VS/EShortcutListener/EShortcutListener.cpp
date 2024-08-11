@@ -12,17 +12,17 @@ import eutilities;
 
 void EShortcutListener::startListening(std::function<void()> iCallbackFunction)
 {
-	sCallbackFunction = iCallbackFunction;
+	mCallbackFunction = iCallbackFunction;
 	stopListening();
-	sListenLoop = std::jthread(&EShortcutListener::mainLoop);
+	mListenLoop = std::jthread(std::bind_front(&EShortcutListener::mainLoop, this));
 }
 
 void EShortcutListener::stopListening()
 {
-	if (sListenLoop.joinable())
+	if (mListenLoop.joinable())
 	{
-		sListenLoop.request_stop();
-		sListenLoop.join();
+		mListenLoop.request_stop();
+		mListenLoop.join();
 	}
 }
 
@@ -33,14 +33,14 @@ void EShortcutListener::mainLoop(std::stop_token iStopToken)
 
 	while (!iStopToken.stop_requested())
 	{
-		for (auto i : sShortcutKeys)
+		for (auto i : mShortcutKeys)
 		{
 			if (eutilities::isPressed(i))
 			{
 				++pressedKeys;
-				if (pressedKeys == sShortcutKeys.size() && canTrigger)
+				if (pressedKeys == mShortcutKeys.size() && canTrigger)
 				{
-					sCallbackFunction();
+					mCallbackFunction();
 					canTrigger = false;
 				}
 			}
@@ -57,26 +57,26 @@ void EShortcutListener::mainLoop(std::stop_token iStopToken)
 
 std::vector<eutilities::Key> EShortcutListener::targetKeys()
 {
-	return sShortcutKeys;
+	return mShortcutKeys;
 }
 
 bool EShortcutListener::isListening()
 {
-	return sListenLoop.joinable();
+	return mListenLoop.joinable();
 }
 
 void EShortcutListener::setTargetKeys(std::initializer_list<eutilities::Key> iKeys)
 {
-	sShortcutKeys.assign_range(iKeys);
+	mShortcutKeys.assign_range(iKeys);
 }
 
 void EShortcutListener::setTargetKeys(std::span<const eutilities::Key> iKeys)
 {
-	sShortcutKeys.assign_range(iKeys);
+	mShortcutKeys.assign_range(iKeys);
 }
 
 void EShortcutListener::setTargetKeys(eutilities::Key iKey)
 {
-	sShortcutKeys.clear();
-	sShortcutKeys.emplace_back(iKey);
+	mShortcutKeys.clear();
+	mShortcutKeys.emplace_back(iKey);
 }

@@ -13,22 +13,20 @@ import eutilities;
 export class EShortcutListener
 {
 public:
-	EShortcutListener() = delete;
+	[[nodiscard]] std::vector<eutilities::Key> targetKeys();
+	[[nodiscard]] bool isListening();
 
-	[[nodiscard]] static std::vector<eutilities::Key> targetKeys();
-	[[nodiscard]] static bool isListening();
+	void setTargetKeys(std::initializer_list<eutilities::Key> iKeys);
+	void setTargetKeys(const eutilities::Key iKey);
+	void setTargetKeys(std::span<const eutilities::Key> iKeys);
 
-	static void setTargetKeys(std::initializer_list<eutilities::Key> iKeys);
-	static void setTargetKeys(const eutilities::Key iKey);
-	static void setTargetKeys(std::span<const eutilities::Key> iKeys);
-
-	static void startListening(std::function<void()> iCallbackFunction);
-	static void stopListening();
+	void startListening(std::function<void()> iCallbackFunction);
+	void stopListening();
 
 private:
-	static void mainLoop(std::stop_token iStopToken);
+	void mainLoop(std::stop_token iStopToken);
 
-	inline static std::vector<eutilities::Key> sShortcutKeys;
-	inline static std::jthread sListenLoop;
-	inline static std::function<void()> sCallbackFunction;
+	std::vector<eutilities::Key> mShortcutKeys;
+	std::jthread mListenLoop;
+	std::function<void()> mCallbackFunction;
 };
