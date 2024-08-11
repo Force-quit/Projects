@@ -5,7 +5,7 @@
 	path = VSQT/Input-recorder
 	url = git@github.com:Force-quit/Input-recorder.git
 [submodule "VSQT/AutoClicker"]
-	path = VSQT/AutoClicker
+	path = VSQT/AutoKeys
 	url = git@github.com:Force-quit/AutoClicker.git
 [submodule "VSQT/Password-creator"]
 	path = VSQT/Password-creator
